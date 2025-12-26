@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { TextInput } from '../shared/components/text-input/text-input';
 import { CommonModule } from '@angular/common';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 
 @Component({
@@ -8,7 +9,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, TextInput],
   templateUrl: './login.html',
-  styleUrls: ['./login.css']
+  styleUrls: ['./login.css'],
+  
 })
 export class LoginComponent implements AfterViewInit {
 
