@@ -9,22 +9,46 @@
   <div class="modal">
     <div class="modal-container">
       <div class="modal-left">
-        <h1 class="modal-title">Welcome!</h1>
-        <p class="modal-desc">Fanny pack hexagon food truck, street art waistcoat kitsch.</p>
-        <div class="input-block">
-          <label for="email" class="input-label">Email</label>
-          <input type="email" name="email" id="email" placeholder="Email">
+
+        <h1 class="modal-title">
+          {{ isSignup ? 'Create Account' : 'Welcome Back' }}
+        </h1>
+      
+        <!-- LOGIN -->
+        <div *ngIf="!isSignup">
+      
+          <app-text-input label="Email" type="email" placeholder="Email"></app-text-input>
+          <app-text-input label="Password" type="password" placeholder="Password"></app-text-input>
+      
+          <div class="modal-buttons">
+            <a href="#">Forgot your password?</a>
+            <button class="input-button">Login</button>
+          </div>
+      
+          <p class="sign-up">
+            Don't have an account?
+            <a href="#" (click)="switchToSignup(); $event.preventDefault()">Sign up now</a>
+          </p>
         </div>
-        <div class="input-block">
-          <label for="password" class="input-label">Password</label>
-          <input type="password" name="password" id="password" placeholder="Password">
+      
+        <!-- SIGNUP -->
+        <div *ngIf="isSignup">
+      
+          <app-text-input label="Full Name" placeholder="Your name"></app-text-input>
+          <app-text-input label="Email" type="email" placeholder="Email"></app-text-input>
+          <app-text-input label="Password" type="password" placeholder="Create password"></app-text-input>
+          <app-text-input label="Confirm Password" type="password" placeholder="Confirm password"></app-text-input>
+      
+          <button class="input-button">Create Account</button>
+      
+          <p class="sign-up">
+            Already have an account?
+            <a href="#" (click)="switchToLogin(); $event.preventDefault()">Login here</a>
+          </p>
         </div>
-        <div class="modal-buttons">
-          <a href="" class="">Forgot your password?</a>
-          <button class="input-button">Login</button>
-        </div>
-        <p class="sign-up">Don't have an account? <a href="#">Sign up now</a></p>
+      
       </div>
+      
       <div class="modal-right">
         <img src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=dfd2ec5a01006fd8c4d7592a381d3776&auto=format&fit=crop&w=1000&q=80" alt="">
       </div>

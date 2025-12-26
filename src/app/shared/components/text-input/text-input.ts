@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-text-input',
-  imports: [],
+  standalone: true,
   templateUrl: './text-input.html',
-  styleUrl: './text-input.css',
+  styleUrls: ['./text-input.css'],
 })
 export class TextInput {
-
+  @Input() label!: string;
+  @Input() type: string = 'text';
+  @Input() placeholder!: string;
 }
