@@ -1,0 +1,46 @@
+<div class="table-container" *ngIf="tableDescription">
+  <div class="table-header">
+    <h2 class="table-name">{{ tableDescription.table }}</h2>
+    <p class="table-info">Total Columns: {{ displayColumns.length }}</p>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="dynamic-table">
+      <thead>
+        <tr>
+          <th *ngFor="let column of displayColumns" [title]="'Type: ' + getColumnType(column)">
+            <div class="column-header">
+              <span class="column-name">{{ column }}</span>
+              <span class="column-meta">
+                <span class="nullable-badge" [ngClass]="isNullable(column)">
+                  {{ isNullable(column) === 'nullable' ? 'NULL' : 'NOT NULL' }}
+                </span>
+                <span class="type-badge">{{ getColumnType(column) }}</span>
+              </span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="tableData.length === 0">
+          <td [attr.colspan]="displayColumns.length" class="empty-state">
+            No data available for this table
+          </td>
+        </tr>
+        <tr *ngFor="let row of tableData; let rowIndex = index" [attr.data-row-index]="rowIndex">
+          <td *ngFor="let column of displayColumns" class="table-cell">
+            <span class="cell-value">{{ formatCellValue(row[column]) }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-footer" *ngIf="tableData.length > 0">
+    <p>Total Rows: {{ tableData.length }}</p>
+  </div>
+</div>
+
+<div class="no-table-info" *ngIf="!tableDescription">
+  <p>No table description provided</p>
+</div>

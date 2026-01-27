@@ -4,5 +4,7 @@
     [type]="type"
     [placeholder]="placeholder"
     class="modal-input"
+    [(ngModel)]="inputValue"
+    (change)="onInputChange(inputValue)"
   />
 </div>

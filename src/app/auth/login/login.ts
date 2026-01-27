@@ -1,27 +1,18 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { TextInput } from '../shared/components/text-input/text-input';
-import { CommonModule } from '@angular/common';
-
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, TextInput],
+  standalone: false,
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
 export class LoginComponent implements AfterViewInit {
-
-  // Controls Login / Signup UI
-  isSignup: boolean = false;
-
-  switchToSignup() {
-    this.isSignup = true;
-  }
-
-  switchToLogin() {
-    this.isSignup = false;
-  }
+  username: string = '';
+  password: string = '';
+  isLoading: boolean = false;
+  errorMessage: string = '';
 
   ngAfterViewInit(): void {
 
@@ -57,5 +48,41 @@ export class LoginComponent implements AfterViewInit {
     document.onkeydown = (evt: KeyboardEvent) => {
       evt.key === 'Escape' ? closeModal() : false;
     };
+  }
+
+  emailChanged(value: string): void {
+    this.username = value;
+    this.errorMessage = '';
+  }
+
+  passwordChanged(value: string): void {
+    this.password = value;
+    this.errorMessage = '';
+  }
+
+  async login(): Promise<void> {
+    if (!this.username || !this.password) {
+      this.errorMessage = 'Please enter username and password';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    try {
+      await this.authService.login(this.username, this.password)
+      this.router.navigate(['/admin/dashboard']);
+    } catch (error: any) {
+      this.errorMessage = error?.error?.message || 'Login failed. Please try again.';
+      console.error('Login error:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  constructor(private router: Router, private authService: AuthService) {}
+
+  goToRegister() {
+    this.router.navigate(['/auth/register']);
   }
 }
