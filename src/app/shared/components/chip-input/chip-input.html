@@ -1,0 +1,35 @@
+<div class="chip-input-container" (click)="focusInput()">
+  <div class="chips-container">
+    <span
+      class="chip"
+      *ngFor="let chip of chips; let i = index"
+      (click)="$event.stopPropagation()">
+      {{ chip }}
+      <button
+        class="chip-remove"
+        (click)="removeChip(i)"
+        title="Remove chip">
+        ×
+      </button>
+    </span>
+    <input
+      #inputElement
+      type="text"
+      class="chip-input"
+      [placeholder]="chips.length === 0 ? placeholder : ''"
+      [(ngModel)]="inputValue"
+      (input)="onInputChange($event)"
+      (keydown)="onInputKeyDown($event)"
+      (blur)="onInputBlur()"
+    />
+  </div>
+
+  <div class="chip-actions" *ngIf="chips.length > 0">
+    <button
+      class="clear-all-btn"
+      (click)="clearAllChips()"
+      title="Clear all chips">
+      Clear All
+    </button>
+  </div>
+</div>

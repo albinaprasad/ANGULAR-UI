@@ -4,56 +4,34 @@
     <p class="subtitle">Manage your data with dynamic tables</p>
   </div>
 
-  <div class="tables-grid">
-    <!-- Users Table -->
-    <div class="table-section">
-      <div class="table-header-card">
-        <div class="table-header-icon users-icon">👥</div>
-        <div class="table-header-info">
-          <h2>Users</h2>
-          <p class="table-info">Registered users in the system</p>
-        </div>
-      </div>
-      <div class="table-wrapper">
-        <app-dynamic-table
-          [tableDescription]="usersTable"
-          [tableData]="usersData"
-        ></app-dynamic-table>
-      </div>
-    </div>
+  <div class="table-selector">
+    <button
+      class="selector-btn"
+      [class.active]="selectedTable === 'users'"
+      (click)="selectTable('users')">
+      👥 Users
+    </button>
+    <button
+      class="selector-btn"
+      [class.active]="selectedTable === 'products'"
+      (click)="selectTable('products')">
+      📦 Products
+    </button>
+    <button
+      class="selector-btn"
+      [class.active]="selectedTable === 'orders'"
+      (click)="selectTable('orders')">
+      📋 Orders
+    </button>
+  </div>
 
-    <!-- Products Table -->
-    <div class="table-section">
-      <div class="table-header-card">
-        <div class="table-header-icon products-icon">📦</div>
-        <div class="table-header-info">
-          <h2>Products</h2>
-          <p class="table-info">Available products in inventory</p>
-        </div>
-      </div>
-      <div class="table-wrapper">
-        <app-dynamic-table
-          [tableDescription]="productsTable"
-          [tableData]="productsData"
-        ></app-dynamic-table>
-      </div>
-    </div>
-
-    <!-- Orders Table -->
-    <div class="table-section">
-      <div class="table-header-card">
-        <div class="table-header-icon orders-icon">📋</div>
-        <div class="table-header-info">
-          <h2>Orders</h2>
-          <p class="table-info">Recent customer orders</p>
-        </div>
-      </div>
-      <div class="table-wrapper">
-        <app-dynamic-table
-          [tableDescription]="ordersTable"
-          [tableData]="ordersData"
-        ></app-dynamic-table>
-      </div>
-    </div>
+  <div class="table-container">
+    <app-dynamic-table
+      [tableDescription]="getSelectedTableDescription()"
+      [tableData]="getSelectedTableData()"
+      [enableInfiniteScroll]="true"
+      [loading]="getSelectedTableLoading()"
+      (loadMoreData)="onLoadMoreData()">
+    </app-dynamic-table>
   </div>
 </div>

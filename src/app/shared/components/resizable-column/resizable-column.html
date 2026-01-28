@@ -1,0 +1,6 @@
+<div class="resizable-column" [style.width.px]="width">
+  <div class="column-content">
+    <ng-content></ng-content>
+  </div>
+  <div class="resize-handle" (mousedown)="startResize($event)"></div>
+</div>
