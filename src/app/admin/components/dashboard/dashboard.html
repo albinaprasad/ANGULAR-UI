@@ -1,37 +1,29 @@
-<div class="dashboard-container">
-  <div class="dashboard-header">
-    <h1>Dashboard</h1>
-    <p class="subtitle">Manage your data with dynamic tables</p>
-  </div>
+<div class="dashboard-layout">
+  <app-sidenav
+    [navItems]="navItems"
+    [isOpen]="sidenavOpen"
+    [title]="'Data Tables'"
+    (itemSelected)="selectTable($event)"
+    (toggleSidenav)="toggleSidenav()"
+    (navItemsReordered)="onNavItemsReordered($event)"
+  >
+  </app-sidenav>
 
-  <div class="table-selector">
-    <button
-      class="selector-btn"
-      [class.active]="selectedTable === 'users'"
-      (click)="selectTable('users')">
-      👥 Users
-    </button>
-    <button
-      class="selector-btn"
-      [class.active]="selectedTable === 'products'"
-      (click)="selectTable('products')">
-      📦 Products
-    </button>
-    <button
-      class="selector-btn"
-      [class.active]="selectedTable === 'orders'"
-      (click)="selectTable('orders')">
-      📋 Orders
-    </button>
-  </div>
+  <div class="main-content" [class.sidenav-open]="sidenavOpen">
+    <div class="dashboard-header">
+      <h1>Dashboard</h1>
+      <p class="subtitle">Manage your data with dynamic tables</p>
+    </div>
 
-  <div class="table-container">
-    <app-dynamic-table
-      [tableDescription]="getSelectedTableDescription()"
-      [tableData]="getSelectedTableData()"
-      [enableInfiniteScroll]="true"
-      [loading]="getSelectedTableLoading()"
-      (loadMoreData)="onLoadMoreData()">
-    </app-dynamic-table>
+    <div class="content-area">
+      <app-dynamic-table
+        [tableDescription]="getSelectedTableDescription()"
+        [tableData]="getSelectedTableData()"
+        [enableInfiniteScroll]="true"
+        [loading]="getSelectedTableLoading()"
+        (loadMoreData)="onLoadMoreData()"
+        (cellUpdate)="onCellUpdate($event)"
+      >
+      </app-dynamic-table>
   </div>
 </div>

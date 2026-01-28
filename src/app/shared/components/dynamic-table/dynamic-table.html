@@ -42,7 +42,20 @@
         </tr>
         <tr *ngFor="let row of filteredData; let rowIndex = index" [attr.data-row-index]="rowIndex">
           <td *ngFor="let column of displayColumns; let i = index" class="table-cell" [style.width.px]="columnWidths[i] || 200">
-            <span class="cell-value">{{ formatCellValue(row[column]) }}</span>
+            <ng-container *ngIf="editingCell && editingCell.rowIndex === rowIndex && editingCell.column === column; else displayCell">
+              <input
+                class="cell-edit-input"
+                [(ngModel)]="editValue"
+                (keydown.enter)="saveEditCell(rowIndex, column, row)"
+                (keydown.esc)="cancelEditCell()"
+                autofocus
+              />
+              <button class="cell-edit-save" (click)="saveEditCell(rowIndex, column, row)" title="Save">✓</button>
+              <button class="cell-edit-cancel" (click)="cancelEditCell()" title="Cancel">✗</button>
+            </ng-container>
+            <ng-template #displayCell>
+              <span class="cell-value" (dblclick)="startEditCell(rowIndex, column, row[column])">{{ formatCellValue(row[column]) }}</span>
+            </ng-template>
           </td>
         </tr>
         <tr *ngIf="loading" class="loading-row">

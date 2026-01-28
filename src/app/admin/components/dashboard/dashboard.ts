@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TableDescription } from '../../../shared/components/dynamic-table/dynamic-table';
+import { NavItem } from '../../../shared/components/sidenav/sidenav';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,6 +9,34 @@ import { TableDescription } from '../../../shared/components/dynamic-table/dynam
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
+  // ...existing code...
+
+  onCellUpdate(event: { rowIndex: number; column: string; newValue: any; oldValue: any }): void {
+    // Find the correct data array
+    let dataArr: any[];
+    switch (this.selectedTable) {
+      case 'users':
+        dataArr = this.usersData;
+        break;
+      case 'products':
+        dataArr = this.productsData;
+        break;
+      case 'orders':
+        dataArr = this.ordersData;
+        break;
+      default:
+        return;
+    }
+    // Update the value locally
+    if (dataArr[event.rowIndex]) {
+      dataArr[event.rowIndex][event.column] = event.newValue;
+    }
+    // TODO: Call API to update the DB here
+    // Example: this.dataService.updateCell(this.selectedTable, event.rowIndex, event.column, event.newValue)
+    //   .subscribe(...)
+    // For now, just log
+    console.log(`Updated ${this.selectedTable} row ${event.rowIndex} column ${event.column}:`, event);
+  }
   usersTable: TableDescription | null = null;
   usersData: any[] = [];
   usersLoading: boolean = false;
@@ -24,6 +53,32 @@ export class Dashboard implements OnInit {
   ordersPage: number = 1;
 
   selectedTable: string = 'users';
+  sidenavOpen: boolean = true;
+
+  navItems: NavItem[] = [
+    {
+      id: 'users',
+      label: 'Users',
+      icon: '👥',
+      active: true
+    },
+    {
+      id: 'products',
+      label: 'Products',
+      icon: '📦',
+      active: false
+    },
+    {
+      id: 'orders',
+      label: 'Orders',
+      icon: '📋',
+      active: false
+    }
+  ];
+
+  onNavItemsReordered(newOrder: NavItem[]): void {
+    this.navItems = newOrder;
+  }
 
   ngOnInit(): void {
     this.initializeUsersTable();
@@ -33,6 +88,14 @@ export class Dashboard implements OnInit {
 
   selectTable(tableName: string): void {
     this.selectedTable = tableName;
+    // Update nav items active state
+    this.navItems.forEach(item => {
+      item.active = item.id === tableName;
+    });
+  }
+
+  toggleSidenav(): void {
+    this.sidenavOpen = !this.sidenavOpen;
   }
 
   getSelectedTableDescription(): TableDescription | null {

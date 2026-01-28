@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-
 export interface Column {
   name: string;
   null: boolean;
@@ -18,6 +17,9 @@ export interface TableDescription {
   styleUrls: ['./dynamic-table.css']
 })
 export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
+  @Output() cellUpdate = new EventEmitter<{ rowIndex: number; column: string; newValue: any; oldValue: any }>();
+  editingCell: { rowIndex: number; column: string } | null = null;
+  editValue: any = null;
   @Input() tableDescription: TableDescription | null = null;
   @Input() tableData: any[] = [];
   @Input() enableInfiniteScroll: boolean = false;
@@ -38,6 +40,24 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
     if (this.tableDescription) {
       this.processTableDescription();
     }
+  }
+
+  startEditCell(rowIndex: number, column: string, value: any): void {
+    this.editingCell = { rowIndex, column };
+    this.editValue = value;
+  }
+
+  saveEditCell(rowIndex: number, column: string, row: any): void {
+    const oldValue = row[column];
+    row[column] = this.editValue;
+    this.cellUpdate.emit({ rowIndex, column, newValue: this.editValue, oldValue });
+    this.editingCell = null;
+    this.editValue = null;
+  }
+
+  cancelEditCell(): void {
+    this.editingCell = null;
+    this.editValue = null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
