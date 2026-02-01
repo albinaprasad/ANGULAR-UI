@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { DataService } from '../../../services/http/data.service';
-import { TableDescription, Tables, TypeMap, TypeMapJS } from '../../../types/admin.types';
-import { NavItem } from '../../../shared/components/sidenav/sidenav';
+import { DataService } from '../../../../services/http/data.service';
+import { TableDescription, Tables, TypeMap, TypeMapJS } from '../../../../types/admin.types';
+import { NavItem } from '../../../../shared/components/sidenav/sidenav';
 import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
