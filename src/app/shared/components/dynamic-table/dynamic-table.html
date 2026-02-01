@@ -43,13 +43,11 @@
         <tr *ngFor="let row of filteredData; let rowIndex = index" [attr.data-row-index]="rowIndex">
           <td *ngFor="let column of displayColumns; let i = index" class="table-cell" [style.width.px]="columnWidths[i] || 200">
             <ng-container *ngIf="editingCell && editingCell.rowIndex === rowIndex && editingCell.column === column; else displayCell">
-              <input
-                class="cell-edit-input"
-                [(ngModel)]="editValue"
-                (keydown.enter)="saveEditCell(rowIndex, column, row)"
-                (keydown.esc)="cancelEditCell()"
-                autofocus
-              />
+             <app-dynamic-cell-editor
+              [type]="getColumnType(column)"
+              [(value)]="editValue"
+              [nullable]="isNullable(column) === 'nullable'"
+            ></app-dynamic-cell-editor>
               <button class="cell-edit-save" (click)="saveEditCell(rowIndex, column, row)" title="Save">✓</button>
               <button class="cell-edit-cancel" (click)="cancelEditCell()" title="Cancel">✗</button>
             </ng-container>

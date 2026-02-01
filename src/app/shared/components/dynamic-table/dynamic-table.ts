@@ -1,15 +1,5 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-export interface Column {
-  name: string;
-  null: boolean;
-  type: number;
-}
-
-export interface TableDescription {
-  table: string;
-  columns: Column[];
-}
-
+import { TableDescription, Column, TypeMap, ColumnType } from '../../../types/admin.types';
 @Component({
   selector: 'app-dynamic-table',
   standalone: false,
@@ -34,7 +24,7 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
   columnWidths: number[] = [];
   filteredData: any[] = [];
   columnFilters: { [key: string]: string[] } = {};
-  private scrollThreshold: number = 200; // pixels from bottom to trigger load
+  private scrollThreshold: number = 200; 
 
   ngOnInit(): void {
     if (this.tableDescription) {
@@ -54,6 +44,7 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
     this.editingCell = null;
     this.editValue = null;
   }
+
 
   cancelEditCell(): void {
     this.editingCell = null;
@@ -78,15 +69,12 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
   private processTableDescription(): void {
     if (!this.tableDescription) return;
 
-    // Extract column names for display
     this.displayColumns = this.tableDescription.columns.map(col => col.name);
 
-    // Store column metadata for reference
     this.tableDescription.columns.forEach(col => {
       this.columnMetadata.set(col.name, col);
     });
 
-    // Initialize column widths (default 200px each)
     this.columnWidths = new Array(this.displayColumns.length).fill(200);
   }
 
@@ -103,11 +91,8 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
     const element = this.tableWrapper.nativeElement;
     const { scrollTop, scrollHeight, clientHeight } = element;
 
-    // Check if we're near the bottom
     const nearBottom = scrollHeight - scrollTop - clientHeight < this.scrollThreshold;
 
-    // If we have active filters, be more aggressive about loading data
-    // to find more matches for the current filters
     if (nearBottom || (this.hasActiveFilters() && this.filteredData.length < 20)) {
       this.loadMoreData.emit();
     }
@@ -164,27 +149,16 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
-  getColumnType(columnName: string): string {
+  getColumnType(columnName: string): ColumnType {
     const column = this.columnMetadata.get(columnName);
-    if (!column) return 'unknown';
-
-    // PostgreSQL type OID mapping
-    const typeMap: { [key: number]: string } = {
-      16: 'boolean',
-      20: 'bigint',
-      21: 'smallint',
-      23: 'integer',
-      25: 'text',
-      700: 'real',
-      701: 'double precision',
-      1043: 'varchar',
-      1082: 'date',
-      1083: 'time',
-      1184: 'timestamp',
-      1700: 'numeric'
-    };
-
-    return typeMap[column.type] || `type_${column.type}`;
+    if (TypeMap[column?.type || 0] === 'boolean') return 'boolean';
+    else if (TypeMap[column?.type || 0] === 'varchar') return 'varchar';
+    else if (TypeMap[column?.type || 0] === 'text') return 'text';
+    else if (TypeMap[column?.type || 0] === 'integer' || TypeMap[column?.type || 0] === 'bigint' || TypeMap[column?.type || 0] === 'smallint') return 'int';
+    else if (TypeMap[column?.type || 0] === 'real' || TypeMap[column?.type || 0] === 'double precision' || TypeMap[column?.type || 0] === 'numeric') return 'float';
+    else if (TypeMap[column?.type || 0] === 'date') return 'date';
+    else if (TypeMap[column?.type || 0] === 'timestamp') return 'timestamp';
+    else return 'varchar';
   }
 
   isNullable(columnName: string): string {

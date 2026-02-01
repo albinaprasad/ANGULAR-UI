@@ -1,6 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/http/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -61,6 +61,7 @@ export class LoginComponent implements AfterViewInit {
   }
 
   async login(): Promise<void> {
+    this.authService.logout()
     if (!this.username || !this.password) {
       this.errorMessage = 'Please enter username and password';
       return;

@@ -15,7 +15,7 @@ export interface NavItem {
 })
 export class SidenavComponent {
   @Input() navItems: NavItem[] = [];
-  @Input() isOpen: boolean = true;
+  @Input() isOpen: boolean = false;
   @Input() title: string = 'Navigation';
 
   @Output() itemSelected = new EventEmitter<string>();

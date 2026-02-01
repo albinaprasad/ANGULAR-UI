@@ -76,7 +76,6 @@
   min-width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  min-height: 100%;
   max-height: calc(100vw - 400px);
 }
 
@@ -206,6 +205,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.dynamic-table tbody td {           /* ensures consistency */
+  vertical-align: middle;    /* centers content vertically */
+}
+
 
 .cell-value:hover {
   white-space: normal;

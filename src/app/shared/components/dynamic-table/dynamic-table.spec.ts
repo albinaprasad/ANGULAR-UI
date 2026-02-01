@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DynamicTableComponent, TableDescription } from './dynamic-table';
+import { DynamicTableComponent } from './dynamic-table';
+import { TableDescription } from '../../../types/admin.types';
 
 describe('DynamicTableComponent', () => {
   let component: DynamicTableComponent;

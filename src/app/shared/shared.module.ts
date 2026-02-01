@@ -6,10 +6,11 @@ import { ResizableColumnComponent } from './components/resizable-column/resizabl
 import { ChipInputComponent } from './components/chip-input/chip-input';
 import { SidenavComponent } from './components/sidenav/sidenav';
 import { FormsModule } from '@angular/forms';
+import { AppDynamicTableCell } from './components/app-dynamic-table-cell/app-dynamic-table-cell';
 
 @NgModule({
-  declarations: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent],
+  declarations: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent, AppDynamicTableCell],
   imports: [CommonModule,FormsModule],
-  exports: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent]
+  exports: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent, AppDynamicTableCell]
 })
 export class SharedModule { }
