@@ -1,0 +1,38 @@
+.resizable-column {
+  position: relative;
+  min-width: 100px;
+  max-width: 500px;
+  user-select: none;
+}
+
+.column-content {
+  padding: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.resizable-column:hover .resize-handle {
+  opacity: 1;
+}
+
+.resize-handle:hover {
+  background: rgba(102, 126, 234, 0.3);
+}
+
+.resizing .resize-handle {
+  opacity: 1;
+  background: rgba(102, 126, 234, 0.5);
+}

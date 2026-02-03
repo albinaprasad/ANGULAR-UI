@@ -1,0 +1,82 @@
+<div class="table-container" *ngIf="tableDescription">
+  <div class="table-header">
+    <h2 class="table-name">{{ tableDescription.table }}</h2>
+    <p class="table-info">Total Columns: {{ displayColumns.length }}</p>
+  </div>
+
+  <div class="table-wrapper" #tableWrapper>
+    <table class="dynamic-table">
+      <thead>
+        <tr>
+          <th *ngFor="let column of displayColumns; let i = index" [title]="'Type: ' + getColumnType(column)" [style.width.px]="columnWidths[i] || 200">
+            <app-resizable-column
+              [width]="columnWidths[i] || 200"
+              [minWidth]="100"
+              [maxWidth]="500"
+              (widthChange)="onColumnWidthChange(i, $event)">
+              <div class="column-header">
+                <span class="column-name">{{ column }}</span>
+                <span class="column-meta">
+                  <span class="nullable-badge" [ngClass]="isNullable(column)">
+                    {{ isNullable(column) === 'nullable' ? 'NULL' : 'NOT NULL' }}
+                  </span>
+                  <span class="type-badge">{{ getColumnType(column) }}</span>
+                </span>
+                <div class="filter-container">
+                  <app-chip-input
+                    [placeholder]="'Filter ' + column"
+                    [chips]="getColumnChips(column)"
+                    (chipsChange)="onColumnChipsChange(column, $event)">
+                  </app-chip-input>
+                </div>
+              </div>
+            </app-resizable-column>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredData.length === 0 && !loading">
+          <td [attr.colspan]="displayColumns.length" class="empty-state">
+            {{ hasActiveFilters() ? 'No data matches the current filters' : 'No data available for this table' }}
+          </td>
+        </tr>
+        <tr *ngFor="let row of filteredData; let rowIndex = index" [attr.data-row-index]="rowIndex">
+          <td *ngFor="let column of displayColumns; let i = index" class="table-cell" [style.width.px]="columnWidths[i] || 200">
+            <ng-container *ngIf="editingCell && editingCell.rowIndex === rowIndex && editingCell.column === column; else displayCell">
+             <app-dynamic-cell-editor
+              [type]="getColumnType(column)"
+              [(value)]="editValue"
+              [nullable]="isNullable(column) === 'nullable'"
+            ></app-dynamic-cell-editor>
+              <button class="cell-edit-save" (click)="saveEditCell(rowIndex, column, row)" title="Save">✓</button>
+              <button class="cell-edit-cancel" (click)="cancelEditCell()" title="Cancel">✗</button>
+            </ng-container>
+            <ng-template #displayCell>
+              <span class="cell-value" (dblclick)="startEditCell(rowIndex, column, row[column])">{{ formatCellValue(row[column]) }}</span>
+            </ng-template>
+          </td>
+        </tr>
+        <tr *ngIf="loading" class="loading-row">
+          <td [attr.colspan]="displayColumns.length" class="loading-state">
+            <div class="loading-spinner"></div>
+            <span>{{ hasActiveFilters() ? 'Loading more data to match your filters...' : 'Loading more data...' }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-footer" *ngIf="filteredData.length > 0">
+    <p>Total Rows: {{ filteredData.length }} {{ hasActiveFilters() ? '(filtered from ' + tableData.length + ' total)' : '' }}</p>
+    <button
+      class="clear-all-filters-btn"
+      *ngIf="hasActiveFilters()"
+      (click)="clearAllFilters()">
+      Clear All Filters
+    </button>
+  </div>
+</div>
+
+<div class="no-table-info" *ngIf="!tableDescription">
+  <p>No table description provided</p>
+</div>

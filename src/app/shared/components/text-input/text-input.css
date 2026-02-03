@@ -11,7 +11,7 @@
 .input-label {
   font-size: 11px;
   text-transform: uppercase;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-weight: 600;
   letter-spacing: 0.7px;
   color: #8c7569;
@@ -23,7 +23,7 @@
   border: 0;
   padding: 4px 0 0;
   font-size: 14px;
-  font-family: "Nunito", sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .input-block input::placeholder {

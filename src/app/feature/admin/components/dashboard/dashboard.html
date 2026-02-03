@@ -1,0 +1,27 @@
+<div class="dashboard-layout">
+  <app-sidenav
+    [navItems]="navItems"
+    [isOpen]="sidenavOpen"
+    [title]="'Data Tables'"
+    (itemSelected)="selectTable($event)"
+    (toggleSidenav)="toggleSidenav()"
+    (navItemsReordered)="onNavItemsReordered($event)"
+  >
+  </app-sidenav>
+
+  <div class="main-content" [class.sidenav-open]="sidenavOpen">
+    
+    
+    <div class="content-area">
+      <app-dynamic-table
+        [tableDescription]="tableDescriptions[selectedTable]"
+        [tableData]="tableData[selectedTable] || [] "
+        [enableInfiniteScroll]="true"
+        [loading]="tableLoading[selectedTable]"
+        (loadMoreData)="onLoadMoreData()"
+        (cellUpdate)="onCellUpdate($event)"
+      >
+      </app-dynamic-table>
+  </div>
+  
+</div>
