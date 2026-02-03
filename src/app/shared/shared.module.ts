@@ -7,10 +7,12 @@ import { ChipInputComponent } from './components/chip-input/chip-input';
 import { SidenavComponent } from './components/sidenav/sidenav';
 import { FormsModule } from '@angular/forms';
 import { AppDynamicTableCell } from './components/app-dynamic-table-cell/app-dynamic-table-cell';
+import { Navbar } from './components/navbar/navbar';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
-  declarations: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent, AppDynamicTableCell],
-  imports: [CommonModule,FormsModule],
-  exports: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent, AppDynamicTableCell]
+  declarations: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent, AppDynamicTableCell, Navbar],
+  imports: [CommonModule,FormsModule,RouterModule],
+  exports: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent, AppDynamicTableCell, Navbar]
 })
 export class SharedModule { }

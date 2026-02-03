@@ -1,4 +1,4 @@
-.dashboard-layout {
+.profile-layout {
   display: flex;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -16,7 +16,7 @@
   margin-left: 60px;
 }
 
-.dashboard-header {
+.profile-header {
   padding: 2rem;
   animation: slideDown 0.6s ease-out;
   background: rgba(255, 255, 255, 0.9);
@@ -24,7 +24,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.dashboard-header h1 {
+.profile-header h1 {
   font-size: 2.5rem;
   font-weight: 700;
   color: #2c3e50;
@@ -36,7 +36,7 @@
   background-clip: text;
 }
 
-.dashboard-header .subtitle {
+.profile-header .subtitle {
   font-size: 1.1rem;
   color: #7f8c8d;
   margin: 0;
@@ -72,11 +72,11 @@
     margin-left: 280px;
   }
 
-  .dashboard-header {
+  .profile-header {
     padding: 1rem;
   }
 
-  .dashboard-header h1 {
+  .profile-header h1 {
     font-size: 1.8rem;
   }
 

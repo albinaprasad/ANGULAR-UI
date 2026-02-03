@@ -1,0 +1,14 @@
+<app-navbar
+    [title]="'Admin Panel'"
+    [subtitle]="'Manage your application settings and data'"
+    [logoUrl]="'/assets/admin-logo.png'"
+    [navItems]="[{
+    'label': 'Dashboard', 'route': '/admin/dashboard'
+    }, {
+    'label': 'Profile', 'route': '/admin/profile'
+    }, {
+    'label': 'Notification', 'route': '/admin/notification'
+    }]">
+</app-navbar>
+
+<router-outlet></router-outlet>

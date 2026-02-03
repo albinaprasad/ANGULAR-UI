@@ -67,7 +67,7 @@
   min-height: 300px;
   max-height: 60vh;
   width: 100%;
-  max-width: calc(100vw - 400px);
+  max-width: 100%;
   box-sizing: border-box;
 }
 

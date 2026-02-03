@@ -6,12 +6,12 @@
   flex-direction: column;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   transition: width 0.3s ease;
-  position: fixed;
+  position: relative;
   left: 0;
   top: 0;
   z-index: 1000;
   width: 280px;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .sidenav.collapsed {
@@ -212,4 +212,25 @@
 
 .sidenav-content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
+}
+
+/* Width of vertical scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px; /* horizontal */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Thumb */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.4);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 100, 100, 0.6);
 }
