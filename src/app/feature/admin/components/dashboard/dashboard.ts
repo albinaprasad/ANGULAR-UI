@@ -3,6 +3,9 @@ import { DataService } from '../../../../services/http/data.service';
 import { TableDescription, Tables, TypeMap, TypeMapJS } from '../../../../types/admin.types';
 import { NavItem } from '../../../../shared/components/sidenav/sidenav';
 import { ChangeDetectorRef } from '@angular/core';
+import { SnackbarService } from '../../../../services/modal/snackbar.service';
+import { SnackbarType } from '../../../../shared/components/modals/snackbar/type';
+import { PopupService } from '../../../../services/modal/popup.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,7 +17,9 @@ export class Dashboard implements OnInit {
 
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private snackbarService: SnackbarService,
+    private popupService: PopupService
   ) {}
 
   tables: Tables = { tables: [] };
@@ -25,6 +30,7 @@ export class Dashboard implements OnInit {
   tableData: Record<string, any[]> = {};
   tableLoading: Record<string, boolean> = {};
   tablePage: Record<string, number> = {};
+  editMode: boolean = false;
 
 
   navItems: NavItem[] = [];
@@ -44,6 +50,7 @@ export class Dashboard implements OnInit {
   this.dataService.getTableData(tableName, 1, 20).subscribe(res => {
     this.tableData[tableName] = [...(res.message?.data ?? [])]
   });
+  this.snackbarService.show(`Fetched table ${tableName}`, SnackbarType.SUCCESS, 5000)
    
 }
 
@@ -56,6 +63,11 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
     this.loadTables();
     
+  }
+
+  toggleEditMode(): void {
+    this.editMode = !this.editMode;
+    this.cdr.markForCheck();
   }
 
   private loadTables(): void {
@@ -75,9 +87,9 @@ export class Dashboard implements OnInit {
       if (this.tables.tables.length > 0) {
         this.selectedTable = this.tables.tables[0];
       }
-
-       this.initializeTables();
-       this.cdr.markForCheck()
+      this.snackbarService.show(`Loaded ${this.tables.tables.length} tables`, SnackbarType.SUCCESS, 3000);
+      this.initializeTables();
+      this.cdr.markForCheck()
     });
    
     
@@ -164,6 +176,16 @@ export class Dashboard implements OnInit {
     newValue: any;
     oldValue: any;
   }): void {
+
+    if (!this.editMode) {
+      this.popupService.show('Edit Mode Disabled', 'Please enable edit mode to update cells.', () => {
+        this.editMode = true;
+      }, () => {
+        // Cancel callback, do nothing
+      });
+      return;
+    }
+    
     const table = this.selectedTable;
     const row = this.tableData[table]?.[event.rowIndex];
 

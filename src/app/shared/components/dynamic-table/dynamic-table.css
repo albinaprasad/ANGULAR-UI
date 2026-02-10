@@ -206,6 +206,14 @@
   white-space: nowrap;
 }
 
+.cell-value.editable {
+  cursor: pointer;
+}
+
+.cell-value.editable:hover {
+  text-decoration: underline;
+}
+
 .dynamic-table tbody td {           /* ensures consistency */
   vertical-align: middle;    /* centers content vertically */
 }

@@ -49,10 +49,14 @@
               [nullable]="isNullable(column) === 'nullable'"
             ></app-dynamic-cell-editor>
               <button class="cell-edit-save" (click)="saveEditCell(rowIndex, column, row)" title="Save">✓</button>
-              <button class="cell-edit-cancel" (click)="cancelEditCell()" title="Cancel">✗</button>
+              <button class="cell-edit-cancel" (click)="cancelEditCell(rowIndex, column, row)" title="Cancel">✗</button>
             </ng-container>
             <ng-template #displayCell>
-              <span class="cell-value" (dblclick)="startEditCell(rowIndex, column, row[column])">{{ formatCellValue(row[column]) }}</span>
+              <span
+                class="cell-value"
+                [class.editable]="editMode"
+                (dblclick)="startEditCell(rowIndex, column, row[column])"
+              >{{ formatCellValue(row[column]) }}</span>
             </ng-template>
           </td>
         </tr>

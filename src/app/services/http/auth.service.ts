@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthResponse, LoginRequest } from '../../types/auth.types';
-import { Observable, firstValueFrom } from 'rxjs';
+import { AuthResponse, LoginRequest, User } from '../../types/auth.types';
+import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import environmentJson from '../../../../configs/environment.json';
 import { BaseHttpService } from './base.service';
@@ -12,8 +12,14 @@ import { BaseResponse } from '../../types/base-http.types';
 })
 export class AuthService extends BaseHttpService {
 
+  public user = new BehaviorSubject<User | null>(null)
+
   constructor(private httpClient: HttpClient) {
     super();
+  }
+
+  getUser(): User | null {
+    return this.user.value
   }
 
   setAuthToken(token: string): void {
@@ -37,10 +43,11 @@ export class AuthService extends BaseHttpService {
         loginRequest,
         { headers: this.getAuthHeaders() }
       )
-        .pipe(
+      .pipe(
           tap(response => {
             if (response.message?.token) {
               this.setAuthToken(response.message?.token ?? '');
+              this.user.next(response.message?.user ?? null)
             }
           })
         )
@@ -58,6 +65,7 @@ export class AuthService extends BaseHttpService {
       )
         .pipe(
           tap(response => {
+            console.log(response)
             if (response.message?.token) {
               this.setAuthToken(response.message?.token ?? '');
             }

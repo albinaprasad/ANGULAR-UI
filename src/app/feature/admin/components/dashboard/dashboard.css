@@ -50,6 +50,62 @@
   max-width: calc(100vw - 400px);
 }
 
+.table-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.edit-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 76, 129, 0.12);
+  color: #0f4c81;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.edit-icon {
+  font-size: 14px;
+}
+
+.edit-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(15, 76, 129, 0.25);
+  background: #ffffff;
+  color: #0f4c81;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.edit-toggle:hover {
+  border-color: rgba(15, 76, 129, 0.45);
+}
+
+.edit-toggle:active {
+  transform: translateY(1px);
+}
+
+.edit-toggle.active {
+  background: rgba(15, 76, 129, 0.12);
+}
+
+.edit-toggle__icon {
+  font-size: 14px;
+}
+
 /* Animations */
 @keyframes slideDown {
   from {

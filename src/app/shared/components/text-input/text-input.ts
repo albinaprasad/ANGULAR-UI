@@ -10,6 +10,13 @@ export class TextInput {
   @Input() label!: string;
   @Input() type: string = 'text';
   @Input() placeholder!: string;
+  @Input()
+  get value(): string {
+    return this.inputValue;
+  }
+  set value(val: string | null | undefined) {
+    this.inputValue = val ?? '';
+  }
   @Output() valueChange = new EventEmitter<string>();
 
   inputValue: string = '';

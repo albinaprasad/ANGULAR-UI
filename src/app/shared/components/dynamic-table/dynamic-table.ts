@@ -10,10 +10,12 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
   @Output() cellUpdate = new EventEmitter<{ rowIndex: number; column: string; newValue: any; oldValue: any }>();
   editingCell: { rowIndex: number; column: string } | null = null;
   editValue: any = null;
+  private editOriginalValue: any = null;
   @Input() tableDescription: TableDescription | null = null;
   @Input() tableData: any[] = [];
   @Input() enableInfiniteScroll: boolean = false;
   @Input() loading: boolean = false;
+  @Input() editMode: boolean = false;
 
   @Output() loadMoreData = new EventEmitter<void>();
 
@@ -33,8 +35,10 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   startEditCell(rowIndex: number, column: string, value: any): void {
+    if (!this.editMode) return;
     this.editingCell = { rowIndex, column };
     this.editValue = value;
+    this.editOriginalValue = value;
   }
 
   saveEditCell(rowIndex: number, column: string, row: any): void {
@@ -46,9 +50,15 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
 
-  cancelEditCell(): void {
+  cancelEditCell(rowIndex: number, column: string, row: any): void {
+    const oldValue = this.editOriginalValue;
+    if (row && column) {
+      row[column] = oldValue;
+    }
+    this.cellUpdate.emit({ rowIndex, column, newValue: oldValue, oldValue });
     this.editingCell = null;
     this.editValue = null;
+    this.editOriginalValue = null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

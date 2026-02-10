@@ -10,7 +10,8 @@
       <li *ngFor="let item of navItems">
         <a
           [routerLink]="item.route"
-          routerLinkActive="active">
+          routerLinkActive="active"
+          (click)="selectNavItem(item)">
           {{ item.label }}
         </a>
       </li>

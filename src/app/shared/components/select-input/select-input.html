@@ -1,0 +1,14 @@
+<div class="select-block">
+  <label class="select-label">{{ label }}</label>
+  <select
+    class="select-input"
+    [disabled]="disabled"
+    [(ngModel)]="selectedValue"
+    (change)="onValueChange(selectedValue)"
+  >
+    <option value="" disabled hidden>{{ placeholder }}</option>
+    <option *ngFor="let option of options" [value]="option.value">
+      {{ option.label }}
+    </option>
+  </select>
+</div>
