@@ -18,4 +18,10 @@ export class BaseHttpService {
             'Authorization': `Bearer ${this.getAuthToken() ?? ''}`
         });
     }
+
+    protected getAuthHeadersForFormData(): HttpHeaders {
+        return new HttpHeaders({
+            'Authorization': `Bearer ${this.getAuthToken() ?? ''}`
+        });
+    }
 }

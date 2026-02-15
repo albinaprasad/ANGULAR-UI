@@ -1,0 +1,144 @@
+.notification-layout {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.main-content {
+  flex: 1;
+  transition: margin-left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content:not(.sidenav-open) {
+  margin-left: 0px;
+}
+
+.notification-header {
+  padding: 2rem;
+  animation: slideDown 0.6s ease-out;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.notification-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.notification-header .subtitle {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+  margin: 0;
+  font-weight: 500;
+}
+
+.permission-container {
+  flex: 1;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  max-height: calc(100% - 190px);
+  min-height: calc(100% - 190px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+
+.permissions-content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+.nav-section {
+  gap: 20px;
+  margin-bottom: 1.5rem;
+}
+
+.permission-list-section {
+  flex: 1;
+  min-width: 420px;
+}
+
+.permission-list-header {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(4, minmax(110px, 1fr));
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.5rem;
+  color: #334155;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.permission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.no-permission-text {
+  margin: 1rem 0;
+  color: #475569;
+}
+
+.content-area {
+  flex: 1;
+  padding: 2rem;
+  overflow: hidden;
+  max-width: calc(100vw - 100px);
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+
+  .main-content.sidenav-open {
+    margin-left: 280px;
+  }
+
+  .notification-header {
+    padding: 1rem;
+  }
+
+  .notification-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .content-area {
+    padding: 1rem;
+  }
+
+  .permissions-content {
+    flex-direction: column;
+  }
+
+  .permission-list-header {
+    display: none;
+  }
+}

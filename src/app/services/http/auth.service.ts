@@ -23,15 +23,24 @@ export class AuthService extends BaseHttpService {
   }
 
   setAuthToken(token: string): void {
-    localStorage.setItem(this.AUTH_TOKEN_KEY, token);'authToken'
+    localStorage.setItem(this.AUTH_TOKEN_KEY, token);
   }
 
   isAuthenticated(): boolean {
-    return !!this.getAuthToken();
+    const token = this.getAuthToken();
+    if (!token) return false;
+
+    if (this.isTokenExpired(token)) {
+      this.logout();
+      return false;
+    }
+
+    return true;
   }
 
   logout(): void {
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
+    this.user.next(null);
   }
 
   login(username: string, password: string): Promise<BaseResponse<AuthResponse,string>> {
@@ -72,5 +81,29 @@ export class AuthService extends BaseHttpService {
           })
         )
     );
+  }
+
+  private isTokenExpired(token: string): boolean {
+    const payload = this.decodeJwtPayload(token);
+    if (!payload || typeof payload['exp'] !== 'number') return true;
+
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    return (payload['exp'] as number) <= nowInSeconds;
+  }
+
+  private decodeJwtPayload(token: string): Record<string, unknown> | null {
+    try {
+      const tokenParts = token.split('.');
+      if (tokenParts.length < 2) return null;
+
+      const base64Url = tokenParts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const normalized = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+      const jsonPayload = atob(normalized);
+
+      return JSON.parse(jsonPayload);
+    } catch {
+      return null;
+    }
   }
 }

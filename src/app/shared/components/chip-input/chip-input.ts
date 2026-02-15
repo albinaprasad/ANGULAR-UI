@@ -9,6 +9,8 @@ import { Component, Input, Output, EventEmitter, ElementRef, ViewChild } from '@
 export class ChipInputComponent {
   @Input() placeholder: string = 'Add chips...';
   @Input() chips: string[] = [];
+  @Input() label: string = '';
+  @Input() readonly: boolean = false;
   @Output() chipsChange = new EventEmitter<string[]>();
 
   @ViewChild('inputElement', { static: false }) inputElement!: ElementRef<HTMLInputElement>;
@@ -16,6 +18,7 @@ export class ChipInputComponent {
   inputValue: string = '';
 
   onInputChange(event: any): void {
+    console.log('chipsChange event:',this.chips);
     const value = event.target.value;
     this.inputValue = value;
 

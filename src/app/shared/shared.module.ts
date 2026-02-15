@@ -14,6 +14,8 @@ import { Snackbar } from './components/modals/snackbar/snackbar';
 import { SnackbarContainer } from './components/modals/snackbar/snackbar-container/snackbar-container';
 import { Popup } from './components/modals/popup/popup';
 import { PopupContainer } from './components/modals/popup/popup-container/popup-container';
+import { List } from './components/list/list';
+import { PermissionElement } from './components/permission-element/permission-element';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,9 @@ import { PopupContainer } from './components/modals/popup/popup-container/popup-
     Snackbar,
     SnackbarContainer,
     Popup,
-    PopupContainer
+    PopupContainer,
+    List,
+    PermissionElement
   ],
   imports: [
     CommonModule,
@@ -50,7 +54,9 @@ import { PopupContainer } from './components/modals/popup/popup-container/popup-
     Snackbar,
     SnackbarContainer,
     Popup,
-    PopupContainer
+    PopupContainer,
+    List,
+    PermissionElement
   ]
 })
 export class SharedModule { }
