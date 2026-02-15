@@ -63,8 +63,8 @@ export class AuthService extends BaseHttpService {
     );
   }
 
-  register(email: string, password: string, name: string): Promise<BaseResponse<AuthResponse,string>> {
-    const registerRequest = { email, password, name, password_confirmation: password };
+  register(email: string, password: string, username: string): Promise<BaseResponse<AuthResponse,string>> {
+    const registerRequest = { email, password, username, password_confirmation: password };
     
     return firstValueFrom(
       this.httpClient.post<BaseResponse<AuthResponse,string>>(

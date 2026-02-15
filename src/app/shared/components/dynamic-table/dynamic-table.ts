@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { TableDescription, Column, TypeMap, ColumnType } from '../../../types/admin.types';
 @Component({
   selector: 'app-dynamic-table',
@@ -6,7 +6,7 @@ import { TableDescription, Column, TypeMap, ColumnType } from '../../../types/ad
   templateUrl: './dynamic-table.html',
   styleUrls: ['./dynamic-table.css']
 })
-export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
+export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Output() cellUpdate = new EventEmitter<{ rowIndex: number; column: string; newValue: any; oldValue: any }>();
   editingCell: { rowIndex: number; column: string } | null = null;
   editValue: any = null;
@@ -19,7 +19,12 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
 
   @Output() loadMoreData = new EventEmitter<void>();
 
-  @ViewChild('tableWrapper', { static: false }) tableWrapper!: ElementRef;
+  @ViewChild('tableWrapper', { static: false })
+  set tableWrapperRef(ref: ElementRef | undefined) {
+    this.tableWrapper = ref;
+    this.setupInfiniteScroll();
+  }
+  tableWrapper?: ElementRef;
 
   displayColumns: string[] = [];
   columnMetadata: Map<string, Column> = new Map();
@@ -27,6 +32,8 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
   filteredData: any[] = [];
   columnFilters: { [key: string]: string[] } = {};
   private scrollThreshold: number = 200; 
+  private activeScrollElement: HTMLElement | null = null;
+  private readonly boundOnScroll = this.onScroll.bind(this);
 
   ngOnInit(): void {
     if (this.tableDescription) {
@@ -71,9 +78,11 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (this.enableInfiniteScroll) {
-      this.setupInfiniteScroll();
-    }
+    this.setupInfiniteScroll();
+  }
+
+  ngOnDestroy(): void {
+    this.teardownInfiniteScroll();
   }
 
   private processTableDescription(): void {
@@ -89,16 +98,28 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   private setupInfiniteScroll(): void {
+    if (!this.enableInfiniteScroll) return;
     if (!this.tableWrapper) return;
 
-    const element = this.tableWrapper.nativeElement;
-    element.addEventListener('scroll', this.onScroll.bind(this));
+    const element = this.tableWrapper.nativeElement as HTMLElement;
+    if (this.activeScrollElement === element) return;
+
+    this.teardownInfiniteScroll();
+    element.addEventListener('scroll', this.boundOnScroll);
+    this.activeScrollElement = element;
+  }
+
+  private teardownInfiniteScroll(): void {
+    if (!this.activeScrollElement) return;
+    this.activeScrollElement.removeEventListener('scroll', this.boundOnScroll);
+    this.activeScrollElement = null;
   }
 
   private onScroll(): void {
     if (!this.enableInfiniteScroll || this.loading) return;
+    if (!this.activeScrollElement) return;
 
-    const element = this.tableWrapper.nativeElement;
+    const element = this.activeScrollElement;
     const { scrollTop, scrollHeight, clientHeight } = element;
 
     const nearBottom = scrollHeight - scrollTop - clientHeight < this.scrollThreshold;

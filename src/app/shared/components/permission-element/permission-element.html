@@ -13,10 +13,10 @@
   <label class="permission-flag">
     <input
       type="checkbox"
-      [checked]="permission.canCreate"
-      (change)="togglePermission('create', $any($event.target).checked)"
+      [checked]="permission.canChange"
+      (change)="togglePermission('change', $any($event.target).checked)"
     />
-    <span>Can Create</span>
+    <span>Can Change</span>
   </label>
 
   <label class="permission-flag">

@@ -9,12 +9,12 @@ export type PermissionGroup = {
     name: string;
 }
 
-export type PermissionAction = 'view' | 'create' | 'delete' | 'add';
+export type PermissionAction = 'view' | 'change' | 'delete' | 'add';
 
 export type TablePermissions = {
     table: string;
     canView: boolean;
-    canCreate: boolean;
+    canChange: boolean;
     canDelete: boolean;
     canAdd: boolean;
     permissionIds: Partial<Record<PermissionAction, number>>;

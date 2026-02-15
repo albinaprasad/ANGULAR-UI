@@ -127,7 +127,7 @@ export class PermissionsComponent implements OnInit {
       return {
         ...permission,
         canView: change.action === 'view' ? change.assigned : permission.canView,
-        canCreate: change.action === 'create' ? change.assigned : permission.canCreate,
+        canChange: change.action === 'change' ? change.assigned : permission.canChange,
         canDelete: change.action === 'delete' ? change.assigned : permission.canDelete,
         canAdd: change.action === 'add' ? change.assigned : permission.canAdd
       };
@@ -177,7 +177,7 @@ export class PermissionsComponent implements OnInit {
       const current = groupedByTable.get(table) ?? {
         table,
         canView: false,
-        canCreate: false,
+        canChange: false,
         canDelete: false,
         canAdd: false,
         permissionIds: {}
@@ -187,8 +187,8 @@ export class PermissionsComponent implements OnInit {
         current.canView = assignedCodenames.has(permission.codename);
       }
 
-      if (action === 'create') {
-        current.canCreate = assignedCodenames.has(permission.codename);
+      if (action === 'change') {
+        current.canChange = assignedCodenames.has(permission.codename);
       }
 
       if (action === 'delete') {
@@ -207,12 +207,12 @@ export class PermissionsComponent implements OnInit {
   }
 
   private parseCodename(codename: string): { action: PermissionAction; table: string } | null {
-    const matched = codename.match(/^(view|add|create|change|delete)_(.+)$/i);
+    const matched = codename.match(/^(view|add|change|delete)_(.+)$/i);
     if (!matched) return null;
 
-    const rawAction = matched[1].toLowerCase();
+    const rawAction = matched[1].toLowerCase() as PermissionAction;
     const table = matched[2];
-    const action: PermissionAction = rawAction === 'change' ? 'create' : (rawAction as PermissionAction);
+    const action: PermissionAction = rawAction;
 
     return { action, table };
   }

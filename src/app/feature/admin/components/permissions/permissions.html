@@ -11,7 +11,7 @@
                 <app-sidenav
                     [navItems]="groups"
                     [isOpen]="true"
-                    [title]="'Permission Management'"
+                    [title]="'Roles'"
                     (itemSelected)="onGroupSelected($event)"
                     (toggleSidenav)="toggleSidenav()"
                     (navItemsReordered)="onNavItemsReordered($event)"
@@ -23,7 +23,7 @@
               <div class="permission-list-header" *ngIf="tablePermissions.length > 0">
                 <span>Table</span>
                 <span>View</span>
-                <span>Create</span>
+                <span>Change</span>
                 <span>Delete</span>
                 <span>Add</span>
               </div>
