@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { Profile } from "./profile/profile";
-import { Notification } from "./notification/notification";
+import { NotificationComponent } from "./notification/notification";
 
 const routes: Routes = [
     {
@@ -9,8 +9,13 @@ const routes: Routes = [
         component: Profile
     },
     {
+        path: 'nofication',
+        redirectTo: 'notification',
+        pathMatch: 'full'
+    },
+    {
         path: 'notification',
-        component: Notification
+        component: NotificationComponent
     },
     {
         path:'',

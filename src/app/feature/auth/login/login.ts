@@ -1,5 +1,5 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/http/auth.service';
 
 @Component({
@@ -13,6 +13,7 @@ export class LoginComponent implements AfterViewInit {
   password: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
+  private returnUrl: string = '/admin/dashboard';
 
   ngAfterViewInit(): void {
 
@@ -72,7 +73,7 @@ export class LoginComponent implements AfterViewInit {
 
     try {
       await this.authService.login(this.username, this.password)
-      this.router.navigate(['/admin/dashboard']);
+      this.router.navigateByUrl(this.returnUrl);
     } catch (error: any) {
       this.errorMessage = error?.error?.message || 'Login failed. Please try again.';
       console.error('Login error:', error);
@@ -81,7 +82,13 @@ export class LoginComponent implements AfterViewInit {
     }
   }
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private route: ActivatedRoute
+  ) {
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/admin/dashboard';
+  }
 
   goToRegister() {
     this.router.navigate(['/auth/register']);

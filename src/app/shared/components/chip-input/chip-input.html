@@ -1,11 +1,12 @@
 <div class="chip-input-container" (click)="focusInput()">
+  <label *ngIf="label" class="chip-input-label">{{ label }}</label>
   <div class="chips-container">
     <span
       class="chip"
       *ngFor="let chip of chips; let i = index"
       (click)="$event.stopPropagation()">
       {{ chip }}
-      <button
+      <button *ngIf="!readonly"
         class="chip-remove"
         (click)="removeChip(i)"
         title="Remove chip">
@@ -14,6 +15,7 @@
     </span>
     <input
       #inputElement
+      readonly="{{readonly}}"
       type="text"
       class="chip-input"
       [placeholder]="chips.length === 0 ? placeholder : ''"
@@ -24,8 +26,8 @@
     />
   </div>
 
-  <div class="chip-actions" *ngIf="chips.length > 0">
-    <button
+  <div  class="chip-actions" *ngIf="chips.length > 0 && !readonly">
+    <button 
       class="clear-all-btn"
       (click)="clearAllChips()"
       title="Clear all chips">

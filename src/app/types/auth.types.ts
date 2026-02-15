@@ -1,10 +1,16 @@
 
 export type AuthResponse = {
     token: string;
-    message: string;
+    user: any;
 }
 
 export type LoginRequest = {
     username: string;
     password: string;
+}
+
+export type User = {
+    username : string;
+    role: string;
+    is_superAdmin: boolean
 }

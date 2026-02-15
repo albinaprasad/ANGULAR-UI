@@ -17,12 +17,44 @@
         <!-- SIGNUP -->
         <div>
       
-          <app-text-input label="Full Name" placeholder="Your name"></app-text-input>
-          <app-text-input label="Email" type="email" placeholder="Email"></app-text-input>
-          <app-text-input label="Password" type="password" placeholder="Create password"></app-text-input>
-          <app-text-input label="Confirm Password" type="password" placeholder="Confirm password"></app-text-input>
+          <app-text-input
+            label="Full Name"
+            placeholder="Your name"
+            [required]="true"
+            [value]="fullName"
+            (valueChange)="fullNameChanged($event)"
+          ></app-text-input>
+          <app-text-input
+            label="Email"
+            type="email"
+            placeholder="Email"
+            [required]="true"
+            validationType="email"
+            [showValidation]="true"
+            [value]="email"
+            (valueChange)="emailChanged($event)"
+          ></app-text-input>
+          <app-text-input
+            label="Password"
+            type="password"
+            placeholder="Create password"
+            [required]="true"
+            [value]="password"
+            (valueChange)="passwordChanged($event)"
+          ></app-text-input>
+          <app-text-input
+            label="Confirm Password"
+            type="password"
+            placeholder="Confirm password"
+            [required]="true"
+            [value]="confirmPassword"
+            (valueChange)="confirmPasswordChanged($event)"
+          ></app-text-input>
       
-          <button class="input-button">Create Account</button>
+          <button class="input-button" (click)="register()" [disabled]="isLoading">
+            {{ isLoading ? 'Creating...' : 'Create Account' }}
+          </button>
+          <p class="signup-error" *ngIf="errorMessage">{{ errorMessage }}</p>
       
           <p class="sign-up">
             Already have an account?
@@ -41,4 +73,5 @@
         </svg>
       </button>
     </div>
+    <button class="modal-button">Click here to create account</button>
   </div>

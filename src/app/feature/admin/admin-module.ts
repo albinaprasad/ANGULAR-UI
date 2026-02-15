@@ -4,9 +4,10 @@ import { Dashboard } from './components/dashboard/dashboard';
 import { SharedModule } from '../../shared/shared.module';
 import { AdminRoutingModule } from './admin-routing.module';
 import { Panel } from './components/panel/panel';
+import { PermissionsComponent } from './components/permissions/permissions';
 
 @NgModule({
-  declarations: [Dashboard,Panel],
+  declarations: [Dashboard, Panel, PermissionsComponent],
   imports: [
     CommonModule,
     SharedModule,

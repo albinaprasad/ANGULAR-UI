@@ -1,0 +1,10 @@
+<div class="popup-backdrop" *ngIf="popupData.title || popupData.message">
+  <app-popup
+    class="popup-surface"
+    [title]="popupData.title"
+    [message]="popupData.message"
+    (confirm)="confirmCallback($event)"
+    (cancel)="cancelCallback($event)"
+  >
+  </app-popup>
+</div>

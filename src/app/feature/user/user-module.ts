@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../shared/shared.module';
 import { CustomerRoutingModule } from './user-routing.module';
 import { Profile } from './profile/profile';
-import { Notification } from './notification/notification';
+import { NotificationComponent } from './notification/notification';
 
 @NgModule({
   declarations: [
     Profile,
-    Notification
+    NotificationComponent
   ],
   imports: [
     CommonModule,

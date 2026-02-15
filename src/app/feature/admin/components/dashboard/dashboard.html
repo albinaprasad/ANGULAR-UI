@@ -13,11 +13,23 @@
     
     
     <div class="content-area">
+      <div class="table-toolbar">
+        <button
+          type="button"
+          class="edit-toggle"
+          [class.active]="editMode"
+          (click)="toggleEditMode()"
+        >
+          <span class="edit-toggle__icon" aria-hidden="true">✎</span>
+          <span class="edit-toggle__label">{{ editMode ? 'Edit mode on' : 'Edit mode off' }}</span>
+        </button>
+      </div>
       <app-dynamic-table
         [tableDescription]="tableDescriptions[selectedTable]"
         [tableData]="tableData[selectedTable] || [] "
         [enableInfiniteScroll]="true"
         [loading]="tableLoading[selectedTable]"
+        [editMode]="editMode"
         (loadMoreData)="onLoadMoreData()"
         (cellUpdate)="onCellUpdate($event)"
       >

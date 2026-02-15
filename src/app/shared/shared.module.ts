@@ -9,10 +9,54 @@ import { FormsModule } from '@angular/forms';
 import { AppDynamicTableCell } from './components/app-dynamic-table-cell/app-dynamic-table-cell';
 import { Navbar } from './components/navbar/navbar';
 import { RouterModule } from '@angular/router';
+import { SelectInput } from './components/select-input/select-input';
+import { Snackbar } from './components/modals/snackbar/snackbar';
+import { SnackbarContainer } from './components/modals/snackbar/snackbar-container/snackbar-container';
+import { Popup } from './components/modals/popup/popup';
+import { PopupContainer } from './components/modals/popup/popup-container/popup-container';
+import { List } from './components/list/list';
+import { PermissionElement } from './components/permission-element/permission-element';
 
 @NgModule({
-  declarations: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent, AppDynamicTableCell, Navbar],
-  imports: [CommonModule,FormsModule,RouterModule],
-  exports: [TextInput, DynamicTableComponent, ResizableColumnComponent, ChipInputComponent, SidenavComponent, AppDynamicTableCell, Navbar]
+  declarations: [
+    TextInput, 
+    DynamicTableComponent, 
+    ResizableColumnComponent, 
+    ChipInputComponent, 
+    SidenavComponent, 
+    AppDynamicTableCell, 
+    Navbar, 
+    SelectInput,
+    Snackbar,
+    SnackbarContainer,
+    Popup,
+    PopupContainer,
+    List,
+    PermissionElement
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule
+  ],
+  exports: [
+    CommonModule, 
+    FormsModule, 
+    RouterModule, 
+    TextInput, 
+    DynamicTableComponent, 
+    ResizableColumnComponent, 
+    ChipInputComponent, 
+    SidenavComponent, 
+    AppDynamicTableCell, 
+    Navbar, 
+    SelectInput,
+    Snackbar,
+    SnackbarContainer,
+    Popup,
+    PopupContainer,
+    List,
+    PermissionElement
+  ]
 })
 export class SharedModule { }

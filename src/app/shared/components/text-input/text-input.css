@@ -26,6 +26,10 @@
   font-family: 'Roboto', sans-serif;
 }
 
+.input-block input.invalid {
+  color: #c62828;
+}
+
 .input-block input::placeholder {
   color: #ccc;
 }
@@ -36,4 +40,10 @@
 
 .input-block:focus-within .input-label {
   color: rgba(140, 117, 105, 0.8);
+}
+
+.input-error {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #c62828;
 }

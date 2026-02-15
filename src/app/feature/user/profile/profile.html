@@ -1,11 +1,162 @@
 <div class="profile-layout">
-
-  <div class="main-content" >
-    
-    <div class="content-area">
-        
+  <div class="main-content">
+    <div class="profile-header">
+      <div class="profile-actions">
+        <button class="ghost-button" (click)="loadProfile()" [disabled]="loading || saving">
+          Refresh
+        </button>
+        <button class="primary-button" (click)="saveProfile()" [disabled]="saving || loading">
+          {{ saving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+      <p class="status-message error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="status-message success" *ngIf="successMessage">{{ successMessage }}</p>
     </div>
-      
+
+    <div class="content-area">
+      <div class="profile-grid">
+        <section class="profile-card">
+          <div class="card-header">
+            <h2>Basic Information</h2>
+            <p>How people recognize you across the app.</p>
+          </div>
+          <div class="card-body">
+            <div class="avatar-block">
+              <div class="avatar">
+                <img
+                  *ngIf="profile.avatarUrl"
+                  [src]="profile.avatarUrl"
+                  alt="Profile avatar"
+                />
+                <span *ngIf="!profile.avatarUrl">{{ profile.username ? profile.username[0] : 'U' }}</span>
+              </div>
+              <div class="avatar-upload">
+                <label
+                  class="drop-zone"
+                  [class.drag-active]="isDragActive"
+                  for="avatarInput"
+                  (dragover)="onAvatarDragOver($event)"
+                  (dragleave)="onAvatarDragLeave($event)"
+                  (drop)="onAvatarDrop($event)"
+                >
+                  <input
+                    id="avatarInput"
+                    type="file"
+                    accept="image/*"
+                    (change)="onAvatarSelected($event)"
+                  />
+                  <span class="drop-zone-title">Drag & drop profile image</span>
+                  <span class="drop-zone-subtitle">or click to choose from your computer</span>
+                </label>
+                <div class="avatar-upload-actions">
+                  <button
+                    type="button"
+                    class="ghost-button small"
+                    (click)="clearAvatar()"
+                    [disabled]="!profile.avatarUrl"
+                  >
+                    Remove
+                  </button>
+                  <span class="upload-hint">JPG, PNG, WEBP up to 5MB</span>
+                </div>
+                <p class="status-message error" *ngIf="avatarErrorMessage">{{ avatarErrorMessage }}</p>
+              </div>
+            </div>
+
+            <div class="grid-two">
+              <app-text-input
+                label="Full Name"
+                placeholder="Enter your name"
+                [(value)]="profile.fullName"
+              ></app-text-input>
+              <app-chip-input
+                label="Title"
+                placeholder="Add a title (e.g. Product Manager)"
+                [chips]="profile.roles || []"
+                [readonly]="true"
+              ></app-chip-input>
+              <!-- <app-text-input
+                label="Title"
+                placeholder="Product Manager"
+                [(value)]="profile.title"
+              ></app-text-input> -->
+            </div>
+
+            <div class="grid-two">
+              <app-text-input
+                label="Email"
+                type="email"
+                placeholder="you@example.com"
+                validationType="email"
+                [showValidation]="saving || !emailValid"
+                (validityChange)="updateEmailValidity($event)"
+                [(value)]="profile.email"
+              ></app-text-input>
+              <app-text-input
+                label="Phone"
+                type="tel"
+                placeholder="+1 555 123 4567"
+                validationType="phone"
+                [showValidation]="saving || !phoneValid"
+                (validityChange)="updatePhoneValidity($event)"
+                [(value)]="profile.phone"
+              ></app-text-input>
+            </div>
+
+            <div class="textarea-block">
+              <label>Bio</label>
+              <textarea
+                rows="4"
+                placeholder="Tell us about yourself"
+                [(ngModel)]="profile.bio"
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-card">
+          <div class="card-header">
+            <h2>Preferences</h2>
+            <p>Personalize how we communicate and display information.</p>
+          </div>
+          <div class="card-body">
+            <div class="grid-two">
+              <app-select-input
+                label="Gender"
+                placeholder="Select gender"
+                [options]="genderOptions"
+                [(value)]="profile.gender"
+              ></app-select-input>
+              <app-select-input
+                label="Timezone"
+                placeholder="Select timezone"
+                [options]="timezoneOptions"
+                [(value)]="profile.timezone"
+              ></app-select-input>
+            </div>
+
+            <div class="grid-two">
+              <app-select-input
+                label="Language"
+                placeholder="Preferred language"
+                [options]="languageOptions"
+                [(value)]="profile.language"
+              ></app-select-input>
+              <app-select-input
+                label="Location"
+                placeholder="Select location"
+                [options]="locationOptions"
+                [(value)]="profile.location"
+              ></app-select-input>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Loading profile...</p>
+      </div>
+    </div>
   </div>
-  
 </div>
