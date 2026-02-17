@@ -1,22 +1,25 @@
 import { Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
+import { CanActivate, Router, UrlTree } from '@angular/router';
+import { AuthService } from '../services/http/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminGuard implements CanActivate{
-  constructor() {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  canActivate(): boolean {
-    // Implement your logic to check if the user has admin privileges
-    // For example, you can check the user's role from a service or token
-    // const userRole = 'admin'; // Replace with actual role checking logic
+  canActivate(): boolean | UrlTree {
+    if (!this.authService.isAuthenticated()) {
+      return this.router.createUrlTree(['/auth/login']);
+    }
 
-    // if (userRole === 'admin') {
-    //   return true; // Allow access to admin routes
-    // } else {
-    //   return false; // Deny access to non-admin users
-    // }
-    return true; // Placeholder: Allow access for now, replace with actual logic
+    if (this.authService.isSuperAdmin()) {
+      return true;
+    }
+
+    return this.router.createUrlTree(['/user/profile']);
   }
 }

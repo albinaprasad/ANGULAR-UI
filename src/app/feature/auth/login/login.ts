@@ -13,7 +13,7 @@ export class LoginComponent implements AfterViewInit {
   password: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
-  private returnUrl: string = '/admin/dashboard';
+  private returnUrl: string | null = null;
 
   ngAfterViewInit(): void {
 
@@ -73,7 +73,8 @@ export class LoginComponent implements AfterViewInit {
 
     try {
       await this.authService.login(this.username, this.password)
-      this.router.navigateByUrl(this.returnUrl);
+      const defaultRoute = this.authService.isSuperAdmin() ? '/admin/dashboard' : '/user/profile';
+      this.router.navigateByUrl(this.returnUrl || defaultRoute);
     } catch (error: any) {
       this.errorMessage = error?.error?.message || 'Login failed. Please try again.';
       console.error('Login error:', error);
@@ -87,7 +88,7 @@ export class LoginComponent implements AfterViewInit {
     private authService: AuthService,
     private route: ActivatedRoute
   ) {
-    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/admin/dashboard';
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
   }
 
   goToRegister() {

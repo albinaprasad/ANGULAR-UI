@@ -1,27 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 import { Panel } from './feature/admin/components/panel/panel';
-import { AuthService } from './services/http/auth.service';
-
-let isAdmin = true;
-
-const adminChildren = [
-  {
-    path: 'admin',
-    loadChildren: () => import('./feature/admin/admin-module').then(m => m.AdminModule),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'user',
-    loadChildren: () => import('./feature/user/user-module').then(m => m.CustomerModule),
-    canActivate: [AuthGuard]
-  }
-];
-
-const userChildren = [{
-  
-}]
 export const routes: Routes = [
   {
     path: '',
@@ -37,7 +18,17 @@ export const routes: Routes = [
     path: '',
     component: Panel,
     canActivate: [AuthGuard],
-    children: isAdmin ? adminChildren : userChildren,
+    children: [
+      {
+        path: 'admin',
+        loadChildren: () => import('./feature/admin/admin-module').then(m => m.AdminModule),
+        canActivate: [AdminGuard]
+      },
+      {
+        path: 'user',
+        loadChildren: () => import('./feature/user/user-module').then(m => m.CustomerModule),
+      }
+    ],
   },
   {
     path: '**',
@@ -51,7 +42,5 @@ export const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { 
-  constructor(private authService:AuthService) {
-    isAdmin = authService.getUser()?.is_superAdmin ?? false  
-  }
+  constructor() {}
 }
