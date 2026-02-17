@@ -16,6 +16,7 @@ import { Popup } from './components/modals/popup/popup';
 import { PopupContainer } from './components/modals/popup/popup-container/popup-container';
 import { List } from './components/list/list';
 import { PermissionElement } from './components/permission-element/permission-element';
+import { Note } from './components/note/note';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { PermissionElement } from './components/permission-element/permission-el
     Popup,
     PopupContainer,
     List,
-    PermissionElement
+    PermissionElement,
+    Note
   ],
   imports: [
     CommonModule,
@@ -56,7 +58,8 @@ import { PermissionElement } from './components/permission-element/permission-el
     Popup,
     PopupContainer,
     List,
-    PermissionElement
+    PermissionElement,
+    Note
   ]
 })
 export class SharedModule { }
