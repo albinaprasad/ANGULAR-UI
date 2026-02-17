@@ -13,6 +13,7 @@ import { BaseResponse } from '../../types/base-http.types';
 export class AuthService extends BaseHttpService {
 
   public user = new BehaviorSubject<User | null>(null)
+  
 
   constructor(private httpClient: HttpClient) {
     super();
@@ -20,6 +21,15 @@ export class AuthService extends BaseHttpService {
 
   getUser(): User | null {
     return this.user.value
+  }
+
+  isSuperAdmin(): boolean {
+    const currentUser = this.user.value;
+    if (currentUser) {
+      return Boolean(currentUser.is_superAdmin || currentUser.role?.includes('admin'));
+    }
+
+    return localStorage.getItem(environmentJson.IS_SUPER_ADMIN) === 'true';
   }
 
   setAuthToken(token: string): void {
@@ -40,6 +50,7 @@ export class AuthService extends BaseHttpService {
 
   logout(): void {
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
+    localStorage.removeItem(environmentJson.IS_SUPER_ADMIN);
     this.user.next(null);
   }
 
@@ -56,6 +67,10 @@ export class AuthService extends BaseHttpService {
           tap(response => {
             if (response.message?.token) {
               this.setAuthToken(response.message?.token ?? '');
+              if (response.message.user.is_superAdmin || response.message.user.role.includes('admin'))
+                localStorage.setItem(environmentJson.IS_SUPER_ADMIN, 'true' );
+              else
+                localStorage.setItem(environmentJson.IS_SUPER_ADMIN, 'false');
               this.user.next(response.message?.user ?? null)
             }
           })

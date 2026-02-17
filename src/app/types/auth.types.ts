@@ -11,6 +11,6 @@ export type LoginRequest = {
 
 export type User = {
     username : string;
-    role: string;
+    role: string[];
     is_superAdmin: boolean
 }
