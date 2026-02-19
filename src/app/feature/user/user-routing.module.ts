@@ -21,6 +21,10 @@ const routes: Routes = [
         path:'',
         redirectTo: 'profile',
         pathMatch: 'full'
+    },
+    {
+        path: '**',
+        redirectTo: '/error'
     }
 ]
 

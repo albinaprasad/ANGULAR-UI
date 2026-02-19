@@ -227,8 +227,7 @@
 .empty-state {
   text-align: center;
   padding: 40px 16px;
-  color: #999;
-  font-style: italic;
+  background: #f8faff;
 }
 
 .table-footer {
@@ -265,8 +264,10 @@
 .no-table-info {
   padding: 40px 20px;
   text-align: center;
-  color: #999;
-  font-style: italic;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {

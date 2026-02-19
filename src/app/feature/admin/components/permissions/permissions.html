@@ -9,7 +9,7 @@
         >
             
         </app-note>
-        <div class="permissions-content">
+        <div class="permissions-content" *ngIf="!shouldShowPageState(); else pageState">
             <div class="nav-section">
                 <app-sidenav
                     [navItems]="groups"
@@ -19,11 +19,10 @@
                     (toggleSidenav)="toggleSidenav()"
                     (navItemsReordered)="onNavItemsReordered($event)"
                 >
-
                 </app-sidenav>
             </div>
             <div class="permission-list-section">
-              <div class="permission-list-header" *ngIf="tablePermissions.length > 0">
+              <div class="permission-list-header">
                 <span>Table</span>
                 <span>View</span>
                 <span>Change</span>
@@ -31,19 +30,24 @@
                 <span>Add</span>
               </div>
 
-              <div class="permission-list" *ngIf="tablePermissions.length > 0; else noPermissions">
+              <div class="permission-list">
                 <app-permission-element
                   *ngFor="let permission of tablePermissions"
                   [permission]="permission"
                   (permissionChange)="onTablePermissionChanged($event)"
                 ></app-permission-element>
               </div>
-
-              <ng-template #noPermissions>
-                <p class="no-permission-text">No permissions found for this group.</p>
-              </ng-template>
             </div>
         </div>
+        <ng-template #pageState>
+          <div class="permissions-page-state">
+            <app-empty-state
+              [variant]="getPageStateVariant()"
+              [title]="getPageStateTitle()"
+              [message]="getPageStateMessage()"
+            ></app-empty-state>
+          </div>
+        </ng-template>
       </div>
     </section>
 

@@ -20,6 +20,7 @@ import { Note } from './components/note/note';
 import { InsertRow } from './components/modals/insert-row/insert-row';
 import { InsertRowContainer } from './components/modals/insert-row/insert-row-container/insert-row-container';
 import { InfiniteScrollDirective } from './directives/infinite-scroll/infinite-scroll.directive';
+import { EmptyStateComponent } from './components/empty-state/empty-state';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { InfiniteScrollDirective } from './directives/infinite-scroll/infinite-s
     Note,
     InsertRow,
     InsertRowContainer,
-    InfiniteScrollDirective
+    InfiniteScrollDirective,
+    EmptyStateComponent
   ],
   imports: [
     CommonModule,
@@ -68,7 +70,8 @@ import { InfiniteScrollDirective } from './directives/infinite-scroll/infinite-s
     Note,
     InsertRow,
     InsertRowContainer,
-    InfiniteScrollDirective
+    InfiniteScrollDirective,
+    EmptyStateComponent
   ]
 })
 export class SharedModule { }

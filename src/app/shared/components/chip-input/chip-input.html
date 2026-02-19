@@ -13,7 +13,8 @@
         ×
       </button>
     </span>
-    <input
+
+    <input *ngIf="readonly;else input"
       #inputElement
       readonly="{{readonly}}"
       type="text"
@@ -24,6 +25,18 @@
       (keydown)="onInputKeyDown($event)"
       (blur)="onInputBlur()"
     />
+    <ng-template #input>
+      <input
+        #inputElement
+        type="text"
+        class="chip-input"
+        [placeholder]="chips.length === 0 ? placeholder : ''"
+        [(ngModel)]="inputValue"
+        (input)="onInputChange($event)"
+        (keydown)="onInputKeyDown($event)"
+        (blur)="onInputBlur()"
+      />
+    </ng-template>
   </div>
 
   <div  class="chip-actions" *ngIf="chips.length > 0 && !readonly">

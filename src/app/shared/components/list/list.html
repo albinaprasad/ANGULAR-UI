@@ -61,7 +61,11 @@
 
     <!-- Empty -->
     <div *ngIf="items.length === 0" class="empty">
-      No data
+      <app-empty-state
+        [compact]="true"
+        [title]="'No data available'"
+        [message]="'There are no records to display right now.'"
+      ></app-empty-state>
     </div>
 
   </div>
