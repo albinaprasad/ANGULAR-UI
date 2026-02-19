@@ -7,6 +7,7 @@ export class BaseHttpService {
     protected readonly AUTH_TOKEN_KEY = environmentJSON.AUTH_TOKEN_KEY;
     protected readonly API_URL = environmentJSON.AUTH_API_URL;
 
+
     protected getAuthToken(): string | null {
         return localStorage.getItem(this.authTokenKey);
     }

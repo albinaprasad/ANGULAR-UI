@@ -4,7 +4,12 @@
     <p class="table-info">Total Columns: {{ displayColumns.length }}</p>
   </div>
 
-  <div class="table-wrapper" #tableWrapper>
+  <div
+    class="table-wrapper"
+    appInfiniteScroll
+    [disabled]="!enableInfiniteScroll || loading"
+    (reachedBottom)="onInfiniteScroll()"
+  >
     <table class="dynamic-table">
       <thead>
         <tr>

@@ -17,6 +17,9 @@ import { PopupContainer } from './components/modals/popup/popup-container/popup-
 import { List } from './components/list/list';
 import { PermissionElement } from './components/permission-element/permission-element';
 import { Note } from './components/note/note';
+import { InsertRow } from './components/modals/insert-row/insert-row';
+import { InsertRowContainer } from './components/modals/insert-row/insert-row-container/insert-row-container';
+import { InfiniteScrollDirective } from './directives/infinite-scroll/infinite-scroll.directive';
 
 @NgModule({
   declarations: [
@@ -34,7 +37,10 @@ import { Note } from './components/note/note';
     PopupContainer,
     List,
     PermissionElement,
-    Note
+    Note,
+    InsertRow,
+    InsertRowContainer,
+    InfiniteScrollDirective
   ],
   imports: [
     CommonModule,
@@ -59,7 +65,10 @@ import { Note } from './components/note/note';
     PopupContainer,
     List,
     PermissionElement,
-    Note
+    Note,
+    InsertRow,
+    InsertRowContainer,
+    InfiniteScrollDirective
   ]
 })
 export class SharedModule { }
