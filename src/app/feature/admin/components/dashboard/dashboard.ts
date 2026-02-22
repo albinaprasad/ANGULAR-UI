@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { DataService } from '../../../../services/http/data.service';
 import { TableDescription, Tables, TypeMap, TypeMapJS } from '../../../../types/admin.types';
 import { NavItem } from '../../../../shared/components/sidenav/sidenav';
@@ -6,6 +6,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { SnackbarService } from '../../../../services/modal/snackbar.service';
 import { SnackbarType } from '../../../../shared/components/modals/snackbar/type';
 import { PopupService } from '../../../../services/modal/popup.service';
+import { InsertRowService } from '../../../../services/modal/insert-row.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +20,8 @@ export class Dashboard implements OnInit {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private snackbarService: SnackbarService,
-    private popupService: PopupService
+    private popupService: PopupService,
+    private insertRowSerivce: InsertRowService
   ) {}
 
   tables: Tables = { tables: [] };
@@ -241,5 +243,17 @@ export class Dashboard implements OnInit {
         // optimistic UI update
         row[event.column] = event.newValue;
       });
+  }
+
+  floatingActionButtonHandler(event: boolean) {
+    const navitem = this.navItems.filter((item) => {
+      return item.active
+    })[0];
+    const tableDescription = this.tableDescriptions[navitem.id]
+    console.log("Is open ", event, navitem, tableDescription)
+    if (event)
+      this.insertRowSerivce.show(tableDescription)
+    else
+      this.insertRowSerivce.close()
   }
 }

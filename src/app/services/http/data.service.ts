@@ -35,6 +35,16 @@ export class DataService extends BaseHttpService {
     });
   }
 
+  insertTableRow(tableName: string, rowData: Record<string, any>): Observable<BaseResponse<any, string>> {
+    return this.http.post<BaseResponse<any, string>>(
+      `${this.API_URL}/api/tables/${tableName}/data`,
+      rowData,
+      {
+        headers: this.getAuthHeaders()
+      }
+    );
+  }
+
   updateTableCell(tableName: string, rowId: any, column: string[], newValue: any[]): Observable<BaseResponse<string,string>> {
     if (column.length !== newValue.length) {
       throw new Error("Column and newValue arrays must have the same length.");

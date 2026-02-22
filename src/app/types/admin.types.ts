@@ -2,6 +2,7 @@ export type Column = {
   name: string;
   null: boolean;
   type: number;
+  foreignKey: [];
 }
 
 export type TableDescription = {

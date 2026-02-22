@@ -40,7 +40,9 @@
   </div>
 
   <div  class="chip-actions" *ngIf="chips.length > 0 && !readonly">
-    <button 
+    <button
+      app-button
+      variant="secondary"
       class="clear-all-btn"
       (click)="clearAllChips()"
       title="Clear all chips">

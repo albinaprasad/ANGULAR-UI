@@ -1,0 +1,146 @@
+.select-wrapper {
+  width: 100%;
+}
+
+.select-trigger {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid #d8dee4;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  color: #1f2937;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.select-trigger:focus {
+  outline: none;
+  border-color: #8c7569;
+  box-shadow: 0 0 0 2px rgba(140, 117, 105, 0.16);
+}
+
+.trigger-text.placeholder {
+  color: #94a3b8;
+}
+
+.trigger-icon {
+  color: #64748b;
+  font-size: 10px;
+}
+
+.select-wrapper.disabled .select-trigger {
+  cursor: not-allowed;
+  background: #f8fafc;
+  color: #9aa5b1;
+}
+
+.select-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 16px;
+}
+
+.select-overlay {
+  width: min(520px, 100%);
+  max-height: min(75vh, 680px);
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.22);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.overlay-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.close-btn {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  color: #475569;
+}
+
+.search-input {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #8c7569;
+  box-shadow: 0 0 0 2px rgba(140, 117, 105, 0.12);
+}
+
+.options-list {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: auto;
+  min-height: 180px;
+  max-height: 44vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.option-item {
+  border: 0;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fff;
+  text-align: left;
+  padding: 9px 10px;
+  font-size: 13px;
+  color: #334155;
+  cursor: pointer;
+}
+
+.option-item:hover {
+  background: #f8fafc;
+}
+
+.option-item.active {
+  background: #f1f5f9;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.option-item.clear-item {
+  border: 1px dashed #d6b7ab;
+  border-radius: 8px;
+  color: #8c7569;
+  font-weight: 600;
+}
+
+.hint {
+  margin: 0;
+  padding: 10px;
+  font-size: 12px;
+  color: #64748b;
+}

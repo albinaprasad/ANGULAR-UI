@@ -6,7 +6,7 @@
     <p id="popup-message" class="popup__message">{{ message }}</p>
   </div>
   <div class="popup__actions">
-    <button type="button" class="popup__btn popup__btn--cancel" (click)="onCancel()">Cancel</button>
-    <button type="button" class="popup__btn popup__btn--confirm" (click)="onConfirm()">Confirm</button>
+    <button app-button variant="secondary" type="button" class="popup__btn popup__btn--cancel" (click)="onCancel()">Cancel</button>
+    <button app-button variant="primary" type="button" class="popup__btn popup__btn--confirm" (click)="onConfirm()">Confirm</button>
   </div>
 </div>

@@ -22,7 +22,6 @@ export class ChipInputComponent {
     const value = event.target.value;
     this.inputValue = value;
 
-    // Check for comma separator
     if (value.includes(',')) {
       this.addChipsFromInput(value);
     }
@@ -39,7 +38,6 @@ export class ChipInputComponent {
   }
 
   onInputBlur(): void {
-    // Add remaining input as chip when focus is lost
     if (this.inputValue.trim()) {
       this.addChipsFromInput(this.inputValue);
     }
@@ -49,7 +47,7 @@ export class ChipInputComponent {
     const newChips = input.split(',')
       .map(chip => chip.trim())
       .filter(chip => chip.length > 0)
-      .filter(chip => !this.chips.includes(chip)); // Avoid duplicates
+      .filter(chip => !this.chips.includes(chip));
 
     if (newChips.length > 0) {
       this.chips = [...this.chips, ...newChips];

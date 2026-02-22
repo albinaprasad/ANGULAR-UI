@@ -1,7 +1,7 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { InsertRowService } from '../../../../../services/modal/insert-row.service';
-import { IInsertRow } from '../type/insert-row.type';
+import { TableDescription } from '../../../../../types/admin.types';
 
 @Component({
   selector: 'app-insert-row-container',
@@ -11,8 +11,9 @@ import { IInsertRow } from '../type/insert-row.type';
 })
 export class InsertRowContainer implements OnDestroy{
   sub: Subscription;
-  public insertRow: IInsertRow = {
-    tableName: ''
+  public insertRow: TableDescription = {
+    table: '',
+    columns: []
   }
 
   constructor(private insertRowService: InsertRowService) {
@@ -25,5 +26,8 @@ export class InsertRowContainer implements OnDestroy{
     this.sub.unsubscribe()
   }
 
+  onBackDropClick(): void {
+    this.insertRowService.close()
+  }
 
 }

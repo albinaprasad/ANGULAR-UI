@@ -55,10 +55,11 @@
              <app-dynamic-cell-editor
               [type]="getColumnType(column)"
               [(value)]="editValue"
+              [foreignKey]="columnMetadata.get(column)?.foreignKey || []"
               [nullable]="isNullable(column) === 'nullable'"
             ></app-dynamic-cell-editor>
-              <button class="cell-edit-save" (click)="saveEditCell(rowIndex, column, row)" title="Save">✓</button>
-              <button class="cell-edit-cancel" (click)="cancelEditCell(rowIndex, column, row)" title="Cancel">✗</button>
+              <button app-button variant="primary" class="cell-edit-save" (click)="saveEditCell(rowIndex, column, row)" title="Save">✓</button>
+              <button app-button variant="secondary" class="cell-edit-cancel" (click)="cancelEditCell(rowIndex, column, row)" title="Cancel">✗</button>
             </ng-container>
             <ng-template #displayCell>
               <span
@@ -82,6 +83,8 @@
   <div class="table-footer" *ngIf="filteredData.length > 0">
     <p>Total Rows: {{ filteredData.length }} {{ hasActiveFilters() ? '(filtered from ' + tableData.length + ' total)' : '' }}</p>
     <button
+      app-button
+      variant="secondary"
       class="clear-all-filters-btn"
       *ngIf="hasActiveFilters()"
       (click)="clearAllFilters()">

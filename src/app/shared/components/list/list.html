@@ -18,6 +18,8 @@
         placeholder="Search..."
         />
         <button
+        app-button
+        variant="secondary"
         *ngIf="search"
         class="clear-btn"
         (click)="search=''"
@@ -50,6 +52,8 @@
       <!-- Actions -->
       <div class="cell actions" *ngIf="actions.length">
         <button
+          app-button
+          variant="secondary"
           *ngFor="let action of actions"
           (click)="triggerAction(action, item)"
         >

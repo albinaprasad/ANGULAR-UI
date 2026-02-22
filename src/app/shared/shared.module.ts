@@ -10,6 +10,7 @@ import { AppDynamicTableCell } from './components/app-dynamic-table-cell/app-dyn
 import { Navbar } from './components/navbar/navbar';
 import { RouterModule } from '@angular/router';
 import { SelectInput } from './components/select-input/select-input';
+import { Select } from './components/select/select';
 import { Snackbar } from './components/modals/snackbar/snackbar';
 import { SnackbarContainer } from './components/modals/snackbar/snackbar-container/snackbar-container';
 import { Popup } from './components/modals/popup/popup';
@@ -21,6 +22,8 @@ import { InsertRow } from './components/modals/insert-row/insert-row';
 import { InsertRowContainer } from './components/modals/insert-row/insert-row-container/insert-row-container';
 import { InfiniteScrollDirective } from './directives/infinite-scroll/infinite-scroll.directive';
 import { EmptyStateComponent } from './components/empty-state/empty-state';
+import { FloatingActionBar } from './components/floating-action-bar/floating-action-bar';
+import { ButtonComponent } from './components/button/button';
 
 @NgModule({
   declarations: [
@@ -32,6 +35,7 @@ import { EmptyStateComponent } from './components/empty-state/empty-state';
     AppDynamicTableCell, 
     Navbar, 
     SelectInput,
+    Select,
     Snackbar,
     SnackbarContainer,
     Popup,
@@ -42,7 +46,9 @@ import { EmptyStateComponent } from './components/empty-state/empty-state';
     InsertRow,
     InsertRowContainer,
     InfiniteScrollDirective,
-    EmptyStateComponent
+    EmptyStateComponent,
+    FloatingActionBar,
+    ButtonComponent
   ],
   imports: [
     CommonModule,
@@ -61,6 +67,7 @@ import { EmptyStateComponent } from './components/empty-state/empty-state';
     AppDynamicTableCell, 
     Navbar, 
     SelectInput,
+    Select,
     Snackbar,
     SnackbarContainer,
     Popup,
@@ -71,7 +78,9 @@ import { EmptyStateComponent } from './components/empty-state/empty-state';
     InsertRow,
     InsertRowContainer,
     InfiniteScrollDirective,
-    EmptyStateComponent
+    EmptyStateComponent,
+    FloatingActionBar,
+    ButtonComponent
   ]
 })
 export class SharedModule { }
