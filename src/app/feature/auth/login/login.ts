@@ -71,16 +71,11 @@ export class LoginComponent implements AfterViewInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    try {
-      await this.authService.login(this.username, this.password)
-      const defaultRoute = this.authService.isSuperAdmin() ? '/admin/dashboard' : '/user/semesters';
-      this.router.navigateByUrl(this.returnUrl || defaultRoute);
-    } catch (error: any) {
-      this.errorMessage = error?.error?.message || 'Login failed. Please try again.';
-      console.error('Login error:', error);
-    } finally {
+    // Bypassing API authentication for student view
+    setTimeout(() => {
       this.isLoading = false;
-    }
+      this.router.navigateByUrl('/user/semesters');
+    }, 500); // Small delay to simulate loading
   }
 
   constructor(

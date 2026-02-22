@@ -27,7 +27,7 @@ export const routes: Routes = [
       },
       {
         path: 'user',
-        loadChildren: () => import('./feature/user/user-module').then(m => m.CustomerModule),
+        loadChildren: () => import('./feature/user/user-module').then(m => m.CustomerModule)
       }
     ],
   },
@@ -46,6 +46,6 @@ export const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { 
-  constructor() {}
+export class AppRoutingModule {
+  constructor() { }
 }
