@@ -4,7 +4,12 @@
     <p class="table-info">Total Columns: {{ displayColumns.length }}</p>
   </div>
 
-  <div class="table-wrapper" #tableWrapper>
+  <div
+    class="table-wrapper"
+    appInfiniteScroll
+    [disabled]="!enableInfiniteScroll || loading"
+    (reachedBottom)="onInfiniteScroll()"
+  >
     <table class="dynamic-table">
       <thead>
         <tr>
@@ -37,7 +42,11 @@
       <tbody>
         <tr *ngIf="filteredData.length === 0 && !loading">
           <td [attr.colspan]="displayColumns.length" class="empty-state">
-            {{ hasActiveFilters() ? 'No data matches the current filters' : 'No data available for this table' }}
+            <app-empty-state
+              [compact]="true"
+              [title]="hasActiveFilters() ? 'No matching rows found' : 'No table data yet'"
+              [message]="hasActiveFilters() ? 'Try removing a few filters or widening your search terms.' : 'The server returned an empty result for this table.'"
+            ></app-empty-state>
           </td>
         </tr>
         <tr *ngFor="let row of filteredData; let rowIndex = index" [attr.data-row-index]="rowIndex">
@@ -46,10 +55,11 @@
              <app-dynamic-cell-editor
               [type]="getColumnType(column)"
               [(value)]="editValue"
+              [foreignKey]="columnMetadata.get(column)?.foreignKey || []"
               [nullable]="isNullable(column) === 'nullable'"
             ></app-dynamic-cell-editor>
-              <button class="cell-edit-save" (click)="saveEditCell(rowIndex, column, row)" title="Save">✓</button>
-              <button class="cell-edit-cancel" (click)="cancelEditCell(rowIndex, column, row)" title="Cancel">✗</button>
+              <button app-button variant="primary" class="cell-edit-save" (click)="saveEditCell(rowIndex, column, row)" title="Save">✓</button>
+              <button app-button variant="secondary" class="cell-edit-cancel" (click)="cancelEditCell(rowIndex, column, row)" title="Cancel">✗</button>
             </ng-container>
             <ng-template #displayCell>
               <span
@@ -73,6 +83,8 @@
   <div class="table-footer" *ngIf="filteredData.length > 0">
     <p>Total Rows: {{ filteredData.length }} {{ hasActiveFilters() ? '(filtered from ' + tableData.length + ' total)' : '' }}</p>
     <button
+      app-button
+      variant="secondary"
       class="clear-all-filters-btn"
       *ngIf="hasActiveFilters()"
       (click)="clearAllFilters()">
@@ -82,5 +94,8 @@
 </div>
 
 <div class="no-table-info" *ngIf="!tableDescription">
-  <p>No table description provided</p>
+  <app-empty-state
+    [title]="'No table description provided'"
+    [message]="'Pick a table from the sidebar, or check the dashboard API response.'"
+  ></app-empty-state>
 </div>

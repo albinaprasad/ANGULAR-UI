@@ -1,0 +1,41 @@
+<div class="insert-row-main">
+    <div class="insert-row-content">
+        <div class="insert-row-card" (click)="$event.stopPropagation()">
+            <div class="insert-row-header">
+                <h2>Insert Row</h2>
+                <p class="table-name">{{ tableDes.table }}</p>
+            </div>
+
+            <form class="insert-row-form" autocomplete="off">
+                <div class="form-row" *ngFor="let column of tableDes.columns; let i = index">
+                    <label class="field-label" [attr.for]="'col-' + i">
+                        {{ column.name }}
+                        <span class="required-marker" *ngIf="!column.null">*</span>
+                    </label>
+                    <div class="field-input">
+                        <app-dynamic-cell-editor
+                            [type]="getCellType(column.type)"
+                            [value]="rowValues[column.name]"
+                            (valueChange)="onFieldChange(column.name, $event)"
+                            [nullable]="column.null"
+                            [foreignKey]="column.foreignKey"
+                            >
+                        </app-dynamic-cell-editor>
+                        <p class="field-error" *ngIf="fieldErrors[column.name]">
+                            {{ fieldErrors[column.name] }}
+                        </p>
+                    </div>
+
+                    <div class="field-meta">
+                        <span class="type">{{ column.type }}</span>
+                        <span class="nullable">{{ column.null ? 'NULL' : 'NOT NULL' }}</span>
+                    </div>
+                </div>
+                <p class="submit-error" *ngIf="submitError">{{ submitError }}</p>
+                <button class="insert-button" app-button variant="primary" type="button" [disabled]="isSubmitting" (click)="onInsert()">
+                    {{ isSubmitting ? 'Inserting...' : 'Insert' }}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

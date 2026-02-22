@@ -2,10 +2,10 @@
   <div class="main-content">
     <div class="profile-header">
       <div class="profile-actions">
-        <button class="ghost-button" (click)="loadProfile()" [disabled]="loading || saving">
+        <button app-button variant="secondary" class="ghost-button" (click)="loadProfile()" [disabled]="loading || saving">
           Refresh
         </button>
-        <button class="primary-button" (click)="saveProfile()" [disabled]="saving || loading">
+        <button app-button variant="primary" class="primary-button" (click)="saveProfile()" [disabled]="saving || loading">
           {{ saving ? 'Saving...' : 'Save Changes' }}
         </button>
       </div>
@@ -50,6 +50,8 @@
                 </label>
                 <div class="avatar-upload-actions">
                   <button
+                    app-button
+                    variant="secondary"
                     type="button"
                     class="ghost-button small"
                     (click)="clearAvatar()"

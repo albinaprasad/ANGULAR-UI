@@ -1,0 +1,61 @@
+<div class="select-wrapper" [class.disabled]="disabled">
+  <button
+    type="button"
+    class="select-trigger"
+    [disabled]="disabled"
+    (click)="openOverlay()"
+    [attr.aria-expanded]="isOpen"
+    aria-haspopup="dialog"
+  >
+    <span class="trigger-text" [class.placeholder]="!selectedLabel">
+      {{ selectedLabel || placeholder }}
+    </span>
+    <span class="trigger-icon">&#9662;</span>
+  </button>
+</div>
+
+<div class="select-overlay-backdrop" *ngIf="isOpen" (click)="closeOverlay()">
+  <div class="select-overlay" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <div class="overlay-header">
+      <h4 class="overlay-title">{{ placeholder }}</h4>
+      <button type="button" class="close-btn" (click)="closeOverlay()" aria-label="Close">&#10005;</button>
+    </div>
+
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search options"
+      [(ngModel)]="searchTerm"
+      autocomplete="off"
+    />
+
+    <button
+      *ngIf="nullable"
+      type="button"
+      class="option-item clear-item"
+      (click)="clearSelection()"
+    >
+      Clear selection
+    </button>
+
+    <div
+      class="options-list"
+      appInfiniteScroll
+      [disabled]="loading || !hasMore"
+      (reachedBottom)="loadMore()"
+    >
+      <button
+        *ngFor="let option of filteredOptions; trackBy: trackByOption"
+        type="button"
+        class="option-item"
+        [class.active]="isSelected(option)"
+        (click)="selectOption(option)"
+      >
+        {{ getOptionLabel(option) }}
+      </button>
+
+      <p class="hint" *ngIf="!filteredOptions.length && !loading">No matching options</p>
+      <p class="hint" *ngIf="loading">Loading more options...</p>
+    </div>
+  </div>
+</div>

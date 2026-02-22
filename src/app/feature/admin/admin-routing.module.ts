@@ -31,6 +31,10 @@ export const routes: Routes = [
       {
         path: 'notification',
         redirectTo: '/user/notification',
+      },
+      {
+        path: '**',
+        redirectTo: '/error'
       }
     ]
   }

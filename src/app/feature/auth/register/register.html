@@ -51,7 +51,7 @@
             (valueChange)="confirmPasswordChanged($event)"
           ></app-text-input>
       
-          <button class="input-button" (click)="register()" [disabled]="isLoading">
+          <button app-button variant="primary" class="input-button" (click)="register()" [disabled]="isLoading">
             {{ isLoading ? 'Creating...' : 'Create Account' }}
           </button>
           <p class="signup-error" *ngIf="errorMessage">{{ errorMessage }}</p>
@@ -73,5 +73,5 @@
         </svg>
       </button>
     </div>
-    <button class="modal-button">Click here to create account</button>
+    <button app-button variant="secondary" class="modal-button">Click here to create account</button>
   </div>

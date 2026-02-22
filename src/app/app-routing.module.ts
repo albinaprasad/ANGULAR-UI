@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { Panel } from './feature/admin/components/panel/panel';
+import { ErrorPageComponent } from './feature/error/error-page/error-page';
 export const routes: Routes = [
   {
     path: '',
@@ -31,8 +32,12 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'error',
+    component: ErrorPageComponent
+  },
+  {
     path: '**',
-    redirectTo: 'auth/login'
+    redirectTo: 'error'
   }
 ];
 

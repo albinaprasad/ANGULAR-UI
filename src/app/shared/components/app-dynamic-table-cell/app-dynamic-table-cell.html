@@ -1,6 +1,18 @@
-<!-- BOOLEAN → DROPDOWN -->
+<!-- FOREIGN KEY -> SEARCHABLE OVERLAY SELECT -->
+<app-select
+  *ngIf="hasForeignKey"
+  [tableDetails]="foreignKey"
+  [value]="value"
+  [valueKey]="foreignValueKey"
+  [labelKey]="foreignLabelKey"
+  [nullable]="nullable"
+  [placeholder]="foreignPlaceholder"
+  (valueChange)="onChange($event)"
+></app-select>
+
+<!-- BOOLEAN -->
 <select
-  *ngIf="type === 'boolean'"
+  *ngIf="type === 'boolean' && !hasForeignKey"
   class="cell-edit-input"
   [class.null-value]="value === null"
   [ngModel]="value"
@@ -13,7 +25,7 @@
 
 <!-- VARCHAR / TEXT -->
 <input
-  *ngIf="type === 'varchar' || type === 'text'"
+  *ngIf="(type === 'varchar' || type === 'text') && !hasForeignKey"
   type="text"
   class="cell-edit-input"
   [class.null-value]="value === null"
@@ -22,7 +34,7 @@
 
 <!-- INT / FLOAT -->
 <input
-  *ngIf="type === 'int' || type === 'float'"
+  *ngIf="(type === 'int' || type === 'float') && !hasForeignKey"
   type="number"
   class="cell-edit-input"
   [step]="type === 'float' ? 'any' : 1"
@@ -32,7 +44,7 @@
 
 <!-- DATE -->
 <input
-  *ngIf="type === 'date'"
+  *ngIf="type === 'date' && !hasForeignKey"
   type="date"
   class="cell-edit-input"
   [class.null-value]="value === null"
@@ -41,7 +53,7 @@
 
 <!-- DATETIME -->
 <input
-  *ngIf="type === 'timestamp'"
+  *ngIf="type === 'timestamp' && !hasForeignKey"
   type="datetime-local"
   class="cell-edit-input"
   [class.null-value]="value === null"

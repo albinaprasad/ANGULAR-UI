@@ -1,0 +1,14 @@
+<div class="state-card" [class.state-card--error]="variant === 'error'" [class.state-card--compact]="compact">
+  <div class="state-illustration" aria-hidden="true">
+    <svg viewBox="0 0 180 120" role="img" focusable="false">
+      <rect x="10" y="20" width="160" height="90" rx="10" class="frame"></rect>
+      <rect x="22" y="34" width="136" height="14" rx="4" class="line line-strong"></rect>
+      <rect x="22" y="55" width="95" height="10" rx="4" class="line"></rect>
+      <rect x="22" y="72" width="120" height="10" rx="4" class="line"></rect>
+      <circle cx="140" cy="60" r="12" class="dot"></circle>
+      <line x1="149" y1="69" x2="160" y2="80" class="search-stroke"></line>
+    </svg>
+  </div>
+  <h3>{{ title }}</h3>
+  <p>{{ message }}</p>
+</div>

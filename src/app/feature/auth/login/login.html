@@ -37,7 +37,7 @@
       
           <div class="modal-buttons">
             <a href="#">Forgot your password?</a>
-            <button class="input-button" (click)="login()" [disabled]="isLoading">
+            <button app-button variant="primary" class="input-button" (click)="login()" [disabled]="isLoading">
               {{ isLoading ? 'Logging in...' : 'Login' }}
             </button>
           </div>
@@ -59,6 +59,6 @@
         </svg>
       </button>
     </div>
-    <button class="modal-button">Click here to login</button>
+    <button app-button variant="secondary" class="modal-button">Click here to login</button>
   </div>
   

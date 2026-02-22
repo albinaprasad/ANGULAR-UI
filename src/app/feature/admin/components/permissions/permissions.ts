@@ -22,6 +22,9 @@ export class PermissionsComponent implements OnInit {
   tablePermissions: TablePermissions[] = [];
   allPermissions: Permissions[] = [];
   currentGroupPermissions: Permissions[] = [];
+  pageErrorMessage = '';
+  private pendingRequests = 0;
+  isLoading = false;
 
   ngOnInit(): void {
     console.log('Permissions component initialized');
@@ -30,32 +33,38 @@ export class PermissionsComponent implements OnInit {
   }
 
   private fetchAllPermissions(): void {
+    this.beginRequest();
     this.permissionsService.getAllPermissions().subscribe({
       next: (response) => {
         this.allPermissions = response.message ?? [];
         this.refreshTablePermissions();
         this.cdr.markForCheck();
+        this.endRequest();
       },
       error: (err) => {
         console.error('Error fetching all permissions:', err);
+        this.pageErrorMessage = 'Unable to load permissions from server.';
+        this.endRequest();
       }
     });
   }
 
   private fetchGroups(): void {
+    this.beginRequest();
     this.permissionsService.getGroups().subscribe({
       next: (response) => {
-        response.message?.forEach((group)=>{
-          if(group.id === 1) {
+        const groupItems = (response.message ?? []).map((group) => {
+          if (group.id === 1) {
             this.selectedGroup = String(group.id);
           }
-          this.groups.push({
+          return {
             id: String(group.id),
             label: group.name,
             active: group.id === 1,
             icon: '📄',
-          })
-        }) || [];
+          };
+        });
+        this.groups = groupItems;
         console.log('Groups fetched successfully:', this.groups);
         this.cdr.markForCheck();
         this.snackbarService.success('Groups fetched successfully');
@@ -63,9 +72,12 @@ export class PermissionsComponent implements OnInit {
         if(response.message && response.message.length > 0) {
           this.getPermissionsForGroup(Number(response.message?.[0].id));
         }
+        this.endRequest();
       },
       error: (err) => {
         console.error('Error fetching groups:', err);
+        this.pageErrorMessage = 'Unable to load roles from server.';
+        this.endRequest();
       }
     });
   }
@@ -88,6 +100,7 @@ export class PermissionsComponent implements OnInit {
   }
 
   getPermissionsForGroup(groupName: number) {
+    this.beginRequest();
     this.permissionsService.getGroupPermissions(Number(groupName)).subscribe({
       next: (response) => {
         this.currentGroupPermissions = response.message ?? [];
@@ -95,9 +108,12 @@ export class PermissionsComponent implements OnInit {
         console.log('Permissions for group fetched successfully:', response);
         this.snackbarService.success('Permissions for group fetched successfully');
         this.cdr.markForCheck();
+        this.endRequest();
       },
       error: (err) => {
         console.error('Error fetching permissions for group:', err);
+        this.pageErrorMessage = 'Unable to load selected role permissions.';
+        this.endRequest();
       }
     });
   }
@@ -215,5 +231,33 @@ export class PermissionsComponent implements OnInit {
     const action: PermissionAction = rawAction;
 
     return { action, table };
+  }
+
+  shouldShowPageState(): boolean {
+    if (this.isLoading) return false;
+    if (this.pageErrorMessage) return true;
+    return this.groups.length === 0 || this.tablePermissions.length === 0;
+  }
+
+  getPageStateTitle(): string {
+    return this.pageErrorMessage ? 'Unable to load permissions' : 'No permission data available';
+  }
+
+  getPageStateMessage(): string {
+    return this.pageErrorMessage || 'No roles or table permissions are available right now.';
+  }
+
+  getPageStateVariant(): 'empty' | 'error' {
+    return this.pageErrorMessage ? 'error' : 'empty';
+  }
+
+  private beginRequest(): void {
+    this.pendingRequests += 1;
+    this.isLoading = true;
+  }
+
+  private endRequest(): void {
+    this.pendingRequests = Math.max(0, this.pendingRequests - 1);
+    this.isLoading = this.pendingRequests > 0;
   }
 }

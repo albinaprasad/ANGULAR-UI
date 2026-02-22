@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { TableDescription, Column, TypeMap, ColumnType } from '../../../types/admin.types';
 @Component({
   selector: 'app-dynamic-table',
@@ -6,7 +6,7 @@ import { TableDescription, Column, TypeMap, ColumnType } from '../../../types/ad
   templateUrl: './dynamic-table.html',
   styleUrls: ['./dynamic-table.css']
 })
-export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class DynamicTableComponent implements OnInit, OnChanges {
   @Output() cellUpdate = new EventEmitter<{ rowIndex: number; column: string; newValue: any; oldValue: any }>();
   editingCell: { rowIndex: number; column: string } | null = null;
   editValue: any = null;
@@ -19,21 +19,11 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit, 
 
   @Output() loadMoreData = new EventEmitter<void>();
 
-  @ViewChild('tableWrapper', { static: false })
-  set tableWrapperRef(ref: ElementRef | undefined) {
-    this.tableWrapper = ref;
-    this.setupInfiniteScroll();
-  }
-  tableWrapper?: ElementRef;
-
   displayColumns: string[] = [];
   columnMetadata: Map<string, Column> = new Map();
   columnWidths: number[] = [];
   filteredData: any[] = [];
   columnFilters: { [key: string]: string[] } = {};
-  private scrollThreshold: number = 200; 
-  private activeScrollElement: HTMLElement | null = null;
-  private readonly boundOnScroll = this.onScroll.bind(this);
 
   ngOnInit(): void {
     if (this.tableDescription) {
@@ -77,14 +67,6 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit, 
     }
   }
 
-  ngAfterViewInit(): void {
-    this.setupInfiniteScroll();
-  }
-
-  ngOnDestroy(): void {
-    this.teardownInfiniteScroll();
-  }
-
   private processTableDescription(): void {
     if (!this.tableDescription) return;
 
@@ -97,36 +79,13 @@ export class DynamicTableComponent implements OnInit, OnChanges, AfterViewInit, 
     this.columnWidths = new Array(this.displayColumns.length).fill(200);
   }
 
-  private setupInfiniteScroll(): void {
-    if (!this.enableInfiniteScroll) return;
-    if (!this.tableWrapper) return;
-
-    const element = this.tableWrapper.nativeElement as HTMLElement;
-    if (this.activeScrollElement === element) return;
-
-    this.teardownInfiniteScroll();
-    element.addEventListener('scroll', this.boundOnScroll);
-    this.activeScrollElement = element;
-  }
-
-  private teardownInfiniteScroll(): void {
-    if (!this.activeScrollElement) return;
-    this.activeScrollElement.removeEventListener('scroll', this.boundOnScroll);
-    this.activeScrollElement = null;
-  }
-
-  private onScroll(): void {
+  onInfiniteScroll(): void {
     if (!this.enableInfiniteScroll || this.loading) return;
-    if (!this.activeScrollElement) return;
-
-    const element = this.activeScrollElement;
-    const { scrollTop, scrollHeight, clientHeight } = element;
-
-    const nearBottom = scrollHeight - scrollTop - clientHeight < this.scrollThreshold;
-
-    if (nearBottom || (this.hasActiveFilters() && this.filteredData.length < 20)) {
+    if (this.hasActiveFilters() && this.filteredData.length < 20) {
       this.loadMoreData.emit();
+      return;
     }
+    this.loadMoreData.emit();
   }
 
   onColumnWidthChange(columnIndex: number, newWidth: number): void {

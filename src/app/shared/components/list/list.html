@@ -18,6 +18,8 @@
         placeholder="Search..."
         />
         <button
+        app-button
+        variant="secondary"
         *ngIf="search"
         class="clear-btn"
         (click)="search=''"
@@ -50,6 +52,8 @@
       <!-- Actions -->
       <div class="cell actions" *ngIf="actions.length">
         <button
+          app-button
+          variant="secondary"
           *ngFor="let action of actions"
           (click)="triggerAction(action, item)"
         >
@@ -61,7 +65,11 @@
 
     <!-- Empty -->
     <div *ngIf="items.length === 0" class="empty">
-      No data
+      <app-empty-state
+        [compact]="true"
+        [title]="'No data available'"
+        [message]="'There are no records to display right now.'"
+      ></app-empty-state>
     </div>
 
   </div>

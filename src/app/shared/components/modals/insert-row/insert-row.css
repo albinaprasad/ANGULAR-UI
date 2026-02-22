@@ -1,0 +1,183 @@
+.insert-row-main {
+    width: 100vw;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background: rgba(16, 20, 26, 0.4);
+    padding: 24px;
+}
+
+.insert-row-content {
+    width: 50%;
+    max-height: 80%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.insert-row-card {
+    width: 100%;
+    max-height: 100%;
+    height: auto;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+    padding: 24px 28px 28px;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.insert-row-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-bottom: 1px solid #e6e9ef;
+    padding-bottom: 12px;
+}
+
+.insert-row-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.insert-row-header .table-name {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+    letter-spacing: 0.3px;
+}
+
+.insert-row-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    gap: 14px;
+    align-items: center;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1.1fr 2fr 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 8px;
+    border-radius: 10px;
+    background: #f9fafb;
+    border: 1px solid #eef2f7;
+    width: 80%;
+}
+
+.field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    word-break: break-word;
+}
+
+.field-input {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field-input app-dynamic-cell-editor {
+    width: 100%;
+    display: block;
+}
+
+.field-input .cell-edit-input {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #d7dce5;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+.insert-button {
+    width: min-content;
+    display: flex;
+}
+
+.required-marker {
+    margin-left: 4px;
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.field-error {
+    margin: 0;
+    color: #b91c1c;
+    font-size: 12px;
+}
+
+.submit-error {
+    margin: 0;
+    color: #b91c1c;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.field-input .cell-edit-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.field-meta {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.field-meta .type {
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-weight: 600;
+}
+
+.field-meta .nullable {
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+    .insert-row-content {
+        width: 70%;
+    }
+}
+
+@media (max-width: 900px) {
+    .insert-row-content {
+        width: 90%;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
+    .field-meta {
+        justify-content: flex-start;
+    }
+}
