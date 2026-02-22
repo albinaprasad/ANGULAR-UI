@@ -3,13 +3,80 @@
     background: linear-gradient(135deg, #eef0ff 0%, #f5f0ff 50%, #fdf0ff 100%);
     min-height: calc(100vh - 72px);
     font-family: 'Inter', 'Roboto', sans-serif;
+    position: relative;
+    overflow: hidden;
 }
+
+/* ── Background Decoration Divs ───────────────── */
+.bg-blob {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(60px);
+    z-index: 0;
+}
+
+.bg-blob-1 {
+    width: 520px;
+    height: 520px;
+    top: -150px;
+    right: -120px;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.28) 0%, rgba(118, 75, 162, 0.12) 55%, transparent 75%);
+    animation: blobDrift 14s ease-in-out infinite alternate;
+}
+
+.bg-blob-2 {
+    width: 400px;
+    height: 400px;
+    bottom: -100px;
+    left: -80px;
+    background: radial-gradient(circle, rgba(240, 147, 251, 0.22) 0%, rgba(118, 75, 162, 0.08) 55%, transparent 75%);
+    animation: blobDrift 18s ease-in-out infinite alternate-reverse;
+}
+
+.bg-blob-3 {
+    width: 260px;
+    height: 260px;
+    top: 40%;
+    left: 55%;
+    background: radial-gradient(circle, rgba(79, 172, 254, 0.18) 0%, rgba(0, 242, 254, 0.06) 55%, transparent 75%);
+    animation: blobDrift 22s ease-in-out infinite alternate;
+}
+
+/* Dot-grid overlay */
+.bg-grid {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: radial-gradient(circle, rgba(102, 126, 234, 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+
+@keyframes blobDrift {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(28px, 18px) scale(1.07);
+    }
+
+    100% {
+        transform: translate(-14px, 32px) scale(0.95);
+    }
+}
+
 
 .dashboard-wrapper {
     max-width: 1020px;
     margin: 0 auto;
     padding: 2.5rem 2rem;
     animation: fadeSlide 0.4s ease-out;
+    position: relative;
+    z-index: 1;
 }
 
 /* ── Page Header ────────────────────────────── */
@@ -43,6 +110,8 @@
     box-shadow: 0 4px 24px rgba(102, 126, 234, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
     margin-bottom: 1.75rem;
     border: 1px solid rgba(102, 126, 234, 0.14);
+    position: relative;
+    z-index: 50;
 }
 
 /* ── Styled Dropdown ────────────────────────── */
