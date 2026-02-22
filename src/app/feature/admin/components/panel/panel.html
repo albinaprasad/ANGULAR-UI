@@ -9,8 +9,8 @@
 
 <ng-template #userNavbar>
     <app-navbar
-        [title]="'User Panel'"
-        [subtitle]="'Manage your profile and notifications'"
+        [title]="studentName ? studentName + ' Panel' : 'Student Panel'"
+        [subtitle]="'View your semesters and Profile'"
         [logoUrl]="'/assets/admin-logo.png'"
         [navItems]="userPanel">
     </app-navbar>

@@ -1,39 +1,86 @@
-<div class="semester-container">
-    <div class="semester-card">
-        <h1 class="semester-title">My Semesters</h1>
-        <p class="semester-desc">View your subjects and marks for each semester.</p>
+<div class="dashboard-wrapper">
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="page-title">My Semesters</h1>
+            <p class="page-subtitle">Track your academic progress and subject performance</p>
+        </div>
+        <div class="header-actions">
+            <!-- Optional actions can go here -->
+        </div>
+    </div>
 
-        <div class="input-block">
-            <label class="input-label" for="semester-select">Select a Semester</label>
-            <select id="semester-select" class="semester-select" [value]="selectedSemesterId"
-                (change)="onSemesterSelect($event)">
-                <option *ngFor="let sem of semesters" [value]="sem.id">{{ sem.name }}</option>
-            </select>
+    <div class="control-panel">
+        <div class="select-wrapper">
+            <label for="semester-select" class="select-label">Select Semester</label>
+            <div class="custom-select-container">
+                <select id="semester-select" class="custom-select" [value]="selectedSemesterId"
+                    (change)="onSemesterSelect($event)">
+                    <option *ngFor="let sem of semesters" [value]="sem.id">{{ sem.name }}</option>
+                </select>
+                <div class="select-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
         </div>
 
-        <div class="marks-table-container" *ngIf="selectedSemester">
-            <h2 class="semester-subtitle">{{ selectedSemester.name }} Results</h2>
-
-            <table class="marks-table">
-                <thead>
-                    <tr>
-                        <th>Subject</th>
-                        <th class="marks-column">Marks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let subject of selectedSemester.subjects">
-                        <td>{{ subject.name }}</td>
-                        <td class="marks-column">
-                            <span class="mark-badge"
-                                [ngClass]="{'pass': subject.marks && subject.marks >= 50, 'fail': subject.marks && subject.marks < 50}">
-                                {{ subject.marks ? subject.marks : 'N/A' }}
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="stats-overview" *ngIf="selectedSemester">
+            <div class="stat-card">
+                <span class="stat-value">{{ selectedSemester.subjects.length }}</span>
+                <span class="stat-label">Total Subjects</span>
+            </div>
         </div>
+    </div>
 
+    <div class="results-container" *ngIf="selectedSemester">
+        <div class="card result-card">
+            <div class="card-header">
+                <h2 class="card-title">{{ selectedSemester.name }} Results</h2>
+                <div class="badge-status">Official</div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Course / Subject</th>
+                            <th class="text-right">Credits</th>
+                            <th class="text-center">Score</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let subject of selectedSemester.subjects; let i = index" class="table-row">
+                            <td class="subject-cell">
+                                <div class="subject-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="subject-details">
+                                    <span class="subject-code">SUB-{{ 100 + i + (selectedSemester.id * 10) }}</span>
+                                    <span class="subject-name">{{ subject.name.split(' - ')[0] }}</span>
+                                </div>
+                            </td>
+                            <td class="text-right credits-cell">3.0</td>
+                            <td class="text-center score-cell">
+                                <span class="score-value">{{ subject.marks ? subject.marks : '-' }}</span>
+                            </td>
+                            <td class="text-center status-cell">
+                                <span class="status-badge"
+                                    [ngClass]="{'status-pass': subject.marks && subject.marks >= 50, 'status-fail': subject.marks && subject.marks < 50, 'status-pending': !subject.marks}">
+                                    {{ subject.marks ? (subject.marks >= 50 ? 'Pass' : 'Fail') : 'Pending' }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>

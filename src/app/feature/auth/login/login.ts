@@ -62,17 +62,23 @@ export class LoginComponent implements AfterViewInit {
   }
 
   async login(): Promise<void> {
-    this.authService.logout()
-    if (!this.username || !this.password) {
-      this.errorMessage = 'Please enter username and password';
-      return;
-    }
+    console.log('Login clicked. Starting bypass flow...');
+    this.authService.logout();
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Bypassing API authentication for student view
     setTimeout(() => {
+      console.log('Timeout finished. Redirecting to /user/semesters...');
+
+      // Close modal to actually show the page we are redirecting to
+      const body = document.querySelector("body") as HTMLElement;
+      const modal = document.querySelector(".modal") as HTMLElement;
+      if (modal) {
+        modal.classList.remove("is-open");
+        body.style.overflow = "initial";
+      }
+
       this.isLoading = false;
       this.router.navigateByUrl('/user/semesters');
     }, 500); // Small delay to simulate loading
