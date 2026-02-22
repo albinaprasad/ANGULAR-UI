@@ -33,9 +33,6 @@ export class Panel {
     'label': 'Semesters', 'route': '/user/semesters', 'title': 'Student Panel', 'subtitle': 'View your semesters and marks'
   }, {
     'label': 'Profile', 'route': '/user/profile', 'title': 'Profile', 'subtitle': 'Edit and save your profile'
-  }, {
-    'label': 'Notification', 'route': '/user/notification', 'title': 'Notification', 'subtitle': 'Your Notification'
-  }
-  ]
+  }]
 
 }
