@@ -1,0 +1,27 @@
+<div class="navbar-header">
+  <div class ="title-section">
+    <h1>{{ title }}</h1>
+    <p *ngIf="subtitle" class="subtitle">{{ subtitle }}</p>
+  </div>
+
+  <nav class="navbar">
+    <!-- LEFT: NAV ITEMS -->
+    <ul class="nav-items">
+      <li *ngFor="let item of navItems">
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          (click)="selectNavItem(item)">
+          {{ item.label }}
+        </a>
+      </li>
+    </ul>
+
+    <!-- RIGHT: LOGOUT BUTTON -->
+  </nav>
+  <div class="logout">
+      <button app-button variant="primary" class="logout-btn" (click)="logout()">
+      Logout
+    </button>
+  </div>
+</div>

@@ -1,0 +1,89 @@
+.state-card {
+  margin: 0 auto;
+  max-width: 460px;
+  padding: 22px 20px;
+  border-radius: 14px;
+  border: 1px solid #d8e2ff;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8ff 100%);
+  box-shadow: 0 10px 30px rgba(71, 85, 138, 0.12);
+  text-align: center;
+}
+
+.state-card--compact {
+  max-width: 380px;
+  padding: 18px 16px;
+}
+
+.state-card--error {
+  border-color: #f5c7c7;
+  background: linear-gradient(180deg, #ffffff 0%, #fff6f6 100%);
+  box-shadow: 0 10px 30px rgba(148, 55, 55, 0.12);
+}
+
+.state-card h3 {
+  margin: 0;
+  color: #2f3a60;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.state-card p {
+  margin: 8px 0 0;
+  color: #5f6b8f;
+  font-size: 14px;
+}
+
+.state-illustration {
+  margin: 0 auto 14px;
+  width: min(260px, 100%);
+}
+
+.state-illustration svg {
+  width: 100%;
+  height: auto;
+}
+
+.state-illustration .frame {
+  fill: #edf3ff;
+  stroke: #c5d3ff;
+  stroke-width: 2;
+}
+
+.state-card--error .state-illustration .frame {
+  fill: #fff0f0;
+  stroke: #f5c7c7;
+}
+
+.state-illustration .line {
+  fill: #d5e1ff;
+}
+
+.state-card--error .state-illustration .line {
+  fill: #ffd7d7;
+}
+
+.state-illustration .line-strong {
+  fill: #adc1ff;
+}
+
+.state-card--error .state-illustration .line-strong {
+  fill: #ffb1b1;
+}
+
+.state-illustration .dot {
+  fill: #6f8df8;
+}
+
+.state-card--error .state-illustration .dot {
+  fill: #ee6d6d;
+}
+
+.state-illustration .search-stroke {
+  stroke: #6f8df8;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.state-card--error .state-illustration .search-stroke {
+  stroke: #ee6d6d;
+}

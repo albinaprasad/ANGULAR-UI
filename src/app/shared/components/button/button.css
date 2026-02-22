@@ -1,0 +1,33 @@
+:host {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+:host(:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+:host(.app-btn--primary) {
+  background: #0f4c81;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(15, 76, 129, 0.25);
+}
+
+:host(.app-btn--primary:hover:not(:disabled)) {
+  background: #0d416d;
+}
+
+:host(.app-btn--secondary) {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+:host(.app-btn--secondary:hover:not(:disabled)) {
+  background: #e2e8f0;
+}

@@ -1,0 +1,9 @@
+<div
+    class="insert-row-backdrop"
+    *ngIf="insertRow.table !== ''" 
+    (click)="onBackDropClick()"
+    >
+    <app-insert-row
+    [table]="insertRow"
+    ></app-insert-row>
+</div>

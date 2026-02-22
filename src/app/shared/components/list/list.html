@@ -1,0 +1,76 @@
+<div class="list-page">
+
+  <!-- Header -->
+  <div class="list-header">
+    <div>
+      <h2>{{ title }}</h2>
+      <p>{{ subtitle }}</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+    <div class="list-toolbar">
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+        type="text"
+        [(ngModel)]="search"
+        placeholder="Search..."
+        />
+        <button
+        app-button
+        variant="secondary"
+        *ngIf="search"
+        class="clear-btn"
+        (click)="search=''"
+        >
+        ✕
+        </button>
+    </div>
+</div>
+
+
+  <!-- Table -->
+  <div class="table">
+
+    <!-- Header row -->
+    <div class="row header">
+      <div class="cell" *ngFor="let col of columns">
+        {{ col }}
+      </div>
+
+      <div class="cell" *ngIf="actions.length">Actions</div>
+    </div>
+
+    <!-- Data rows -->
+    <div class="row" *ngFor="let item of items">
+
+      <div class="cell" *ngFor="let col of columns">
+        {{ item[col] }}
+      </div>
+
+      <!-- Actions -->
+      <div class="cell actions" *ngIf="actions.length">
+        <button
+          app-button
+          variant="secondary"
+          *ngFor="let action of actions"
+          (click)="triggerAction(action, item)"
+        >
+          {{ action.name }}
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="items.length === 0" class="empty">
+      <app-empty-state
+        [compact]="true"
+        [title]="'No data available'"
+        [message]="'There are no records to display right now.'"
+      ></app-empty-state>
+    </div>
+
+  </div>
+</div>

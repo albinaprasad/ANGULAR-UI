@@ -1,0 +1,39 @@
+<div class="semester-container">
+    <div class="semester-card">
+        <h1 class="semester-title">My Semesters</h1>
+        <p class="semester-desc">View your subjects and marks for each semester.</p>
+
+        <div class="input-block">
+            <label class="input-label" for="semester-select">Select a Semester</label>
+            <select id="semester-select" class="semester-select" [value]="selectedSemesterId"
+                (change)="onSemesterSelect($event)">
+                <option *ngFor="let sem of semesters" [value]="sem.id">{{ sem.name }}</option>
+            </select>
+        </div>
+
+        <div class="marks-table-container" *ngIf="selectedSemester">
+            <h2 class="semester-subtitle">{{ selectedSemester.name }} Results</h2>
+
+            <table class="marks-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th class="marks-column">Marks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let subject of selectedSemester.subjects">
+                        <td>{{ subject.name }}</td>
+                        <td class="marks-column">
+                            <span class="mark-badge"
+                                [ngClass]="{'pass': subject.marks && subject.marks >= 50, 'fail': subject.marks && subject.marks < 50}">
+                                {{ subject.marks ? subject.marks : 'N/A' }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>

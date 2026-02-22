@@ -1,0 +1,9 @@
+<div class="error-page">
+  <app-empty-state
+    [variant]="'error'"
+    [title]="'Page not found'"
+    [message]="'The page you requested does not exist or was moved.'"
+  ></app-empty-state>
+
+  <a routerLink="/" class="error-page-link">Go to Home</a>
+</div>

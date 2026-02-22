@@ -1,0 +1,39 @@
+<div class="permission-element-container">
+  <div class="permission-table">{{ permission.table }}</div>
+
+  <label class="permission-flag">
+    <input
+      type="checkbox"
+      [checked]="permission.canView"
+      (change)="togglePermission('view', $any($event.target).checked)"
+    />
+    <span>Can View</span>
+  </label>
+
+  <label class="permission-flag">
+    <input
+      type="checkbox"
+      [checked]="permission.canChange"
+      (change)="togglePermission('change', $any($event.target).checked)"
+    />
+    <span>Can Change</span>
+  </label>
+
+  <label class="permission-flag">
+    <input
+      type="checkbox"
+      [checked]="permission.canDelete"
+      (change)="togglePermission('delete', $any($event.target).checked)"
+    />
+    <span>Can Delete</span>
+  </label>
+
+  <label class="permission-flag">
+    <input
+      type="checkbox"
+      [checked]="permission.canAdd"
+      (change)="togglePermission('add', $any($event.target).checked)"
+    />
+    <span>Can Add</span>
+  </label>
+</div>

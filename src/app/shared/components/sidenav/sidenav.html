@@ -1,0 +1,48 @@
+<div class="sidenav" [class.collapsed]="!isOpen">
+  <div class="sidenav-header">
+    <div class="sidenav-title" *ngIf="isOpen">
+      {{ title }}
+    </div>
+    <button
+      class="toggle-btn"
+      (click)="toggle()"
+      [title]="isOpen ? 'Collapse sidebar' : 'Expand sidebar'">
+      <span class="toggle-icon">{{ isOpen ? '◀' : '▶' }}</span>
+    </button>
+  </div>
+
+  <div class="sidenav-content">
+    <nav class="nav-list">
+      <div
+        class="nav-item"
+        *ngFor="let item of navItems; let i = index"
+        [class.active]="item.active"
+        (click)="selectItem(item.id)"
+        [title]="item.label"
+        draggable="true"
+        (dragstart)="onDragStart($event, i)"
+        (dragover)="onDragOver($event, i)"
+        (drop)="onDrop($event, i)"
+        (dragend)="onDragEnd()"
+        [class.drag-over]="overIndex === i && dragIndex !== null && dragIndex !== i"
+      >
+        <div class="nav-icon">
+          {{ item.icon }}
+        </div>
+
+        <div class="nav-label" *ngIf="isOpen">
+          {{ item.label }}
+        </div>
+
+        <div class="nav-indicator" *ngIf="item.active && isOpen"></div>
+        <span class="drag-handle" title="Drag to reorder">☰</span>
+      </div>
+    </nav>
+  </div>
+
+  <div class="sidenav-footer" *ngIf="isOpen">
+    <div class="footer-content">
+      <small>Data Management</small>
+    </div>
+  </div>
+</div>

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Login } from './login';
+import { PermissionElement } from './permission-element';
 
-describe('Login', () => {
-  let component: Login;
-  let fixture: ComponentFixture<Login>;
+describe('PermissionElement', () => {
+  let component: PermissionElement;
+  let fixture: ComponentFixture<PermissionElement>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Login]
+      declarations: [PermissionElement]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Login);
+    fixture = TestBed.createComponent(PermissionElement);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

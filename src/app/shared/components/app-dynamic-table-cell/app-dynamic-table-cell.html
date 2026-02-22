@@ -1,0 +1,61 @@
+<!-- FOREIGN KEY -> SEARCHABLE OVERLAY SELECT -->
+<app-select
+  *ngIf="hasForeignKey"
+  [tableDetails]="foreignKey"
+  [value]="value"
+  [valueKey]="foreignValueKey"
+  [labelKey]="foreignLabelKey"
+  [nullable]="nullable"
+  [placeholder]="foreignPlaceholder"
+  (valueChange)="onChange($event)"
+></app-select>
+
+<!-- BOOLEAN -->
+<select
+  *ngIf="type === 'boolean' && !hasForeignKey"
+  class="cell-edit-input"
+  [class.null-value]="value === null"
+  [ngModel]="value"
+  (ngModelChange)="onChange($event)">
+
+  <option *ngIf="nullable" [ngValue]="null">— NULL —</option>
+  <option [ngValue]="true">True</option>
+  <option [ngValue]="false">False</option>
+</select>
+
+<!-- VARCHAR / TEXT -->
+<input
+  *ngIf="(type === 'varchar' || type === 'text') && !hasForeignKey"
+  type="text"
+  class="cell-edit-input"
+  [class.null-value]="value === null"
+  [ngModel]="value"
+  (ngModelChange)="onChange($event)" />
+
+<!-- INT / FLOAT -->
+<input
+  *ngIf="(type === 'int' || type === 'float') && !hasForeignKey"
+  type="number"
+  class="cell-edit-input"
+  [step]="type === 'float' ? 'any' : 1"
+  [class.null-value]="value === null"
+  [ngModel]="value"
+  (ngModelChange)="onChange($event)" />
+
+<!-- DATE -->
+<input
+  *ngIf="type === 'date' && !hasForeignKey"
+  type="date"
+  class="cell-edit-input"
+  [class.null-value]="value === null"
+  [ngModel]="value"
+  (ngModelChange)="onChange($event)" />
+
+<!-- DATETIME -->
+<input
+  *ngIf="type === 'timestamp' && !hasForeignKey"
+  type="datetime-local"
+  class="cell-edit-input"
+  [class.null-value]="value === null"
+  [ngModel]="value | date:'yyyy-MM-ddTHH:mm'"
+  (ngModelChange)="onChange($event)" />

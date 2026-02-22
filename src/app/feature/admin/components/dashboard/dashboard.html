@@ -1,0 +1,45 @@
+<div class="dashboard-layout">
+  <app-sidenav
+    [navItems]="navItems"
+    [isOpen]="sidenavOpen"
+    [title]="'Data Tables'"
+    (itemSelected)="selectTable($event)"
+    (toggleSidenav)="toggleSidenav()"
+    (navItemsReordered)="onNavItemsReordered($event)"
+  >
+  </app-sidenav>
+
+  <div class="main-content" [class.sidenav-open]="sidenavOpen">
+    
+    
+    <div class="content-area">
+      <div class="table-toolbar">
+        <button
+          app-button
+          variant="secondary"
+          type="button"
+          class="edit-toggle"
+          [class.active]="editMode"
+          (click)="toggleEditMode()"
+        >
+          <span class="edit-toggle__icon" aria-hidden="true">✎</span>
+          <span class="edit-toggle__label">{{ editMode ? 'Edit mode on' : 'Edit mode off' }}</span>
+        </button>
+      </div>
+      <app-dynamic-table
+        [tableDescription]="tableDescriptions[selectedTable]"
+        [tableData]="tableData[selectedTable] || [] "
+        [enableInfiniteScroll]="true"
+        [loading]="tableLoading[selectedTable]"
+        [editMode]="editMode"
+        (loadMoreData)="onLoadMoreData()"
+        (cellUpdate)="onCellUpdate($event)"
+      >
+      </app-dynamic-table>
+      <app-floating-action-bar
+      (onClick)="floatingActionButtonHandler($event)"
+      >
+      </app-floating-action-bar>
+  </div>
+  
+</div>

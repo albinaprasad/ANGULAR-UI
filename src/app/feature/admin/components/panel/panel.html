@@ -1,0 +1,19 @@
+<ng-container *ngIf="isAdmin; else userNavbar">
+    <app-navbar
+        [title]="'Admin Panel'"
+        [subtitle]="'Manage your application settings and data'"
+        [logoUrl]="'/assets/admin-logo.png'"
+        [navItems]="adminPanel">
+    </app-navbar>
+</ng-container>
+
+<ng-template #userNavbar>
+    <app-navbar
+        [title]="'User Panel'"
+        [subtitle]="'Manage your profile and notifications'"
+        [logoUrl]="'/assets/admin-logo.png'"
+        [navItems]="userPanel">
+    </app-navbar>
+</ng-template>
+
+<router-outlet></router-outlet>

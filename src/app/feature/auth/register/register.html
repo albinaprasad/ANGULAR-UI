@@ -11,39 +11,54 @@
       <div class="modal-left">
 
         <h1 class="modal-title">
-          {{ isSignup ? 'Create Account' : 'Welcome Back' }}
+          Create Account
         </h1>
       
-        <!-- LOGIN -->
-        <div *ngIf="!isSignup">
-      
-          <app-text-input label="Email" type="email" placeholder="Email"></app-text-input>
-          <app-text-input label="Password" type="password" placeholder="Password"></app-text-input>
-      
-          <div class="modal-buttons">
-            <a href="#">Forgot your password?</a>
-            <button class="input-button">Login</button>
-          </div>
-      
-          <p class="sign-up">
-            Don't have an account?
-            <a href="#" (click)="switchToSignup(); $event.preventDefault()">Sign up now</a>
-          </p>
-        </div>
-      
         <!-- SIGNUP -->
-        <div *ngIf="isSignup" >
+        <div>
       
-          <app-text-input label="Full Name" placeholder="Your name"></app-text-input>
-          <app-text-input label="Email" type="email" placeholder="Email"></app-text-input>
-          <app-text-input label="Password" type="password" placeholder="Create password"></app-text-input>
-          <app-text-input label="Confirm Password" type="password" placeholder="Confirm password"></app-text-input>
+          <app-text-input
+            label="Full Name"
+            placeholder="Your name"
+            [required]="true"
+            [value]="fullName"
+            (valueChange)="fullNameChanged($event)"
+          ></app-text-input>
+          <app-text-input
+            label="Email"
+            type="email"
+            placeholder="Email"
+            [required]="true"
+            validationType="email"
+            [showValidation]="true"
+            [value]="email"
+            (valueChange)="emailChanged($event)"
+          ></app-text-input>
+          <app-text-input
+            label="Password"
+            type="password"
+            placeholder="Create password"
+            [required]="true"
+            [value]="password"
+            (valueChange)="passwordChanged($event)"
+          ></app-text-input>
+          <app-text-input
+            label="Confirm Password"
+            type="password"
+            placeholder="Confirm password"
+            [required]="true"
+            [value]="confirmPassword"
+            (valueChange)="confirmPasswordChanged($event)"
+          ></app-text-input>
       
-          <button class="input-button">Create Account</button>
+          <button app-button variant="primary" class="input-button" (click)="register()" [disabled]="isLoading">
+            {{ isLoading ? 'Creating...' : 'Create Account' }}
+          </button>
+          <p class="signup-error" *ngIf="errorMessage">{{ errorMessage }}</p>
       
           <p class="sign-up">
             Already have an account?
-            <a href="#" (click)="switchToLogin(); $event.preventDefault()">Login here</a>
+            <a href="#" (click)="goToLogin(); $event.preventDefault()">Login here</a>
           </p>
         </div>
       
@@ -58,6 +73,5 @@
         </svg>
       </button>
     </div>
-    <button class="modal-button">Click here to login</button>
+    <button app-button variant="secondary" class="modal-button">Click here to create account</button>
   </div>
-  

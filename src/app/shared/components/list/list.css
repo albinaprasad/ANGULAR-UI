@@ -1,0 +1,145 @@
+.list-page {
+  padding: 20px;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.list-title {
+  margin: 0;
+}
+
+.list-subtitle {
+  color: #666;
+  font-size: 14px;
+}
+
+.list-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px;
+}
+
+.list-container {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.list-row {
+  display: flex;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.list-row-header {
+  font-weight: bold;
+  background: #f5f5f5;
+}
+
+.col {
+  flex: 1;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.empty-state {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+
+.empty {
+  padding: 20px;
+}
+
+.table {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.row {
+  display: flex;
+  border-bottom: 1px solid #eee;
+}
+
+.header {
+  font-weight: bold;
+  background: #f5f5f5;
+}
+
+.cell {
+  flex: 1;
+  padding: 10px;
+}
+
+.actions button {
+  margin-right: 6px;
+}
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Search container */
+.search-box {
+  position: relative;
+  max-width: 100%;
+}
+
+/* Input */
+.search-box input {
+  width: 100%;
+  padding: 10px 6px 10px 36px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+/* Focus effect */
+.search-box input:focus {
+  border-color: #4f7cff;
+  box-shadow: 0 0 0 2px rgba(79, 124, 255, 0.15);
+}
+
+/* Icon */
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #888;
+}
+
+/* Clear button */
+.clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: #999;
+}
+
+.clear-btn:hover {
+  color: #333;
+}

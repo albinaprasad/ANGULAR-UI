@@ -1,0 +1,12 @@
+<div class="popup" role="dialog" aria-modal="true" aria-labelledby="popup-title" aria-describedby="popup-message">
+  <div class="popup__header">
+    <h2 id="popup-title" class="popup__title">{{ title }}</h2>
+  </div>
+  <div class="popup__body">
+    <p id="popup-message" class="popup__message">{{ message }}</p>
+  </div>
+  <div class="popup__actions">
+    <button app-button variant="secondary" type="button" class="popup__btn popup__btn--cancel" (click)="onCancel()">Cancel</button>
+    <button app-button variant="primary" type="button" class="popup__btn popup__btn--confirm" (click)="onConfirm()">Confirm</button>
+  </div>
+</div>

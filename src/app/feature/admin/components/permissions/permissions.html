@@ -1,0 +1,55 @@
+<div class="notification-layout">
+  <main class="main-content">
+    
+    <section class="content-area">
+      <div class="permission-container">
+        <app-note
+            title="*Note"
+            message="Grant and manage permissions for users and roles. Grant permissions with utmost care as it can cause security issues."
+        >
+            
+        </app-note>
+        <div class="permissions-content" *ngIf="!shouldShowPageState(); else pageState">
+            <div class="nav-section">
+                <app-sidenav
+                    [navItems]="groups"
+                    [isOpen]="true"
+                    [title]="'Roles'"
+                    (itemSelected)="onGroupSelected($event)"
+                    (toggleSidenav)="toggleSidenav()"
+                    (navItemsReordered)="onNavItemsReordered($event)"
+                >
+                </app-sidenav>
+            </div>
+            <div class="permission-list-section">
+              <div class="permission-list-header">
+                <span>Table</span>
+                <span>View</span>
+                <span>Change</span>
+                <span>Delete</span>
+                <span>Add</span>
+              </div>
+
+              <div class="permission-list">
+                <app-permission-element
+                  *ngFor="let permission of tablePermissions"
+                  [permission]="permission"
+                  (permissionChange)="onTablePermissionChanged($event)"
+                ></app-permission-element>
+              </div>
+            </div>
+        </div>
+        <ng-template #pageState>
+          <div class="permissions-page-state">
+            <app-empty-state
+              [variant]="getPageStateVariant()"
+              [title]="getPageStateTitle()"
+              [message]="getPageStateMessage()"
+            ></app-empty-state>
+          </div>
+        </ng-template>
+      </div>
+    </section>
+
+  </main>
+</div>
