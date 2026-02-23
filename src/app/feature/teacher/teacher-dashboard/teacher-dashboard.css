@@ -301,6 +301,26 @@
     background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.07)) !important;
 }
 
+/* Number badge */
+.dd-item-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(102, 126, 234, 0.1);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #764ba2;
+    flex-shrink: 0;
+}
+
+.dd-item-active .dd-item-num {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+}
+
 .dd-item-body {
     display: flex;
     flex-direction: column;
@@ -313,6 +333,12 @@
     font-weight: 600;
     color: #1a1340;
     line-height: 1;
+}
+
+.dd-item-year {
+    font-size: 0.7rem;
+    color: #9b8fc2;
+    font-weight: 500;
 }
 
 .dd-item-check {
