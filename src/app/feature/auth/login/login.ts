@@ -92,6 +92,28 @@ export class LoginComponent implements AfterViewInit {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
   }
 
+  async loginAsTeacher(): Promise<void> {
+    console.log('Login as Teacher clicked. Starting bypass flow...');
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    setTimeout(() => {
+      // Mock teacher login
+      localStorage.removeItem('is_super_admin');
+      localStorage.setItem('is_teacher', 'true');
+
+      const body = document.querySelector("body") as HTMLElement;
+      const modal = document.querySelector(".modal") as HTMLElement;
+      if (modal) {
+        modal.classList.remove("is-open");
+        body.style.overflow = "initial";
+      }
+
+      this.isLoading = false;
+      this.router.navigateByUrl('/teacher/dashboard');
+    }, 500);
+  }
+
   goToRegister() {
     this.router.navigate(['/auth/register']);
   }

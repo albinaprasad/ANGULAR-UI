@@ -1,0 +1,159 @@
+<div class="dashboard-wrapper">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1 class="page-title">Teacher Dashboard</h1>
+        <p class="page-subtitle">Manage your students, upload answer sheets, and grade them with AI.</p>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+
+        <div class="select-group">
+            <label class="select-label">Select Batch / Semester</label>
+            <div class="custom-dropdown-wrapper" [class.open]="isDropdownOpen"
+                (click)="isDropdownOpen = !isDropdownOpen">
+                <button class="dd-trigger">
+                    <div class="dd-trigger-inner">
+                        <div class="dd-icon"><i class="fas fa-layer-group"></i></div>
+                        <div class="dd-trigger-text">
+                            <span class="dd-selected-name">{{ selectedBatch }}</span>
+                            <span class="dd-selected-meta">Current Selection</span>
+                        </div>
+                    </div>
+                    <div class="dd-chevron" [class.rotate]="isDropdownOpen">▼</div>
+                </button>
+                <div class="dd-panel" *ngIf="isDropdownOpen">
+                    <div class="dd-panel-header">Available Semesters</div>
+                    <ul class="dd-list">
+                        <li class="dd-item" *ngFor="let opt of semesterOptions"
+                            [class.dd-item-active]="opt.value === selectedBatch"
+                            (click)="selectedBatch = opt.value; isDropdownOpen = false">
+                            <div class="dd-item-body">
+                                <span class="dd-item-name">{{ opt.label }}</span>
+                            </div>
+                            <div class="dd-item-check" *ngIf="opt.value === selectedBatch">✓</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary / Actions -->
+        <div class="actions-group">
+            <button class="btn-primary" (click)="openAddStudentModal()">
+                <span class="btn-icon">+</span> Add Student
+            </button>
+        </div>
+    </div>
+
+    <!-- Student Grading Table -->
+    <div class="result-card">
+        <div class="card-head">
+            <div class="card-head-left">
+                <h2 class="card-title">Student Evaluation</h2>
+                <span class="card-meta">{{ students.length }} Students in {{ selectedBatch }}</span>
+            </div>
+            <div class="official-badge">
+                <span class="badge-icon">✨</span> AI Grading
+            </div>
+        </div>
+
+        <div class="table-scroll fixed-height-scroll">
+            <table class="grade-table">
+                <thead>
+                    <tr>
+                        <th class="col-center">No.</th>
+                        <th>Student Name</th>
+                        <th>Roll No.</th>
+                        <th>Status</th>
+                        <th>AI Score</th>
+                        <th class="col-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="grade-row" *ngFor="let student of students; let i = index">
+                        <td class="row-index">{{ i + 1 }}</td>
+
+                        <td>
+                            <div class="subject-cell">
+                                <div class="subject-avatar">{{ student.name.charAt(0) }}</div>
+                                <div class="subject-meta">
+                                    <span class="subject-name">{{ student.name }}</span>
+                                    <span class="subject-code">{{ selectedBatch }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="score-num">{{ student.rollNo }}</span>
+                        </td>
+
+                        <td>
+                            <div class="status-chip" [class.chip-pass]="student.status === 'Graded'"
+                                [class.chip-pending]="student.status === 'Pending'"
+                                [class.chip-fail]="student.status === 'Uploaded'">
+                                <span class="chip-dot"></span>
+                                {{ student.status }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="score-cell">
+                                <ng-container
+                                    *ngIf="student.score !== null && student.score !== undefined; else noScore">
+                                    <span class="score-num">{{ student.score }} / 100</span>
+                                    <div class="score-bar-track">
+                                        <div class="score-bar-fill bar-pass" [style.width.%]="student.score"></div>
+                                    </div>
+                                </ng-container>
+                                <ng-template #noScore>
+                                    <span class="score-num" style="color: #9b8fc2;">- -</span>
+                                </ng-template>
+                            </div>
+                        </td>
+
+                        <td class="col-center action-buttons">
+                            <button class="btn-icon-action" (click)="triggerFileUpload(student)"
+                                title="Upload Answer Sheet">
+                                📁 Upload
+                            </button>
+                            <button class="btn-icon-action btn-ai"
+                                [disabled]="!student.answerSheetUploaded || student.status === 'Graded'"
+                                (click)="sendToAI(student)" title="Send to AI for Grading">
+                                ✨ Grade
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Student Semesters Mark Table removed and moved to own path -->
+
+    <!-- Add Student Modal -->
+    <div class="modal-overlay" *ngIf="showAddStudentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Student</h3>
+                <button class="close-btn" (click)="closeAddStudentModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Student Name</label>
+                    <input type="text" [(ngModel)]="newStudentData.name" placeholder="e.g. John Doe" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Roll Number</label>
+                    <input type="text" [(ngModel)]="newStudentData.rollNo" placeholder="e.g. CS101" class="form-input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="closeAddStudentModal()">Cancel</button>
+                <button class="btn-primary" [disabled]="!newStudentData.name || !newStudentData.rollNo"
+                    (click)="addStudent()">Add to Batch</button>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,18 +1,20 @@
-<ng-container *ngIf="isAdmin; else userNavbar">
-    <app-navbar
-        [title]="'Admin Panel'"
-        [subtitle]="'Manage your application settings and data'"
-        [logoUrl]="'/assets/admin-logo.png'"
-        [navItems]="adminPanel">
+<ng-container *ngIf="isTeacher; else checkAdmin">
+    <app-navbar [title]="'TEACHER'" [subtitle]="'Evaluate student uploads and view marks'"
+        [logoUrl]="'/assets/admin-logo.png'" [navItems]="teacherPanel">
     </app-navbar>
 </ng-container>
 
+<ng-template #checkAdmin>
+    <ng-container *ngIf="isAdmin; else userNavbar">
+        <app-navbar [title]="'Admin Panel'" [subtitle]="'Manage your application settings and data'"
+            [logoUrl]="'/assets/admin-logo.png'" [navItems]="adminPanel">
+        </app-navbar>
+    </ng-container>
+</ng-template>
+
 <ng-template #userNavbar>
-    <app-navbar
-        [title]="studentName ? studentName + ' Panel' : 'Student Panel'"
-        [subtitle]="'View your semesters and Profile'"
-        [logoUrl]="'/assets/admin-logo.png'"
-        [navItems]="userPanel">
+    <app-navbar [title]="studentName ? studentName + ' Panel' : 'Student Panel'"
+        [subtitle]="'View your semesters and Profile'" [logoUrl]="'/assets/admin-logo.png'" [navItems]="userPanel">
     </app-navbar>
 </ng-template>
 

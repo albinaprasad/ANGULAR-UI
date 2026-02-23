@@ -26,6 +26,10 @@ export const routes: Routes = [
         canActivate: [AdminGuard]
       },
       {
+        path: 'teacher',
+        loadChildren: () => import('./feature/teacher/teacher.module').then(m => m.TeacherModule)
+      },
+      {
         path: 'user',
         loadChildren: () => import('./feature/user/user-module').then(m => m.CustomerModule)
       }

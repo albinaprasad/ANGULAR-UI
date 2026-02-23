@@ -1,0 +1,215 @@
+/* Container */
+.dashboard-container {
+    padding: 2rem 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    color: #1a1340;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.header-section {
+    margin-bottom: 2rem;
+}
+
+.header-section h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    color: #1a1340;
+    letter-spacing: -0.02em;
+}
+
+.header-section p {
+    color: #6a6096;
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+/* ── Result Cards ───────────────────────────── */
+.result-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(118, 75, 162, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+}
+
+.card-head {
+    padding: 1.5rem 1.8rem;
+    border-bottom: 1px solid rgba(118, 75, 162, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.6), rgba(250, 249, 255, 0.8));
+}
+
+.card-head-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1340;
+    margin: 0;
+}
+
+.card-meta {
+    font-size: 0.85rem;
+    color: #9b8fc2;
+    font-weight: 500;
+}
+
+/* ── Buttons ────────────────────────────────── */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(118, 75, 162, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(118, 75, 162, 0.35);
+}
+
+/* ── Tables ─────────────────────────────────── */
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.fixed-height-scroll {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.grade-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.grade-table th {
+    background: #fbfaff;
+    color: #1a1340;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 2px solid rgba(118, 75, 162, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.grade-row {
+    transition: background 0.2s;
+    border-bottom: 1px solid rgba(118, 75, 162, 0.06);
+}
+
+.grade-row:hover {
+    background: #fcfbfe;
+}
+
+.grade-row td {
+    padding: 1.2rem 1.5rem;
+    vertical-align: middle;
+}
+
+.col-center {
+    text-align: center !important;
+}
+
+.subject-name {
+    font-weight: 700;
+    color: #1a1340;
+}
+
+.score-num {
+    font-weight: 700;
+    color: #4a3e79;
+    font-feature-settings: "tnum";
+}
+
+/* Grades / Chips */
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.chip-pass {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.letter-grade {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    background: #f3f0f8;
+    color: #9b8fc2;
+}
+
+.grade-a {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.grade-b {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.grade-c {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.secondary-table th {
+    padding: 0.8rem 1rem;
+}
+
+.secondary-table td {
+    padding: 0.8rem 1rem;
+}

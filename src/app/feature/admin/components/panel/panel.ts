@@ -9,16 +9,30 @@ import { AuthService } from '../../../../services/http/auth.service';
   styleUrl: './panel.css',
 })
 export class Panel {
-  isAdmin = localStorage.getItem(environmentJson.IS_SUPER_ADMIN) === 'true'
+  isAdmin = localStorage.getItem(environmentJson.IS_SUPER_ADMIN) === 'true';
+  isTeacher = localStorage.getItem('is_teacher') === 'true';
+
   adminPanel: any = [{
     'label': 'Dashboard', 'route': '/admin/dashboard', 'title': 'Admin Panel', 'subtitle': 'Manage your data from here'
+  }, {
+    'label': 'Permission', 'route': '/admin/permissions', 'title': 'Permission', 'subtitle': 'Grant and manage permissions'
   }, {
     'label': 'Profile', 'route': '/user/profile', 'title': 'Profile', 'subtitle': 'Edit and save your profile'
   }, {
     'label': 'Notification', 'route': '/user/notification', 'title': 'Notification', 'subtitle': 'Your Notification'
+  }];
+
+  teacherPanel: any = [{
+    'label': 'Teacher Section', 'route': '/teacher/dashboard', 'title': 'TEACHER', 'subtitle': 'Evaluate student uploads'
   }, {
-    'label': 'Permission', 'route': '/admin/permissions', 'title': 'Permission', 'subtitle': 'Grant and manage permissions'
-  }]
+    'label': 'Marks', 'route': '/teacher/marks', 'title': 'TEACHER', 'subtitle': 'View academic progress'
+  }];
+
+  userPanel: any = [{
+    'label': 'Semesters', 'route': '/user/semesters', 'title': 'Student Panel', 'subtitle': 'View your semesters and marks'
+  }, {
+    'label': 'Profile', 'route': '/user/profile', 'title': 'Profile', 'subtitle': 'Edit and save your profile'
+  }];
 
   studentName: string = '';
 
@@ -28,11 +42,5 @@ export class Panel {
       this.studentName = user.username;
     }
   }
-
-  userPanel: any = [{
-    'label': 'Semesters', 'route': '/user/semesters', 'title': 'Student Panel', 'subtitle': 'View your semesters and marks'
-  }, {
-    'label': 'Profile', 'route': '/user/profile', 'title': 'Profile', 'subtitle': 'Edit and save your profile'
-  }]
 
 }
