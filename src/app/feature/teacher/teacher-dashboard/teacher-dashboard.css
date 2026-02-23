@@ -49,6 +49,13 @@
     border: 1px solid rgba(102, 126, 234, 0.14);
     position: relative;
     z-index: 50;
+    gap: 1.5rem;
+}
+
+.dropdowns-container {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
 /* ── Buttons ────────────────────────────────── */
@@ -195,6 +202,10 @@
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: #fff;
     flex-shrink: 0;
+}
+
+.dd-icon.alt-color {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
 }
 
 .dd-trigger-text {

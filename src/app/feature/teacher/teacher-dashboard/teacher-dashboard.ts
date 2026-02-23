@@ -1,4 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
+
+interface Subject {
+    name: string;
+    marks: number | null;
+}
+
+interface Semester {
+    id: number;
+    name: string;
+    subjects: Subject[];
+}
 
 interface Student {
     id: string;
@@ -7,7 +18,6 @@ interface Student {
     answerSheetUploaded: boolean;
     score?: number | null;
     status: 'Pending' | 'Uploaded' | 'Graded';
-    marksBySemester?: any[]; // optional, if we want to expand table
 }
 
 @Component({
@@ -18,36 +28,110 @@ interface Student {
 })
 export class TeacherDashboardComponent implements OnInit {
 
-    // State
+    // Main Selection State
+    semesters: Semester[] = [];
+    selectedSemesterId: number = 1;
+    semesterDropdownOpen = false;
+
+    selectedSubjectName: string = '';
+    subjectDropdownOpen = false;
+
+    // Student Data
+    students: Student[] = [];
+
+    // Modal State
     showAddStudentModal = false;
-    isDropdownOpen = false;
     newStudentData = { name: '', rollNo: '' };
-
-    // Select options
-    semesterOptions = [
-        { label: 'Semester 1', value: 'Semester 1' },
-        { label: 'Semester 2', value: 'Semester 2' },
-        { label: 'Semester 3', value: 'Semester 3' },
-        { label: 'Semester 4', value: 'Semester 4' },
-        { label: 'Semester 5', value: 'Semester 5' },
-        { label: 'Semester 6', value: 'Semester 6' },
-        { label: 'Semester 7', value: 'Semester 7' },
-        { label: 'Semester 8', value: 'Semester 8' }
-    ];
-    selectedBatch = 'Semester 1';
-
-    students: Student[] = [
-        { id: '1', name: 'Albin Prasad', rollNo: 'CS001', answerSheetUploaded: false, status: 'Pending' },
-        { id: '2', name: 'John Doe', rollNo: 'CS002', answerSheetUploaded: true, status: 'Uploaded', score: null },
-        { id: '3', name: 'Jane Smith', rollNo: 'CS003', answerSheetUploaded: true, status: 'Graded', score: 85 }
-    ];
 
     constructor() { }
 
     ngOnInit(): void {
+        this.generateMockSemesters();
+        this.selectedSubjectName = this.semesters[0].subjects[0].name;
+        this.generateMockStudents();
     }
 
-    // Handlers
+    // --- Mock Data ---
+    generateMockSemesters() {
+        const subjectNames = ['Mathematics', 'Physics', 'Chemistry', 'Computer Science', 'English'];
+        for (let i = 1; i <= 8; i++) {
+            this.semesters.push({
+                id: i,
+                name: `Semester ${i}`,
+                subjects: subjectNames.map(name => ({
+                    name: `${name} - Sem ${i}`,
+                    marks: null
+                }))
+            });
+        }
+    }
+
+    generateMockStudents() {
+        const names = ['Albin Prasad', 'John Doe', 'Jane Smith', 'Michael Johnson', 'Sarah Williams', 'David Brown'];
+        this.students = names.map((name, index) => {
+            const uploaded = Math.random() > 0.3;
+            const graded = uploaded && Math.random() > 0.4;
+            return {
+                id: `${index + 1}`,
+                name: name,
+                rollNo: `CS00${index + 1}`,
+                answerSheetUploaded: uploaded,
+                status: graded ? 'Graded' : (uploaded ? 'Uploaded' : 'Pending'),
+                score: graded ? Math.floor(Math.random() * (100 - 60 + 1) + 60) : null
+            };
+        });
+    }
+
+    // --- Semester Dropdown Logic ---
+    get selectedSemester(): Semester | undefined {
+        return this.semesters.find(s => s.id === Number(this.selectedSemesterId));
+    }
+
+    toggleSemesterDropdown(event: Event) {
+        event.stopPropagation();
+        this.semesterDropdownOpen = !this.semesterDropdownOpen;
+        this.subjectDropdownOpen = false;
+    }
+
+    selectSemester(sem: Semester) {
+        this.selectedSemesterId = sem.id;
+        this.selectedSubjectName = sem.subjects[0].name; // Default to first
+        this.semesterDropdownOpen = false;
+        this.generateMockStudents();
+    }
+
+    semesterLabel(id: number): string {
+        return id <= 2 ? '1st Year' : id <= 4 ? '2nd Year' : id <= 6 ? '3rd Year' : '4th Year';
+    }
+
+    // --- Subject Dropdown Logic ---
+    get currentSubjects(): Subject[] {
+        return this.selectedSemester?.subjects || [];
+    }
+
+    toggleSubjectDropdown(event: Event) {
+        event.stopPropagation();
+        this.subjectDropdownOpen = !this.subjectDropdownOpen;
+        this.semesterDropdownOpen = false;
+    }
+
+    selectSubject(sub: Subject) {
+        this.selectedSubjectName = sub.name;
+        this.subjectDropdownOpen = false;
+        this.generateMockStudents(); // Simulate fetching matching students
+    }
+
+    // --- Click Outside ---
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.custom-dropdown-wrapper')) {
+            this.semesterDropdownOpen = false;
+            this.subjectDropdownOpen = false;
+        }
+    }
+
+    // --- Student Actions ---
     openAddStudentModal() {
         this.showAddStudentModal = true;
         this.newStudentData = { name: '', rollNo: '' };
@@ -59,7 +143,6 @@ export class TeacherDashboardComponent implements OnInit {
 
     addStudent() {
         if (!this.newStudentData.name || !this.newStudentData.rollNo) return;
-
         this.students.push({
             id: Math.random().toString(),
             name: this.newStudentData.name,
@@ -67,7 +150,6 @@ export class TeacherDashboardComponent implements OnInit {
             answerSheetUploaded: false,
             status: 'Pending'
         });
-
         this.closeAddStudentModal();
     }
 
@@ -80,8 +162,6 @@ export class TeacherDashboardComponent implements OnInit {
             if (file) {
                 student.answerSheetUploaded = true;
                 student.status = 'Uploaded';
-                // Mocking a file upload
-                console.log(`Uploaded file ${file.name} for ${student.name}`);
             }
         };
         input.click();
@@ -90,11 +170,10 @@ export class TeacherDashboardComponent implements OnInit {
     sendToAI(student: Student) {
         if (!student.answerSheetUploaded) return;
 
-        student.status = 'Pending'; // Show loading or processing state
-        // Mock processing timeout
+        student.status = 'Pending';
         setTimeout(() => {
             student.status = 'Graded';
-            student.score = Math.floor(Math.random() * (100 - 60 + 1) + 60); // Random score 60-100
-        }, 2000);
+            student.score = Math.floor(Math.random() * (100 - 60 + 1) + 60);
+        }, 1500);
     }
 }

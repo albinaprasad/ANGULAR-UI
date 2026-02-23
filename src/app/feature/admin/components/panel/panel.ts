@@ -26,6 +26,8 @@ export class Panel {
     'label': 'Teacher Section', 'route': '/teacher/dashboard', 'title': 'TEACHER', 'subtitle': 'Evaluate student uploads'
   }, {
     'label': 'Marks', 'route': '/teacher/marks', 'title': 'TEACHER', 'subtitle': 'View academic progress'
+  }, {
+    'label': 'Profile', 'route': '/user/profile', 'title': 'TEACHER', 'subtitle': 'Edit and save your profile'
   }];
 
   userPanel: any = [{

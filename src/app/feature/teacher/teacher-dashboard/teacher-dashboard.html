@@ -1,3 +1,9 @@
+<!-- Background Decoration Divs -->
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="bg-blob bg-blob-3"></div>
+<div class="bg-grid"></div>
+
 <div class="dashboard-wrapper">
     <!-- Header -->
     <div class="dashboard-header">
@@ -8,32 +14,127 @@
     <!-- Control Panel -->
     <div class="control-panel">
 
-        <div class="select-group">
-            <label class="select-label">Select Batch / Semester</label>
-            <div class="custom-dropdown-wrapper" [class.open]="isDropdownOpen"
-                (click)="isDropdownOpen = !isDropdownOpen">
-                <button class="dd-trigger">
-                    <div class="dd-trigger-inner">
-                        <div class="dd-icon"><i class="fas fa-layer-group"></i></div>
-                        <div class="dd-trigger-text">
-                            <span class="dd-selected-name">{{ selectedBatch }}</span>
-                            <span class="dd-selected-meta">Current Selection</span>
-                        </div>
-                    </div>
-                    <div class="dd-chevron" [class.rotate]="isDropdownOpen">▼</div>
-                </button>
-                <div class="dd-panel" *ngIf="isDropdownOpen">
-                    <div class="dd-panel-header">Available Semesters</div>
-                    <ul class="dd-list">
-                        <li class="dd-item" *ngFor="let opt of semesterOptions"
-                            [class.dd-item-active]="opt.value === selectedBatch"
-                            (click)="selectedBatch = opt.value; isDropdownOpen = false">
-                            <div class="dd-item-body">
-                                <span class="dd-item-name">{{ opt.label }}</span>
+        <div class="dropdowns-container">
+            <!-- Semester Dropdown -->
+            <div class="select-group">
+                <span class="select-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Semester / Batch
+                </span>
+
+                <div class="custom-dropdown-wrapper" [class.open]="semesterDropdownOpen">
+                    <button type="button" class="dd-trigger" (click)="toggleSemesterDropdown($event)">
+                        <div class="dd-trigger-inner">
+                            <span class="dd-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                                </svg>
+                            </span>
+                            <div class="dd-trigger-text">
+                                <span class="dd-selected-name">{{ selectedSemester?.name || 'Select Semester' }}</span>
+                                <span class="dd-selected-meta">{{ semesterLabel(selectedSemesterId) }} Batch</span>
                             </div>
-                            <div class="dd-item-check" *ngIf="opt.value === selectedBatch">✓</div>
-                        </li>
-                    </ul>
+                        </div>
+                        <span class="dd-chevron" [class.rotate]="semesterDropdownOpen">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </span>
+                    </button>
+
+                    <div class="dd-panel" *ngIf="semesterDropdownOpen">
+                        <div class="dd-panel-header">Choose a semester</div>
+                        <ul class="dd-list">
+                            <li *ngFor="let sem of semesters" class="dd-item"
+                                [class.dd-item-active]="sem.id === +selectedSemesterId" (click)="selectSemester(sem)">
+                                <div class="dd-item-num">{{ sem.id }}</div>
+                                <div class="dd-item-body">
+                                    <span class="dd-item-name">{{ sem.name }}</span>
+                                    <span class="dd-item-year">{{ semesterLabel(sem.id) }}</span>
+                                </div>
+                                <span class="dd-item-check" *ngIf="sem.id === +selectedSemesterId">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject Dropdown -->
+            <div class="select-group">
+                <span class="select-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    Subject
+                </span>
+
+                <div class="custom-dropdown-wrapper" [class.open]="subjectDropdownOpen">
+                    <button type="button" class="dd-trigger" (click)="toggleSubjectDropdown($event)">
+                        <div class="dd-trigger-inner">
+                            <span class="dd-icon alt-color">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <circle cx="12" cy="12" r="4"></circle>
+                                    <line x1="21.17" y1="8" x2="12" y2="8"></line>
+                                    <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
+                                    <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
+                                </svg>
+                            </span>
+                            <div class="dd-trigger-text">
+                                <span class="dd-selected-name"
+                                    style="width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{
+                                    selectedSubjectName || 'Select Subject' }}</span>
+                                <span class="dd-selected-meta">Current Module</span>
+                            </div>
+                        </div>
+                        <span class="dd-chevron" [class.rotate]="subjectDropdownOpen">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </span>
+                    </button>
+
+                    <div class="dd-panel" *ngIf="subjectDropdownOpen">
+                        <div class="dd-panel-header">Choose a subject</div>
+                        <ul class="dd-list">
+                            <li *ngFor="let sub of currentSubjects" class="dd-item"
+                                [class.dd-item-active]="sub.name === selectedSubjectName" (click)="selectSubject(sub)">
+                                <div class="dd-item-body">
+                                    <span class="dd-item-name">{{ sub.name.split(' - ')[0] }}</span>
+                                </div>
+                                <span class="dd-item-check" *ngIf="sub.name === selectedSubjectName">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -50,8 +151,9 @@
     <div class="result-card">
         <div class="card-head">
             <div class="card-head-left">
-                <h2 class="card-title">Student Evaluation</h2>
-                <span class="card-meta">{{ students.length }} Students in {{ selectedBatch }}</span>
+                <h2 class="card-title">{{ selectedSubjectName ? selectedSubjectName.split(' - ')[0] : 'Evaluations' }}
+                </h2>
+                <span class="card-meta">{{ students.length }} Students in {{ selectedSemester?.name }}</span>
             </div>
             <div class="official-badge">
                 <span class="badge-icon">✨</span> AI Grading
@@ -79,7 +181,8 @@
                                 <div class="subject-avatar">{{ student.name.charAt(0) }}</div>
                                 <div class="subject-meta">
                                     <span class="subject-name">{{ student.name }}</span>
-                                    <span class="subject-code">{{ selectedBatch }}</span>
+                                    <span class="subject-code">{{ selectedSubjectName ? selectedSubjectName.split(' -
+                                        ')[0] : 'Subject' }}</span>
                                 </div>
                             </div>
                         </td>
