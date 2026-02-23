@@ -1,26 +1,39 @@
 <div class="navbar-header">
-  <div class ="title-section">
-    <h1>{{ title }}</h1>
+  <div class="title-section">
+    <div class="title-row">
+      <div class="role-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path [attr.d]="getRoleIconPath()"></path>
+        </svg>
+      </div>
+      <div class="title-copy">
+        <h1>{{ title }}</h1>
+        <span class="role-badge">{{ getRoleLabel() }}</span>
+      </div>
+    </div>
     <p *ngIf="subtitle" class="subtitle">{{ subtitle }}</p>
   </div>
 
   <nav class="navbar">
-    <!-- LEFT: NAV ITEMS -->
     <ul class="nav-items">
       <li *ngFor="let item of navItems">
         <a
           [routerLink]="item.route"
           routerLinkActive="active"
           (click)="selectNavItem(item)">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path [attr.d]="getNavIconPath(item)"></path>
+            </svg>
+          </span>
           {{ item.label }}
         </a>
       </li>
     </ul>
-
-    <!-- RIGHT: LOGOUT BUTTON -->
   </nav>
+
   <div class="logout">
-      <button app-button variant="primary" class="logout-btn" (click)="logout()">
+    <button app-button variant="primary" class="logout-btn" (click)="logout()">
       Logout
     </button>
   </div>
