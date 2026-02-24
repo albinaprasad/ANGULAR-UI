@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/http/auth.service';
 import { PopupService } from '../../../services/modal/popup.service';
@@ -102,10 +102,12 @@ export class LoginComponent implements AfterViewInit {
         this.router.navigateByUrl(this.returnUrl || '/user/semesters');
       }
     } catch (error: any) {
-      this.isLoading = false;
-      const errorMsg = error?.error?.error || 'Login failed. Please check your credentials.';
-      this.errorMessage = errorMsg;
-      this.popupService.show('Login Failed', errorMsg);
+      this.ngZone.run(() => {
+        this.isLoading = false;
+        const errorMsg = error?.error?.error || 'Login failed. Please check your credentials.';
+        this.errorMessage = errorMsg;
+        this.popupService.show('Login Failed', errorMsg);
+      });
       console.error('Login error:', error);
     }
   }
@@ -114,7 +116,8 @@ export class LoginComponent implements AfterViewInit {
     private router: Router,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private popupService: PopupService
+    private popupService: PopupService,
+    private ngZone: NgZone
   ) {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
   }

@@ -1,7 +1,8 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/http/auth.service';
 import { SnackbarService } from '../../../services/modal/snackbar.service';
+import { PopupService } from '../../../services/modal/popup.service';
 
 @Component({
   selector: 'app-register',
@@ -57,7 +58,9 @@ export class RegisterComponent implements AfterViewInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private popupService: PopupService,
+    private ngZone: NgZone
   ) { }
 
   fullNameChanged(value: string): void {
@@ -102,8 +105,11 @@ export class RegisterComponent implements AfterViewInit {
       const response = await this.authService.register(this.email.trim(), this.password, this.fullName.trim(), this.selectedRole);
 
       if (response && response.error) {
-        this.errorMessage = response.error;
-        this.isLoading = false;
+        this.ngZone.run(() => {
+          this.errorMessage = response.error || '';
+          this.isLoading = false;
+          this.popupService.show('Registration Failed', response.error || '');
+        });
         return;
       }
 
@@ -119,10 +125,15 @@ export class RegisterComponent implements AfterViewInit {
 
       this.router.navigate(['/auth/login']);
     } catch (error: any) {
-      this.errorMessage = error?.error?.message || 'Sign up failed. Please try again.';
+      this.ngZone.run(() => {
+        const errorMsg = error?.error?.message || error?.error?.error || 'Sign up failed. Please try again.';
+        this.errorMessage = errorMsg;
+        this.popupService.show('Registration Failed', errorMsg);
+        this.isLoading = false;
+      });
       console.error('Registration error:', error);
     } finally {
-      this.isLoading = false;
+      // Keep finally for safety if needed, but the zone run handles the main error case now
     }
   }
 
