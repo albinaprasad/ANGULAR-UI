@@ -14,6 +14,7 @@ export class TextInput implements OnChanges {
   @Input() type: string = 'text';
   @Input() placeholder!: string;
   @Input() required: boolean = false;
+  @Input() readonly: boolean = false;
   @Input() validationType: 'none' | 'email' | 'phone' | 'custom' = 'none';
   @Input() validationPattern = '';
   @Input() customErrorMessage = '';

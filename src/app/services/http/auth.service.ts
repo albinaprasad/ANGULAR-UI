@@ -58,13 +58,21 @@ export class AuthService extends BaseHttpService {
   getUserRole(): string {
     const user = this.user.value;
     if (user && user.role && user.role.length > 0) {
+      // Prefer 'teacher' or 'admin' over 'student' when multiple roles exist
+      if (user.role.includes('admin')) return 'admin';
+      if (user.role.includes('teacher')) return 'teacher';
       return user.role[0];
     }
     return localStorage.getItem('user_role') || 'student';
   }
 
   isTeacher(): boolean {
-    return this.getUserRole() === 'teacher';
+    const user = this.user.value;
+    if (user && user.role) {
+      return user.role.includes('teacher');
+    }
+    const storedRoles = localStorage.getItem('user_role') || '';
+    return storedRoles.includes('teacher');
   }
 
   login(username: string, password: string): Promise<BaseResponse<AuthResponse, string>> {
@@ -84,9 +92,9 @@ export class AuthService extends BaseHttpService {
                 localStorage.setItem(environmentJson.IS_SUPER_ADMIN, 'true');
               else
                 localStorage.setItem(environmentJson.IS_SUPER_ADMIN, 'false');
-              // Persist user role
+              // Persist user roles (all of them)
               if (response.message.user.role && response.message.user.role.length > 0) {
-                localStorage.setItem('user_role', response.message.user.role[0]);
+                localStorage.setItem('user_role', response.message.user.role.join(','));
               }
               this.user.next(response.message?.user ?? null)
             }

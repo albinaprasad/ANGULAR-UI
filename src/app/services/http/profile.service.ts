@@ -17,44 +17,44 @@ export class ProfileService extends BaseHttpService {
 
   getProfile(): Observable<BaseResponse<UserProfile, string>> {
     return this.httpClient.get<BaseResponse<UserProfileApi, string>>(
-        this.profileEndpoint,
-        { headers: this.getAuthHeaders() }
-      ).pipe(
-        map((response) => ({
-          ...response,
-          message: response.message ? this.toUserProfile(response.message) : null
-        }))
-      );
+      this.profileEndpoint,
+      { headers: this.getAuthHeaders() }
+    ).pipe(
+      map((response) => ({
+        ...response,
+        message: response.message ? this.toUserProfile(response.message) : null
+      }))
+    );
   }
 
   updateProfile(payload: ProfileUpdatePayload): Observable<BaseResponse<UserProfile, string>> {
     return this.httpClient.post<BaseResponse<UserProfileApi, string>>(
-        `${this.profileEndpoint}/update/`,
-        this.toApiPayload(payload),
-        { headers: this.getAuthHeadersForFormData() }
-      ).pipe(
-        map((response) => ({
-          ...response,
-          message: response.message ? this.toUserProfile(response.message) : null
-        }))
-      );
+      `${this.profileEndpoint}/update/`,
+      this.toApiPayload(payload),
+      { headers: this.getAuthHeadersForFormData() }
+    ).pipe(
+      map((response) => ({
+        ...response,
+        message: response.message ? this.toUserProfile(response.message) : null
+      }))
+    );
   }
 
-  getLanguages(offset:number, limit:number): Observable<BaseResponse<Language[], string>> {
+  getLanguages(offset: number, limit: number): Observable<BaseResponse<Language[], string>> {
     return this.httpClient.get<BaseResponse<Language[], string>>(
       `${this.API_URL}/profile/languages/${offset}/${limit}`,
       { headers: this.getAuthHeaders() }
     );
   }
 
-  getTimezones(offset:number, limit:number): Observable<BaseResponse<Timezone[], string>> {
+  getTimezones(offset: number, limit: number): Observable<BaseResponse<Timezone[], string>> {
     return this.httpClient.get<BaseResponse<Timezone[], string>>(
       `${this.API_URL}/profile/timezones/${offset}/${limit}`,
       { headers: this.getAuthHeaders() }
     );
   }
 
-  getLocations(offset:number, limit:number): Observable<BaseResponse<Location[], string>> {
+  getLocations(offset: number, limit: number): Observable<BaseResponse<Location[], string>> {
     return this.httpClient.get<BaseResponse<Location[], string>>(
       `${this.API_URL}/profile/locations/${offset}/${limit}`,
       { headers: this.getAuthHeaders() }
@@ -76,6 +76,20 @@ export class ProfileService extends BaseHttpService {
       gender = 'other';
     }
 
+    // Determine the user's primary role and filter roles accordingly
+    let roles = payload.title || [];
+    const storedRole = localStorage.getItem('user_role') || '';
+    const isSuperAdmin = localStorage.getItem('is_super_admin') === 'true';
+
+    if (isSuperAdmin || storedRole.includes('admin')) {
+      // Admin user — show 'Admin' role
+      roles = ['Admin'];
+    } else if (storedRole.includes('teacher')) {
+      roles = ['Teacher'];
+    } else {
+      roles = ['Student'];
+    }
+
     return {
       id: payload.id,
       username: payload.username,
@@ -92,7 +106,7 @@ export class ProfileService extends BaseHttpService {
       gender,
       avatarUrl: this.resolveAvatarUrl(payload.avatar_url),
       title,
-      roles: payload.title
+      roles
     };
   }
 

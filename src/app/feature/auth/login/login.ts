@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/http/auth.service';
+import { PopupService } from '../../../services/modal/popup.service';
 
 @Component({
   selector: 'app-login',
@@ -102,7 +103,9 @@ export class LoginComponent implements AfterViewInit {
       }
     } catch (error: any) {
       this.isLoading = false;
-      this.errorMessage = error?.error?.error || 'Login failed. Please check your credentials.';
+      const errorMsg = error?.error?.error || 'Login failed. Please check your credentials.';
+      this.errorMessage = errorMsg;
+      this.popupService.show('Login Failed', errorMsg);
       console.error('Login error:', error);
     }
   }
@@ -110,7 +113,8 @@ export class LoginComponent implements AfterViewInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private popupService: PopupService
   ) {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
   }

@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
-import environmentJson from '../../../../../../configs/environment.json';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../../services/http/auth.service';
+import { PopupService } from '../../../../services/modal/popup.service';
+import { SnackbarService } from '../../../../services/modal/snackbar.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-panel',
@@ -8,11 +11,56 @@ import { AuthService } from '../../../../services/http/auth.service';
   templateUrl: './panel.html',
   styleUrl: './panel.css',
 })
-export class Panel {
+export class Panel implements OnInit, OnDestroy {
   isAdmin = false;
   isTeacher = false;
+  studentName: string = '';
+  private userSub?: Subscription;
 
-  constructor(private authService: AuthService) {
+  constructor(
+    private authService: AuthService,
+    private popupService: PopupService,
+    private snackbarService: SnackbarService,
+    private router: Router
+  ) {
+    this.updateRoles();
+  }
+
+  ngOnInit(): void {
+    // Push a dummy state so popstate fires when user presses the back button
+    history.pushState({ panel: true }, '');
+
+    // Subscribe to user changes so navbar updates reactively after login
+    this.userSub = this.authService.user.subscribe(user => {
+      this.updateRoles();
+      if (user && user.username) {
+        this.studentName = user.username;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.userSub?.unsubscribe();
+  }
+
+  /** Intercept browser back button while logged in */
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: PopStateEvent): void {
+    // Re-push state so the button is still interceptable if user cancels
+    history.pushState({ panel: true }, '');
+    this.popupService.show(
+      'Leave & Logout?',
+      'Going back will log you out of your account. Are you sure?',
+      () => {
+        this.authService.logout();
+        this.snackbarService.success('Logged out successfully', 3000);
+        this.router.navigate(['/auth/login']);
+      },
+      () => { /* Cancel – stay on the page */ }
+    );
+  }
+
+  private updateRoles(): void {
     this.isAdmin = this.authService.isSuperAdmin();
     this.isTeacher = this.authService.isTeacher();
     const user = this.authService.getUser();
@@ -32,7 +80,7 @@ export class Panel {
   }];
 
   teacherPanel: any = [{
-    'label': 'Teacher Section', 'route': '/teacher/dashboard', 'title': 'TEACHER', 'subtitle': 'Evaluate student uploads'
+    'label': 'Dashboard', 'route': '/teacher/dashboard', 'title': 'TEACHER', 'subtitle': 'Evaluate student uploads'
   }, {
     'label': 'Marks', 'route': '/teacher/marks', 'title': 'TEACHER', 'subtitle': 'View academic progress'
   }, {
@@ -44,9 +92,4 @@ export class Panel {
   }, {
     'label': 'Profile', 'route': '/user/profile', 'title': 'Profile', 'subtitle': 'Edit and save your profile'
   }];
-
-  studentName: string = '';
-
-  // Constructor moved to top for role initialization
-
 }

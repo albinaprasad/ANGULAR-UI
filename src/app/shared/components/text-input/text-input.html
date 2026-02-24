@@ -1,12 +1,7 @@
 <div class="input-block">
   <label class="input-label">{{ label }}</label>
-  <input
-    [type]="type"
-    [placeholder]="placeholder"
-    class="modal-input"
-    [class.invalid]="showValidation && !isValid"
-    [(ngModel)]="inputValue"
-    (ngModelChange)="onInputChange(inputValue)"
-  />
+  <input [type]="type" [placeholder]="placeholder" class="modal-input" [class.invalid]="showValidation && !isValid"
+    [class.readonly-field]="readonly" [readonly]="readonly" [(ngModel)]="inputValue"
+    (ngModelChange)="onInputChange(inputValue)" />
   <small class="input-error" *ngIf="showValidation && !isValid">{{ validationMessage }}</small>
 </div>
