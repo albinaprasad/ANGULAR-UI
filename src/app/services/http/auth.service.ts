@@ -13,7 +13,7 @@ import { BaseResponse } from '../../types/base-http.types';
 export class AuthService extends BaseHttpService {
 
   public user = new BehaviorSubject<User | null>(null)
-  
+
 
   constructor(private httpClient: HttpClient) {
     super();
@@ -51,26 +51,43 @@ export class AuthService extends BaseHttpService {
   logout(): void {
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
     localStorage.removeItem(environmentJson.IS_SUPER_ADMIN);
+    localStorage.removeItem('user_role');
     this.user.next(null);
   }
 
-  login(username: string, password: string): Promise<BaseResponse<AuthResponse,string>> {
+  getUserRole(): string {
+    const user = this.user.value;
+    if (user && user.role && user.role.length > 0) {
+      return user.role[0];
+    }
+    return localStorage.getItem('user_role') || 'student';
+  }
+
+  isTeacher(): boolean {
+    return this.getUserRole() === 'teacher';
+  }
+
+  login(username: string, password: string): Promise<BaseResponse<AuthResponse, string>> {
     const loginRequest: LoginRequest = { username, password };
-    
+
     return firstValueFrom(
-      this.httpClient.post<BaseResponse<AuthResponse,string>>(
-        `${this.API_URL}/auth/login`, 
+      this.httpClient.post<BaseResponse<AuthResponse, string>>(
+        `${this.API_URL}/auth/login`,
         loginRequest,
         { headers: this.getAuthHeaders() }
       )
-      .pipe(
+        .pipe(
           tap(response => {
             if (response.message?.token) {
               this.setAuthToken(response.message?.token ?? '');
               if (response.message.user.is_superAdmin || response.message.user.role.includes('admin'))
-                localStorage.setItem(environmentJson.IS_SUPER_ADMIN, 'true' );
+                localStorage.setItem(environmentJson.IS_SUPER_ADMIN, 'true');
               else
                 localStorage.setItem(environmentJson.IS_SUPER_ADMIN, 'false');
+              // Persist user role
+              if (response.message.user.role && response.message.user.role.length > 0) {
+                localStorage.setItem('user_role', response.message.user.role[0]);
+              }
               this.user.next(response.message?.user ?? null)
             }
           })
@@ -78,12 +95,12 @@ export class AuthService extends BaseHttpService {
     );
   }
 
-  register(email: string, password: string, username: string): Promise<BaseResponse<AuthResponse,string>> {
-    const registerRequest = { email, password, username, password_confirmation: password };
-    
+  register(email: string, password: string, username: string, role: string = 'student'): Promise<BaseResponse<AuthResponse, string>> {
+    const registerRequest = { email, password, username, password_confirmation: password, role };
+
     return firstValueFrom(
-      this.httpClient.post<BaseResponse<AuthResponse,string>>(
-        `${this.API_URL}/auth/register`, 
+      this.httpClient.post<BaseResponse<AuthResponse, string>>(
+        `${this.API_URL}/auth/register`,
         registerRequest,
         { headers: this.getAuthHeaders() }
       )

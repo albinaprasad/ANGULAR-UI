@@ -14,6 +14,7 @@ export class RegisterComponent implements AfterViewInit {
   email = '';
   password = '';
   confirmPassword = '';
+  selectedRole: 'student' | 'teacher' = 'student';
   isLoading = false;
   errorMessage = '';
 
@@ -57,7 +58,7 @@ export class RegisterComponent implements AfterViewInit {
     private router: Router,
     private authService: AuthService,
     private snackbarService: SnackbarService
-  ) {}
+  ) { }
 
   fullNameChanged(value: string): void {
     this.fullName = value;
@@ -79,6 +80,10 @@ export class RegisterComponent implements AfterViewInit {
     this.errorMessage = '';
   }
 
+  selectRole(role: 'student' | 'teacher'): void {
+    this.selectedRole = role;
+  }
+
   async register(): Promise<void> {
     if (!this.fullName.trim() || !this.email.trim() || !this.password || !this.confirmPassword) {
       this.errorMessage = 'Please fill all fields.';
@@ -94,8 +99,24 @@ export class RegisterComponent implements AfterViewInit {
     this.errorMessage = '';
 
     try {
-      await this.authService.register(this.email.trim(), this.password, this.fullName.trim());
+      const response = await this.authService.register(this.email.trim(), this.password, this.fullName.trim(), this.selectedRole);
+
+      if (response && response.error) {
+        this.errorMessage = response.error;
+        this.isLoading = false;
+        return;
+      }
+
       this.snackbarService.success('Account created successfully');
+
+      // Close modal before navigating
+      const body = document.querySelector("body") as HTMLElement;
+      const modal = document.querySelector(".modal") as HTMLElement;
+      if (modal) {
+        modal.classList.remove("is-open");
+        body.style.overflow = "initial";
+      }
+
       this.router.navigate(['/auth/login']);
     } catch (error: any) {
       this.errorMessage = error?.error?.message || 'Sign up failed. Please try again.';

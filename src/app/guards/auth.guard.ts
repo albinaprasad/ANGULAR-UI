@@ -16,7 +16,14 @@ export class AuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | Promise<boolean> | boolean {
-    // BYPASS AUTHENTICATION FOR LOCAL DEMO
-    return true;
+    if (this.authService.isAuthenticated()) {
+      return true;
+    }
+
+    this.router.navigate(['/auth/login'], {
+      queryParams: { returnUrl: state.url },
+      replaceUrl: true
+    });
+    return false;
   }
 }

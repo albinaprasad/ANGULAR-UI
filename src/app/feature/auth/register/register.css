@@ -44,7 +44,7 @@ body {
   background: #fff;
   transform: translateY(100px) scale(0.4);
   min-height: 550px;
-  max-height: 600px;
+  max-height: 650px;
 }
 
 .modal-title {
@@ -67,7 +67,7 @@ body {
   opacity: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 550px;
+  max-height: 650px;
 }
 
 .modal-button {
@@ -142,7 +142,7 @@ body {
 }
 
 .sign-up {
-  margin: 60px 0 0;
+  margin: 20px 0 0;
   font-size: 14px;
   text-align: center;
 }
@@ -152,7 +152,8 @@ body {
 }
 
 .input-button {
-  padding: 8px 12px;
+  padding: 10px 12px;
+  width: 100%;
   outline: none;
   border: 0;
   color: #fff;
@@ -161,6 +162,9 @@ body {
   font-family: 'Roboto', sans-serif;
   transition: 0.3s;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 10px;
 }
 
 .input-button:hover {
@@ -194,7 +198,7 @@ body {
   padding: 10px 10px 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   transition: 0.3s;
 }
 
@@ -252,10 +256,59 @@ body {
   fill: currentColor;
 }
 
+/* --- Role Selector Styling --- */
+.role-selector {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.role-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  color: #8c7569;
+  margin-bottom: 8px;
+}
+
+.role-toggle {
+  display: flex;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.role-btn {
+  flex: 1;
+  padding: 12px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Roboto', sans-serif;
+}
+
+.role-btn:hover {
+  background-color: #ebebeb;
+}
+
+.role-btn.active {
+  background-color: #8c7569;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 @media(max-width: 750px) {
   .modal-container {
     width: 90%;
   }
+
   .modal-right {
     display: none;
   }

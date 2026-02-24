@@ -62,16 +62,26 @@ export class LoginComponent implements AfterViewInit {
   }
 
   async login(): Promise<void> {
-    console.log('Login clicked. Starting bypass flow...');
     this.authService.logout();
+
+    if (!this.username || !this.password) {
+      this.errorMessage = 'Please enter username and password';
+      return;
+    }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    setTimeout(() => {
-      console.log('Timeout finished. Redirecting to /user/semesters...');
+    try {
+      const response = await this.authService.login(this.username, this.password);
 
-      // Close modal to actually show the page we are redirecting to
+      if (response.error) {
+        this.errorMessage = response.error;
+        this.isLoading = false;
+        return;
+      }
+
+      // Close modal
       const body = document.querySelector("body") as HTMLElement;
       const modal = document.querySelector(".modal") as HTMLElement;
       if (modal) {
@@ -80,8 +90,21 @@ export class LoginComponent implements AfterViewInit {
       }
 
       this.isLoading = false;
-      this.router.navigateByUrl('/user/semesters');
-    }, 500); // Small delay to simulate loading
+
+      // Route based on role
+      const user = response.message?.user;
+      if (user?.is_superAdmin || user?.role?.includes('admin')) {
+        this.router.navigateByUrl('/admin/dashboard');
+      } else if (user?.role?.includes('teacher')) {
+        this.router.navigateByUrl('/teacher/dashboard');
+      } else {
+        this.router.navigateByUrl(this.returnUrl || '/user/semesters');
+      }
+    } catch (error: any) {
+      this.isLoading = false;
+      this.errorMessage = error?.error?.error || 'Login failed. Please check your credentials.';
+      console.error('Login error:', error);
+    }
   }
 
   constructor(
@@ -90,28 +113,6 @@ export class LoginComponent implements AfterViewInit {
     private route: ActivatedRoute
   ) {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-  }
-
-  async loginAsTeacher(): Promise<void> {
-    console.log('Login as Teacher clicked. Starting bypass flow...');
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    setTimeout(() => {
-      // Mock teacher login
-      localStorage.removeItem('is_super_admin');
-      localStorage.setItem('is_teacher', 'true');
-
-      const body = document.querySelector("body") as HTMLElement;
-      const modal = document.querySelector(".modal") as HTMLElement;
-      if (modal) {
-        modal.classList.remove("is-open");
-        body.style.overflow = "initial";
-      }
-
-      this.isLoading = false;
-      this.router.navigateByUrl('/teacher/dashboard');
-    }, 500);
   }
 
   goToRegister() {

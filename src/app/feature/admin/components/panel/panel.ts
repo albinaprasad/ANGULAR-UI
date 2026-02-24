@@ -9,8 +9,17 @@ import { AuthService } from '../../../../services/http/auth.service';
   styleUrl: './panel.css',
 })
 export class Panel {
-  isAdmin = localStorage.getItem(environmentJson.IS_SUPER_ADMIN) === 'true';
-  isTeacher = localStorage.getItem('is_teacher') === 'true';
+  isAdmin = false;
+  isTeacher = false;
+
+  constructor(private authService: AuthService) {
+    this.isAdmin = this.authService.isSuperAdmin();
+    this.isTeacher = this.authService.isTeacher();
+    const user = this.authService.getUser();
+    if (user && user.username) {
+      this.studentName = user.username;
+    }
+  }
 
   adminPanel: any = [{
     'label': 'Dashboard', 'route': '/admin/dashboard', 'title': 'Admin Panel', 'subtitle': 'Manage your data from here'
@@ -38,11 +47,6 @@ export class Panel {
 
   studentName: string = '';
 
-  constructor(private authService: AuthService) {
-    const user = this.authService.getUser();
-    if (user && user.username) {
-      this.studentName = user.username;
-    }
-  }
+  // Constructor moved to top for role initialization
 
 }
