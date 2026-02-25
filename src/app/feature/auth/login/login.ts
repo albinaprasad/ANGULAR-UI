@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/http/auth.service';
+import { WebSocketService } from '../../../services/websocket/websocket.service';
 
 @Component({
   selector: 'app-login',
@@ -73,6 +74,8 @@ export class LoginComponent implements AfterViewInit {
 
     try {
       await this.authService.login(this.username, this.password)
+      this.websocketService.disconnect();
+      this.websocketService.connectToUrl('notifications');
       const defaultRoute = this.authService.isSuperAdmin() ? '/admin/dashboard' : '/user/profile';
       this.router.navigateByUrl(this.returnUrl || defaultRoute);
     } catch (error: any) {
@@ -86,7 +89,8 @@ export class LoginComponent implements AfterViewInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private websocketService: WebSocketService
   ) {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
   }
