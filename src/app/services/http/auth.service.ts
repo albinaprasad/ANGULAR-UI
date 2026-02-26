@@ -13,10 +13,12 @@ import { BaseResponse } from '../../types/base-http.types';
 export class AuthService extends BaseHttpService {
 
   public user = new BehaviorSubject<User | null>(null)
+  public tokenChanges: BehaviorSubject<string | null>;
   
 
   constructor(private httpClient: HttpClient) {
     super();
+    this.tokenChanges = new BehaviorSubject<string | null>(this.getAuthToken());
   }
 
   getUser(): User | null {
@@ -34,6 +36,7 @@ export class AuthService extends BaseHttpService {
 
   setAuthToken(token: string): void {
     localStorage.setItem(this.AUTH_TOKEN_KEY, token);
+    this.tokenChanges.next(token);
   }
 
   isAuthenticated(): boolean {
@@ -51,6 +54,7 @@ export class AuthService extends BaseHttpService {
   logout(): void {
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
     localStorage.removeItem(environmentJson.IS_SUPER_ADMIN);
+    this.tokenChanges.next(null);
     this.user.next(null);
   }
 

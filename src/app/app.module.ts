@@ -12,7 +12,6 @@ import { ErrorPageComponent } from './feature/error/error-page/error-page';
   declarations: [App, ErrorPageComponent],
   imports: [BrowserModule, AppRoutingModule, CommonModule, HttpClientModule, SharedModule],
   providers: [
-    App,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

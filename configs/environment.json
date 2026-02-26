@@ -1,5 +1,6 @@
 {
     "AUTH_API_URL": "http://localhost:8000",
     "AUTH_TOKEN_KEY": "auth_token",
-    "IS_SUPER_ADMIN": "is_super_admin"
+    "IS_SUPER_ADMIN": "is_super_admin",
+    "WEB_SOCKET_URL": "ws://127.0.0.1:8000/ws/"
 }
