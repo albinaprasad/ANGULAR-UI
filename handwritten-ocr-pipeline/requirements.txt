@@ -1,0 +1,12 @@
+--extra-index-url https://download.pytorch.org/whl/cu124
+
+transformers
+torch
+opencv-python
+numpy
+scikit-image
+torchvision
+pymupdf
+sentence-transformers
+nltk
+textstat

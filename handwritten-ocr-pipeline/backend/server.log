@@ -1,0 +1,5 @@
+nohup: ignoring input
+Watching for file changes with StatReloader
+[33m[WARNING] 2026-02-24 10:38:39,902 auth.jwt Invalid JWT | path=/api/tables ip=127.0.0.1[0m
+Unauthorized: /api/tables
+[24/Feb/2026 10:38:39] "GET /api/tables HTTP/1.1" 401 26
