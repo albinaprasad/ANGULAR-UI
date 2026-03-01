@@ -58,6 +58,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
       is_seen: true,
       seen_at: new Date().toISOString(),
     });
+    this.syncUnreadCount();
 
     this.notificationService
       .markAsSeen(notificationId)
@@ -73,9 +74,11 @@ export class NotificationComponent implements OnInit, OnDestroy {
             seen_at: response.seen_at,
             read_by_user_ids: updatedReaderIds,
           });
+          this.syncUnreadCount();
         },
         error: () => {
           this.patchNotification(notificationId, previousState);
+          this.syncUnreadCount();
         },
       });
   }
@@ -108,10 +111,12 @@ export class NotificationComponent implements OnInit, OnDestroy {
           this.notificationService.fetchNotifications().pipe(
             tap((response) => {
               this.notifications = this.sortNotifications(this.extractNotifications(response?.message));
+              this.syncUnreadCount();
             }),
             catchError(() => {
               this.errorMessage = 'Unable to load notifications. Please try again.';
               this.notifications = [];
+              this.notificationService.setUnreadCount(0);
               return of(null);
             }),
             finalize(() => {
@@ -160,5 +165,11 @@ export class NotificationComponent implements OnInit, OnDestroy {
   private addReadById(existingIds: number[], userId: number): number[] {
     if (existingIds.includes(userId)) return existingIds;
     return [...existingIds, userId];
+  }
+
+  private syncUnreadCount(): void {
+    this.notificationService.setUnreadCount(
+      this.notificationService.deriveUnreadCount(this.notifications)
+    );
   }
 }
