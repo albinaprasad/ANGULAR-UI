@@ -1,8 +1,16 @@
-<ng-container *ngIf="isTeacher; else checkAdmin">
-    <app-navbar [title]="'TEACHER'" [subtitle]="'Evaluate student uploads and view marks'"
-        [logoUrl]="'/assets/admin-logo.png'" [navItems]="teacherPanel">
+<ng-container *ngIf="isInstitutionRoute; else checkTeacher">
+    <app-navbar [title]="'INSTITUTION'" [subtitle]="'Manage institutions, semesters & teacher assignments'"
+        [logoUrl]="'/assets/admin-logo.png'" [navItems]="institutionPanel">
     </app-navbar>
 </ng-container>
+
+<ng-template #checkTeacher>
+    <ng-container *ngIf="isTeacher; else checkAdmin">
+        <app-navbar [title]="'TEACHER'" [subtitle]="'Evaluate student uploads and view marks'"
+            [logoUrl]="'/assets/admin-logo.png'" [navItems]="teacherPanel">
+        </app-navbar>
+    </ng-container>
+</ng-template>
 
 <ng-template #checkAdmin>
     <ng-container *ngIf="isAdmin; else userNavbar">

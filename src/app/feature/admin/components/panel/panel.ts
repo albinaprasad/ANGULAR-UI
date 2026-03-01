@@ -69,14 +69,25 @@ export class Panel implements OnInit, OnDestroy {
     }
   }
 
+  /** Detect if user is currently on an institution route */
+  get isInstitutionRoute(): boolean {
+    return this.router.url.startsWith('/institution');
+  }
+
   adminPanel: any = [{
     'label': 'Dashboard', 'route': '/admin/dashboard', 'title': 'Admin Panel', 'subtitle': 'Manage your data from here'
+  }, {
+    'label': 'Institution', 'route': '/institution/manage', 'title': 'Institution', 'subtitle': 'Manage institutions & assignments'
   }, {
     'label': 'Permission', 'route': '/admin/permissions', 'title': 'Permission', 'subtitle': 'Grant and manage permissions'
   }, {
     'label': 'Profile', 'route': '/user/profile', 'title': 'Profile', 'subtitle': 'Edit and save your profile'
   }, {
     'label': 'Notification', 'route': '/user/notification', 'title': 'Notification', 'subtitle': 'Your Notification'
+  }];
+
+  institutionPanel: any = [{
+    'label': 'Manage', 'route': '/institution/manage', 'title': 'INSTITUTION', 'subtitle': 'Manage institutions & teachers'
   }];
 
   teacherPanel: any = [{
@@ -93,3 +104,4 @@ export class Panel implements OnInit, OnDestroy {
     'label': 'Profile', 'route': '/user/profile', 'title': 'Profile', 'subtitle': 'Edit and save your profile'
   }];
 }
+

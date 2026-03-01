@@ -1,4 +1,6 @@
 import { Component, OnInit, HostListener } from '@angular/core';
+import { InstitutionService } from '../../../services/institution.service';
+import { AuthService } from '../../../services/http/auth.service';
 
 interface Subject {
     name: string;
@@ -43,15 +45,41 @@ export class TeacherDashboardComponent implements OnInit {
     showAddStudentModal = false;
     newStudentData = { name: '', rollNo: '' };
 
-    constructor() { }
+    constructor(
+        private institutionService: InstitutionService,
+        private authService: AuthService
+    ) { }
 
     ngOnInit(): void {
-        this.generateMockSemesters();
-        this.selectedSubjectName = this.semesters[0].subjects[0].name;
+        this.loadSemestersFromService();
+        if (this.semesters.length > 0) {
+            this.selectedSemesterId = this.semesters[0].id;
+            this.selectedSubjectName = this.semesters[0].subjects[0]?.name || '';
+        }
         this.generateMockStudents();
     }
 
-    // --- Mock Data ---
+    // --- Load data from InstitutionService or fallback to mock ---
+    loadSemestersFromService(): void {
+        const currentUser = this.authService.getUser();
+        const teacherName = currentUser?.username || '';
+
+        // Try to load from InstitutionService (teacher assignments)
+        const assigned = this.institutionService.getTeacherSemestersAndSubjects(teacherName);
+
+        if (assigned.length > 0) {
+            this.semesters = assigned.map(a => ({
+                id: a.semester.id,
+                name: a.semester.name,
+                subjects: a.subjects.map(s => ({ name: s.name, marks: null }))
+            }));
+        } else {
+            // Fallback to mock data if no assignments exist
+            this.generateMockSemesters();
+        }
+    }
+
+    // --- Mock Data (fallback) ---
     generateMockSemesters() {
         const subjectNames = ['Mathematics', 'Physics', 'Chemistry', 'Computer Science', 'English'];
         for (let i = 1; i <= 8; i++) {
@@ -95,7 +123,7 @@ export class TeacherDashboardComponent implements OnInit {
 
     selectSemester(sem: Semester) {
         this.selectedSemesterId = sem.id;
-        this.selectedSubjectName = sem.subjects[0].name; // Default to first
+        this.selectedSubjectName = sem.subjects[0]?.name || ''; // Default to first
         this.semesterDropdownOpen = false;
         this.generateMockStudents();
     }
@@ -177,3 +205,4 @@ export class TeacherDashboardComponent implements OnInit {
         }, 1500);
     }
 }
+
