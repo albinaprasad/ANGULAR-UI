@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { concat, filter, Subscription } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { AuthService } from '../../../services/http/auth.service';
 import { PopupService } from '../../../services/modal/popup.service';
 import { SnackbarService } from '../../../services/modal/snackbar.service';
@@ -10,6 +10,7 @@ type NavItem = {
   icon?: string;
   title?: string;
   subtitle?: string;
+  count?: number;
 };
 type RoleType = 'admin' | 'student' | 'user';
 
