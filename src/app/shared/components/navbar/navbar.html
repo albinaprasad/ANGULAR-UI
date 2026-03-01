@@ -27,6 +27,9 @@
             </svg>
           </span>
           {{ item.label }}
+          <span *ngIf="item.count !== undefined && item.count > 0" class="nav-item-count">
+            ({{ item.count }})
+          </span>
         </a>
       </li>
     </ul>

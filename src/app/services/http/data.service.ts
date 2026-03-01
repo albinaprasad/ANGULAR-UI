@@ -8,7 +8,10 @@ import { BaseResponse } from '../../types/base-http.types';
 @Injectable({ providedIn: 'root' })
 export class DataService extends BaseHttpService {
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    
+  ) {
     super();
   }
 

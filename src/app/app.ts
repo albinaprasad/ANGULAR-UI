@@ -3,6 +3,7 @@ import { WebSocketConnectionState, WebSocketService } from './services/websocket
 import { Subscription } from 'rxjs';
 import { AuthService } from './services/http/auth.service';
 import environmentJson from '../../configs/environment.json';
+import { SnackbarService } from './services/modal/snackbar.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,8 @@ export class App implements OnInit,OnDestroy{
 
   constructor(
     private websocketService: WebSocketService,
-    private authService: AuthService
+    private authService: AuthService,
+    private snackbarService: SnackbarService
   ) {}
 
   ngOnInit(): void {
@@ -53,7 +55,7 @@ export class App implements OnInit,OnDestroy{
           JSON.stringify(msg),
           ...this.receivedMessages
         ].slice(0, 30);
-      })
+      }),
     )
   }
 

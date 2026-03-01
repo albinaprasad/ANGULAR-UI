@@ -14,7 +14,7 @@ export class Panel {
     }, {
     'label': 'Profile', 'route': '/user/profile','title':'Profile','subtitle': 'Edit and save your profile'
     }, {
-    'label': 'Notification', 'route': '/user/notification', 'title': 'Notification', 'subtitle':'Your Notification'
+    'label': 'Notification', 'route': '/user/notification', 'title': 'Notification', 'subtitle':'Your Notification', 'count': 0
     },{
     'label': 'Permission', 'route': '/admin/permissions', 'title': 'Permission', 'subtitle':'Grant and manage permissions'
     }]

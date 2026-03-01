@@ -1,15 +1,58 @@
 <div class="notification-layout">
-
   <div class="main-content">
-    
-    <div class="content-area">
-        <app-text-input></app-text-input>
-    </div>
+    <header class="notification-header">
+      <h1>Notifications</h1>
+      <p class="subtitle">Your latest updates</p>
+    </header>
 
-    <div>
-      
+    <div class="content-area">
+      <div *ngIf="isLoading" class="state-card">Loading notifications...</div>
+
+      <div *ngIf="!isLoading && errorMessage" class="state-card state-error">
+        <p>{{ errorMessage }}</p>
+        <button type="button" class="state-action" (click)="retryLoad()">Retry</button>
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage && notifications.length === 0" class="state-card empty-state-card">
+        <div class="empty-state-icon" aria-hidden="true">🔔</div>
+        <h3>No notifications available</h3>
+        <p>You're all caught up. New updates will appear here in real time.</p>
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage && notifications.length > 0" class="notification-list">
+        <article
+          *ngFor="let notification of notifications; trackBy: trackByNotificationId"
+          class="notification-card"
+          [class.unread]="!notification.is_seen"
+          (click)="onNotificationOpen(notification)"
+        >
+          <div class="notification-content">
+            <h3>{{ notification.title || 'Notification' }}</h3>
+            <p>{{ notification.message }}</p>
+            <small>{{ notification.created_at | date : 'medium' }}</small>
+          </div>
+
+          <div class="notification-meta">
+            <span class="badge" [class.badge-unread]="!notification.is_seen">
+              {{ notification.is_seen ? 'Seen' : 'Unread' }}
+            </span>
+
+            <div *ngIf="notification.can_view_seen_by" class="seen-by">
+              <span>Seen by {{ notification.read_by_user_ids.length }} users</span>
+              <button
+                type="button"
+                class="toggle-readers"
+                (click)="toggleSeenBy(notification.notification_id); $event.stopPropagation()"
+              >
+                {{ isSeenByExpanded(notification.notification_id) ? 'Hide IDs' : 'Show IDs' }}
+              </button>
+              <div *ngIf="isSeenByExpanded(notification.notification_id)" class="reader-list">
+                {{ notification.read_by_user_ids.join(', ') || 'No readers yet' }}
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
     </div>
-      
   </div>
-  
 </div>
