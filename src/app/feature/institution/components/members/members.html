@@ -1,0 +1,145 @@
+<section class="members-shell">
+  <header class="members-header">
+    <h1>Institution Members</h1>
+    <p>Browse teachers and students with infinite pagination.</p>
+  </header>
+
+  <section class="toolbar-card">
+    <div class="tabs" role="tablist" aria-label="Member roles">
+      <button
+        type="button"
+        [class.active]="activeTab === 'teacher'"
+        (click)="switchTab('teacher')"
+      >
+        Teachers ({{ teacherState.total || teacherState.items.length }})
+      </button>
+      <button
+        type="button"
+        [class.active]="activeTab === 'student'"
+        (click)="switchTab('student')"
+      >
+        Students ({{ studentState.total || studentState.items.length }})
+      </button>
+    </div>
+
+    <label class="search-field">
+      <span>Search</span>
+      <input
+        type="text"
+        [ngModel]="searchText"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Search by name, email or username"
+      />
+    </label>
+  </section>
+
+  <section class="list-card" [hidden]="activeTab !== 'teacher'">
+    <div
+      class="table-scroll"
+      #teacherScroll
+      (scroll)="onScroll('teacher')"
+      appInfiniteScroll
+      [disabled]="!teacherState.hasMore || teacherState.loading"
+      (reachedBottom)="onReachedBottom('teacher')"
+    >
+      <table *ngIf="teacherState.items.length > 0">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Department</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of teacherState.items; trackBy: trackByMemberId">
+            <td>{{ row.username }}</td>
+            <td>{{ row.email }}</td>
+            <td>{{ row.first_name || '-' }}</td>
+            <td>{{ row.last_name || '-' }}</td>
+            <td>{{ row.department_name || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="skeleton" *ngIf="teacherState.loading && teacherState.items.length === 0">
+        <div class="skeleton-row" *ngFor="let r of [1,2,3,4,5,6]"></div>
+      </div>
+
+      <app-empty-state
+        *ngIf="teacherState.loadedOnce && !teacherState.loading && !teacherState.error && teacherState.items.length === 0"
+        title="No teachers found"
+        message="Try adjusting search text."
+      ></app-empty-state>
+
+      <app-empty-state
+        *ngIf="teacherState.error"
+        variant="error"
+        title="Failed to load teachers"
+        [message]="teacherState.error"
+      ></app-empty-state>
+
+      <div class="retry-row" *ngIf="teacherState.error">
+        <button app-button variant="secondary" type="button" (click)="retryActiveTab()">Retry</button>
+      </div>
+
+      <p class="loading-more" *ngIf="teacherState.loading && teacherState.items.length > 0">Loading more...</p>
+    </div>
+  </section>
+
+  <section class="list-card" [hidden]="activeTab !== 'student'">
+    <div
+      class="table-scroll"
+      #studentScroll
+      (scroll)="onScroll('student')"
+      appInfiniteScroll
+      [disabled]="!studentState.hasMore || studentState.loading"
+      (reachedBottom)="onReachedBottom('student')"
+    >
+      <table *ngIf="studentState.items.length > 0">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Department</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of studentState.items; trackBy: trackByMemberId">
+            <td>{{ row.username }}</td>
+            <td>{{ row.email }}</td>
+            <td>{{ row.first_name || '-' }}</td>
+            <td>{{ row.last_name || '-' }}</td>
+            <td>{{ row.department_name || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="skeleton" *ngIf="studentState.loading && studentState.items.length === 0">
+        <div class="skeleton-row" *ngFor="let r of [1,2,3,4,5,6]"></div>
+      </div>
+
+      <app-empty-state
+        *ngIf="studentState.loadedOnce && !studentState.loading && !studentState.error && studentState.items.length === 0"
+        title="No students found"
+        message="Try adjusting search text."
+      ></app-empty-state>
+
+      <app-empty-state
+        *ngIf="studentState.error"
+        variant="error"
+        title="Failed to load students"
+        [message]="studentState.error"
+      ></app-empty-state>
+
+      <div class="retry-row" *ngIf="studentState.error">
+        <button app-button variant="secondary" type="button" (click)="retryActiveTab()">Retry</button>
+      </div>
+
+      <p class="loading-more" *ngIf="studentState.loading && studentState.items.length > 0">Loading more...</p>
+    </div>
+  </section>
+</section>

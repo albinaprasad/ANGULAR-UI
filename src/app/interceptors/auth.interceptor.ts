@@ -21,7 +21,12 @@ export class AuthInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    return next.handle(req).pipe(
+    const token = this.authService.getToken();
+    const requestWithAuth = token && !req.headers.has('Authorization')
+      ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+      : req;
+
+    return next.handle(requestWithAuth).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401 && !this.isRedirecting) {
           this.isRedirecting = true;

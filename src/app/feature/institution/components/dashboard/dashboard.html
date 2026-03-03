@@ -1,0 +1,119 @@
+<section class="dashboard-shell">
+  <header class="dashboard-header">
+    <h1>Institution Dashboard</h1>
+    <p>Create departments, teachers, students, and map true subjects.</p>
+  </header>
+
+  <section class="action-card">
+    <h2>Quick Actions</h2>
+    <div class="actions">
+      <button app-button variant="primary" type="button" (click)="openDepartmentModal()">Create Department</button>
+      <button app-button variant="secondary" type="button" (click)="openTeacherModal()">Create Teacher</button>
+      <button app-button variant="secondary" type="button" (click)="openStudentModal()">Create Student</button>
+      <button app-button variant="secondary" type="button" (click)="openSubjectModal()">Set Subject</button>
+    </div>
+  </section>
+
+  <section class="departments-card">
+    <div class="departments-header">
+      <h2>Departments</h2>
+      <button app-button variant="secondary" type="button" (click)="fetchDepartments()" [disabled]="loadingDepartments">
+        {{ loadingDepartments ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+
+    <p *ngIf="loadingDepartments" class="hint">Loading departments...</p>
+    <app-empty-state
+      *ngIf="!loadingDepartments && departments.length === 0"
+      title="No departments yet"
+      message="Create your first department to enable teacher/student creation."
+      [compact]="true"
+    ></app-empty-state>
+
+    <div class="department-grid" *ngIf="!loadingDepartments && departments.length > 0">
+      <article class="department-tile" *ngFor="let department of departments; let idx = index">
+        <div class="department-badge">{{ idx + 1 }}</div>
+        <div class="department-content">
+          <h3>{{ department.name }}</h3>
+          <p>Active Department</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="departments-card">
+    <div class="departments-header">
+      <h2>Subjects And Assigned Teachers</h2>
+      <button app-button variant="secondary" type="button" (click)="fetchSubjects()" [disabled]="loadingSubjects">
+        {{ loadingSubjects ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+
+    <p *ngIf="loadingSubjects" class="hint">Loading subjects...</p>
+
+    <app-empty-state
+      *ngIf="subjectsError"
+      variant="error"
+      title="Unable to load subjects"
+      [message]="subjectsError"
+      [compact]="true"
+    ></app-empty-state>
+
+    <app-empty-state
+      *ngIf="!loadingSubjects && !subjectsError && subjects.length === 0"
+      title="No subjects mapped yet"
+      message="Use Set Subject to map true subjects to teachers."
+      [compact]="true"
+    ></app-empty-state>
+
+    <div class="subjects-table-wrap" *ngIf="!loadingSubjects && !subjectsError && subjects.length > 0">
+      <table class="subjects-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Code</th>
+            <th>Semester</th>
+            <th>Department</th>
+            <th>Assigned Teacher</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let subject of subjects">
+            <td>{{ subject.name || '-' }}</td>
+            <td>{{ subject.code || '-' }}</td>
+            <td>{{ subject.semester || '-' }}</td>
+            <td>{{ subject.department_name || ('Department #' + subject.department_id) }}</td>
+            <td>{{ getTeacherDisplay(subject) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <app-create-department-modal
+    [isOpen]="showDepartmentModal"
+    (closed)="showDepartmentModal = false"
+    (created)="onDepartmentCreated($event)"
+  ></app-create-department-modal>
+
+  <app-create-teacher-modal
+    [isOpen]="showTeacherModal"
+    [departments]="departments"
+    (closed)="showTeacherModal = false"
+    (created)="onTeacherCreated()"
+  ></app-create-teacher-modal>
+
+  <app-create-student-modal
+    [isOpen]="showStudentModal"
+    [departments]="departments"
+    (closed)="showStudentModal = false"
+    (created)="onStudentCreated()"
+  ></app-create-student-modal>
+
+  <app-create-subject-mapping-modal
+    [isOpen]="showSubjectModal"
+    [departments]="departments"
+    (closed)="showSubjectModal = false"
+    (created)="onSubjectCreated()"
+  ></app-create-subject-mapping-modal>
+</section>

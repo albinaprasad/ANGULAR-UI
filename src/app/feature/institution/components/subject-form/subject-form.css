@@ -1,0 +1,45 @@
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+}
+
+.subject-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.7rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.88rem;
+  color: #4b5563;
+  gap: 0.35rem;
+}
+
+input,
+select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.95rem;
+}
+
+.error {
+  color: #b91c1c;
+  margin: 0 0 0.7rem;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 900px) {
+  .subject-grid {
+    grid-template-columns: 1fr;
+  }
+}

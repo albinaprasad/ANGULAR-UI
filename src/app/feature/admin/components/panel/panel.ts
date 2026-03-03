@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import environmentJson from '../../../../../../configs/environment.json';
 import { NotificationService } from '../../../../services/http/notification.service';
+import { AuthService } from '../../../../services/http/auth.service';
 import { Subject, of } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 
@@ -12,6 +12,8 @@ type PanelNavItem = {
   count?: number;
 };
 
+type PanelRoleType = 'admin' | 'institution' | 'teacher' | 'student' | 'user';
+
 @Component({
   selector: 'app-panel',
   standalone: false,
@@ -19,7 +21,11 @@ type PanelNavItem = {
   styleUrl: './panel.css',
 })
 export class Panel implements OnInit, OnDestroy {
-  isAdmin = localStorage.getItem(environmentJson.IS_SUPER_ADMIN) === 'true';
+  roleType: PanelRoleType = 'user';
+  panelTitle = 'User Panel';
+  panelSubtitle = 'Manage your profile and notifications';
+  navItems: PanelNavItem[] = [];
+
   adminPanel: PanelNavItem[] = [{
     'label': 'Dashboard', 'route': '/admin/dashboard','title':'Admin Panel', 'subtitle': 'Manage your data from here'
     }, {
@@ -37,11 +43,45 @@ export class Panel implements OnInit, OnDestroy {
     }
   ];
 
+  teacherPanel: PanelNavItem[] = [{
+    'label': 'Dashboard', 'route': '/teacher/dashboard','title':'Teacher Panel', 'subtitle': 'Manage classes and student progress'
+    }, {
+    'label': 'Profile', 'route': '/user/profile','title':'Profile','subtitle': 'Edit and save your profile'
+    }, {
+    'label': 'Notification', 'route': '/user/notification', 'title': 'Notification', 'subtitle':'Your Notification', 'count': 0
+    }
+  ]
+
+  studentPanel: PanelNavItem[] = [{
+    'label': 'Dashboard', 'route': '/student/dashboard','title':'Student Panel', 'subtitle': 'View your marks and progress'
+    }, {
+    'label': 'Profile', 'route': '/user/profile','title':'Profile','subtitle': 'Edit and save your profile'
+    }, {
+    'label': 'Notification', 'route': '/user/notification', 'title': 'Notification', 'subtitle':'Your Notification', 'count': 0
+    }
+  ]
+
+  institutionPanel: PanelNavItem[] = [{
+    'label': 'Dashboard', 'route': '/institution/dashboard','title':'Institution Panel', 'subtitle': 'Manage institution activity and analytics'
+    }, {
+    'label': 'Members', 'route': '/institution/members','title':'Institution Members', 'subtitle': 'Browse teachers and students'
+    }, {
+    'label': 'Profile', 'route': '/user/profile','title':'Profile','subtitle': 'Edit and save your profile'
+    }, {
+    'label': 'Notification', 'route': '/user/notification', 'title': 'Notification', 'subtitle':'Your Notification', 'count': 0
+    }
+  ]
+
   private destroy$ = new Subject<void>();
 
-  constructor(private notificationService: NotificationService) {}
+  constructor(
+    private notificationService: NotificationService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    document.body.style.overflow = 'auto';
+    this.initializePanelByRole();
     this.notificationService.connectNotificationsSocket();
     this.loadUnreadCount();
 
@@ -81,5 +121,59 @@ export class Panel implements OnInit, OnDestroy {
     this.userPanel = this.userPanel.map((item) =>
       item.route === '/user/notification' ? { ...item, count } : item
     );
+
+    this.teacherPanel = this.teacherPanel.map((item) =>
+      item.route === '/user/notification' ? { ...item, count } : item
+    );
+
+    this.institutionPanel = this.institutionPanel.map((item) =>
+      item.route === '/user/notification' ? { ...item, count } : item
+    );
+
+    this.studentPanel = this.studentPanel.map((item) =>
+      item.route === '/user/notification' ? { ...item, count } : item
+    );
+
+    this.initializePanelByRole();
+  }
+
+  private initializePanelByRole(): void {
+    if (this.authService.isSuperAdmin()) {
+      this.roleType = 'admin';
+      this.navItems = this.adminPanel;
+      this.panelTitle = 'Admin Panel';
+      this.panelSubtitle = 'Manage your application settings and data';
+      return;
+    }
+
+    const roles = this.authService.getCurrentRoles();
+    if (roles.includes('institution')) {
+      this.roleType = 'institution';
+      this.navItems = this.institutionPanel;
+      this.panelTitle = 'Institution Panel';
+      this.panelSubtitle = 'Manage institution dashboard, profile and notifications';
+      return;
+    }
+
+    if (roles.includes('teacher')) {
+      this.roleType = 'teacher';
+      this.navItems = this.teacherPanel;
+      this.panelTitle = 'Teacher Panel';
+      this.panelSubtitle = 'Manage teacher dashboard, profile and notifications';
+      return;
+    }
+
+    if (roles.includes('student')) {
+      this.roleType = 'student';
+      this.navItems = this.studentPanel;
+      this.panelTitle = 'Student Panel';
+      this.panelSubtitle = 'View marks, profile and notifications';
+      return;
+    }
+
+    this.roleType = 'user';
+    this.navItems = this.userPanel;
+    this.panelTitle = 'User Panel';
+    this.panelSubtitle = 'Manage your profile and notifications';
   }
 }

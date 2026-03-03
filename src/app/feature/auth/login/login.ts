@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/http/auth.service';
 import { WebSocketService } from '../../../services/websocket/websocket.service';
@@ -9,12 +9,19 @@ import { WebSocketService } from '../../../services/websocket/websocket.service'
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
-export class LoginComponent implements AfterViewInit {
+export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   username: string = '';
   password: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
   private returnUrl: string | null = null;
+  private cleanupListeners: Array<() => void> = [];
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigateByUrl(this.getPostLoginRoute());
+    }
+  }
 
   ngAfterViewInit(): void {
 
@@ -36,20 +43,33 @@ export class LoginComponent implements AfterViewInit {
       body.style.overflow = "initial";
     };
 
-    window.addEventListener("scroll", () => {
+    const onScroll = () => {
       if (window.scrollY > window.innerHeight / 3 && !isOpened) {
         isOpened = true;
         scrollDown.style.display = "none";
         openModal();
       }
-    });
+    };
 
+    window.addEventListener("scroll", onScroll);
     modalButton.addEventListener("click", openModal);
     closeButton.addEventListener("click", closeModal);
 
-    document.onkeydown = (evt: KeyboardEvent) => {
+    const onKeyDown = (evt: KeyboardEvent) => {
       evt.key === 'Escape' ? closeModal() : false;
     };
+    document.addEventListener('keydown', onKeyDown);
+
+    this.cleanupListeners.push(() => window.removeEventListener('scroll', onScroll));
+    this.cleanupListeners.push(() => modalButton.removeEventListener('click', openModal));
+    this.cleanupListeners.push(() => closeButton.removeEventListener('click', closeModal));
+    this.cleanupListeners.push(() => document.removeEventListener('keydown', onKeyDown));
+  }
+
+  ngOnDestroy(): void {
+    this.cleanupListeners.forEach((cleanup) => cleanup());
+    this.cleanupListeners = [];
+    document.body.style.overflow = 'initial';
   }
 
   emailChanged(value: string): void {
@@ -76,8 +96,8 @@ export class LoginComponent implements AfterViewInit {
       await this.authService.login(this.username, this.password)
       this.websocketService.disconnect();
       this.websocketService.connectToUrl('notifications');
-      const defaultRoute = this.authService.isSuperAdmin() ? '/admin/dashboard' : '/user/profile';
-      this.router.navigateByUrl(this.returnUrl || defaultRoute);
+      document.body.style.overflow = 'initial';
+      this.router.navigateByUrl(this.getPostLoginRoute());
     } catch (error: any) {
       this.errorMessage = error?.error?.message || 'Login failed. Please try again.';
       console.error('Login error:', error);
@@ -97,5 +117,14 @@ export class LoginComponent implements AfterViewInit {
 
   goToRegister() {
     this.router.navigate(['/auth/register']);
+  }
+
+  private getPostLoginRoute(): string {
+    const trimmedReturnUrl = this.returnUrl?.trim();
+    if (!trimmedReturnUrl || trimmedReturnUrl.startsWith('/auth/')) {
+      return this.authService.getDefaultRoute();
+    }
+
+    return trimmedReturnUrl;
   }
 }

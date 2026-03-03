@@ -50,6 +50,20 @@
             [value]="confirmPassword"
             (valueChange)="confirmPasswordChanged($event)"
           ></app-text-input>
+
+          <div class="input-block">
+            <label class="input-label" for="register-role">Role</label>
+            <select
+              id="register-role"
+              class="role-select"
+              [value]="role"
+              (change)="roleChanged(($any($event.target)).value)"
+            >
+              <option *ngFor="let roleOption of roleOptions" [value]="roleOption.value">
+                {{ roleOption.label }}
+              </option>
+            </select>
+          </div>
       
           <button app-button variant="primary" class="input-button" (click)="register()" [disabled]="isLoading">
             {{ isLoading ? 'Creating...' : 'Create Account' }}

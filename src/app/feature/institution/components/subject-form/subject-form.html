@@ -1,0 +1,62 @@
+<section class="card">
+  <h2>Add Subject</h2>
+
+  <div class="subject-grid">
+    <label>
+      Subject name
+      <input type="text" [(ngModel)]="name" placeholder="Mathematics" maxlength="100" />
+    </label>
+
+    <label>
+      Subject code
+      <input type="text" [(ngModel)]="code" placeholder="MATH101" maxlength="20" />
+    </label>
+
+    <label>
+      Semester
+      <select [ngModel]="semester" (ngModelChange)="semester = $event" (change)="onSemesterChange(($any($event.target)).value)">
+        <option [ngValue]="null">Select semester</option>
+        <option *ngFor="let sem of semesters" [ngValue]="sem">{{ sem }}</option>
+      </select>
+    </label>
+
+    <label>
+      Department
+      <select
+        [ngModel]="departmentId"
+        (ngModelChange)="departmentId = $event"
+        (change)="onDepartmentChange(($any($event.target)).value)"
+      >
+        <option [ngValue]="null">Select department</option>
+        <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
+      </select>
+    </label>
+
+    <label>
+      Teacher
+      <select [ngModel]="teacherId" (ngModelChange)="teacherId = $event" (change)="onTeacherChange(($any($event.target)).value)">
+        <option [ngValue]="null">Select teacher</option>
+        <option *ngFor="let teacher of teachers" [ngValue]="teacher.teacher_id">{{ getTeacherLabel(teacher) }}</option>
+      </select>
+    </label>
+  </div>
+
+  <app-empty-state
+    *ngIf="departments.length === 0 || teachers.length === 0"
+    [title]="departments.length === 0 ? 'No departments yet' : 'No teachers yet'"
+    [message]="departments.length === 0 ? 'Add departments before creating subjects.' : 'Add at least one teacher before creating subjects.'"
+    [compact]="true"
+  ></app-empty-state>
+
+  <p class="error" *ngIf="validationError">{{ validationError }}</p>
+
+  <button
+    app-button
+    variant="primary"
+    type="button"
+    (click)="submit()"
+    [disabled]="loading || departments.length === 0 || teachers.length === 0"
+  >
+    {{ loading ? 'Saving...' : 'Add Subject' }}
+  </button>
+</section>

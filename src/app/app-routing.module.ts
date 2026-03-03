@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
+import { RoleGuard } from './guards/role.guard';
 import { Panel } from './feature/admin/components/panel/panel';
 import { ErrorPageComponent } from './feature/error/error-page/error-page';
 export const routes: Routes = [
@@ -28,6 +29,24 @@ export const routes: Routes = [
       {
         path: 'user',
         loadChildren: () => import('./feature/user/user-module').then(m => m.CustomerModule),
+      },
+      {
+        path: 'teacher',
+        loadChildren: () => import('./feature/teacher/teacher-module').then(m => m.TeacherModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['teacher'] }
+      },
+      {
+        path: 'institution',
+        loadChildren: () => import('./feature/institution/institution-module').then(m => m.InstitutionModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['institution'] }
+      },
+      {
+        path: 'student',
+        loadChildren: () => import('./feature/student/student-module').then(m => m.StudentModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['student'] }
       }
     ],
   },

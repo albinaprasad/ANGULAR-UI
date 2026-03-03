@@ -1,0 +1,145 @@
+.dashboard-shell {
+  --grad-start: #667eea;
+  --grad-end: #764ba2;
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-border: rgba(255, 255, 255, 0.35);
+
+  margin-left: 220px;
+  padding: 2rem;
+  display: grid;
+  gap: 1rem;
+  height: calc(100vh - 140px);
+  min-height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #eef2ff 0%, #ede9fe 100%);
+  border-radius: 14px;
+}
+
+.dashboard-header {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  padding: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.dashboard-header h1 {
+  margin: 0 0 0.35rem;
+  background: linear-gradient(135deg, var(--grad-start) 0%, var(--grad-end) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.dashboard-header p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.action-card,
+.departments-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(76, 85, 146, 0.12);
+}
+
+.action-card h2,
+.departments-card h2 {
+  margin: 0 0 0.8rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.departments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hint {
+  margin: 0;
+  color: #4b5563;
+}
+
+.department-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.department-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  border: 1px solid #dbe3ff;
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%);
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.department-tile:hover {
+  transform: translateY(-2px);
+  border-color: #b9c8ff;
+  box-shadow: 0 8px 20px rgba(76, 85, 146, 0.14);
+}
+
+.department-badge {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.department-content h3 {
+  margin: 0;
+  font-size: 0.96rem;
+  color: #1f2937;
+}
+
+.department-content p {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.subjects-table-wrap {
+  overflow-x: auto;
+}
+
+.subjects-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.subjects-table th,
+.subjects-table td {
+  text-align: left;
+  padding: 0.7rem 0.45rem;
+  border-bottom: 1px solid #e9edff;
+  white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+  .dashboard-shell {
+    margin-left: 0;
+    padding: 1.25rem;
+    height: calc(100vh - 120px);
+    min-height: 460px;
+  }
+}

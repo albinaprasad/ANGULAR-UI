@@ -1,0 +1,43 @@
+<section class="card">
+  <h2>{{ title }}</h2>
+
+  <p class="selected-user" *ngIf="selectedUser; else noUser">
+    Selected user: <strong>{{ selectedUser.name || selectedUser.username }}</strong> ({{ selectedUser.email }})
+  </p>
+  <ng-template #noUser>
+    <p class="hint">Select a user from the search section.</p>
+  </ng-template>
+
+  <label>
+    Department
+    <select
+      [ngModel]="selectedDepartmentId"
+      (ngModelChange)="selectedDepartmentId = $event"
+      (change)="onDepartmentChange(($any($event.target)).value)"
+    >
+      <option [ngValue]="null">Select department</option>
+      <option *ngFor="let department of departments" [ngValue]="department.id">
+        {{ department.name }}
+      </option>
+    </select>
+  </label>
+
+  <app-empty-state
+    *ngIf="departments.length === 0"
+    title="No departments yet"
+    message="Add a department before assigning users."
+    [compact]="true"
+  ></app-empty-state>
+
+  <p class="error" *ngIf="validationError">{{ validationError }}</p>
+
+  <button
+    app-button
+    variant="primary"
+    type="button"
+    (click)="submit()"
+    [disabled]="loading || departments.length === 0"
+  >
+    {{ loading ? 'Submitting...' : actionLabel }}
+  </button>
+</section>

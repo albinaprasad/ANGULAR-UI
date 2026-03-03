@@ -1,0 +1,192 @@
+.members-shell {
+  --grad-start: #667eea;
+  --grad-end: #764ba2;
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-border: rgba(161, 176, 255, 0.55);
+
+  margin-left: 220px;
+  padding: 2rem;
+  display: grid;
+  gap: 1rem;
+  min-height: calc(100vh - 64px);
+  background:
+    radial-gradient(circle at 8% 15%, rgba(102, 126, 234, 0.28) 0%, transparent 40%),
+    radial-gradient(circle at 92% 5%, rgba(118, 75, 162, 0.26) 0%, transparent 38%),
+    linear-gradient(135deg, #e4e9ff 0%, #eee6ff 52%, #e7f0ff 100%);
+}
+
+.members-header {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 236, 255, 0.93) 100%);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 12px 30px rgba(86, 92, 161, 0.16);
+  backdrop-filter: blur(10px);
+}
+
+.members-header h1 {
+  margin: 0 0 0.35rem;
+  background: linear-gradient(135deg, var(--grad-start) 0%, var(--grad-end) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.members-header p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.toolbar-card,
+.list-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(243, 239, 255, 0.9) 100%);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 12px 28px rgba(76, 85, 146, 0.14);
+}
+
+.tabs {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.tabs button {
+  border: 1px solid #c7d2ff;
+  background: linear-gradient(135deg, #ffffff 0%, #eff3ff 100%);
+  color: #24324f;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.tabs button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.15);
+}
+
+.tabs button.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-color: #667eea;
+}
+
+.search-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: #374151;
+  max-width: 420px;
+  width: 100%;
+}
+
+.search-field input {
+  border: 1px solid #dbe3ff;
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
+}
+
+.search-field input:focus {
+  outline: none;
+  border-color: #9fb0ff;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.table-scroll {
+  height: 62vh;
+  min-height: 360px;
+  overflow: auto;
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #cfd8ff;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.7rem 0.45rem;
+  border-bottom: 1px solid #e9edff;
+  white-space: nowrap;
+}
+
+th {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.26) 0%, rgba(118, 75, 162, 0.24) 100%);
+  color: #17233f;
+  font-weight: 700;
+}
+
+tbody tr {
+  transition: background 120ms ease;
+}
+
+tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(219, 231, 255, 0.38);
+}
+
+tbody tr:hover {
+  background: rgba(118, 75, 162, 0.14);
+}
+
+@media (max-width: 720px) {
+  .search-field {
+    max-width: 100%;
+  }
+
+  .table-scroll {
+    height: 56vh;
+    min-height: 300px;
+  }
+}
+
+.skeleton {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.skeleton-row {
+  height: 38px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.loading-more {
+  color: #4b5563;
+  font-size: 0.9rem;
+  margin: 0.7rem 0 0;
+}
+
+.retry-row {
+  margin-top: 0.7rem;
+}
+
+@media (max-width: 960px) {
+  .members-shell {
+    margin-left: 0;
+    padding: 1.25rem;
+  }
+}

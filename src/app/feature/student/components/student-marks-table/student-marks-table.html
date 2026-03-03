@@ -1,0 +1,43 @@
+<section class="card">
+  <h2>Marks</h2>
+
+  <p class="loading" *ngIf="loading">Loading marks...</p>
+
+  <app-empty-state
+    *ngIf="errorMessage"
+    variant="error"
+    title="Unable to load marks"
+    [message]="errorMessage"
+    [compact]="true"
+  ></app-empty-state>
+
+  <app-empty-state
+    *ngIf="!loading && !errorMessage && marks.length === 0"
+    title="No marks available"
+    message="Marks will appear here once published."
+    [compact]="true"
+  ></app-empty-state>
+
+  <div class="results" *ngIf="!loading && !errorMessage && marks.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Code</th>
+          <th>Acquired</th>
+          <th>Total</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mark of marks">
+          <td>{{ mark.subject_name }}</td>
+          <td>{{ mark.subject_code }}</td>
+          <td>{{ mark.acquired_mark }}</td>
+          <td>{{ mark.total_mark }}</td>
+          <td>{{ getPercentage(mark) | number:'1.0-2' }}%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
