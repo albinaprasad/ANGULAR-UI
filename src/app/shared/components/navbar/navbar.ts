@@ -12,7 +12,7 @@ type NavItem = {
   subtitle?: string;
   count?: number;
 };
-type RoleType = 'admin' | 'student' | 'user';
+type RoleType = 'admin' | 'institution' | 'teacher' | 'student' | 'user';
 
 @Component({
   selector: 'app-navbar',
@@ -88,6 +88,8 @@ export class Navbar implements OnInit, OnChanges, OnDestroy {
 
   getRoleLabel(): string {
     if (this.roleType === 'admin') return 'Admin';
+    if (this.roleType === 'institution') return 'Institution';
+    if (this.roleType === 'teacher') return 'Teacher';
     if (this.roleType === 'student') return 'Student';
     return 'User';
   }
@@ -98,6 +100,12 @@ export class Navbar implements OnInit, OnChanges, OnDestroy {
     }
     if (this.roleType === 'student') {
       return 'M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 9.73L4.96 9 12 5.27 19.04 9 12 12.73zM6 12.95V17l6 3 6-3v-4.05l-6 3.27-6-3.27z';
+    }
+    if (this.roleType === 'teacher') {
+      return 'M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 9.73L4.96 9 12 5.27 19.04 9 12 12.73zM6 12.95V17l6 3 6-3v-4.05l-6 3.27-6-3.27z';
+    }
+    if (this.roleType === 'institution') {
+      return 'M4 10h16v10h-2v-8h-3v8h-2v-8h-2v8H9v-8H6v8H4v-10zm8-8 10 5v2H2V7l10-5z';
     }
     return 'M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0-8c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 9c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5zm-5.74 5c.83-1.17 3.02-2 5.74-2s4.91.83 5.74 2H6.26z';
   }

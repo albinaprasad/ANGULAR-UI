@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { HttpErrorResponse } from "@angular/common/http";
+import { BehaviorSubject, Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { BaseHttpService } from "./base.service";
 import {
@@ -9,11 +10,15 @@ import {
 } from "../../types/notification.types";
 import { WebSocketService } from "../websocket/websocket.service";
 import { debounceTime, filter, map } from "rxjs/operators";
+import { catchError } from "rxjs/operators";
+import { throwError } from "rxjs";
 
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationService extends BaseHttpService {
+  private unreadCountSubject = new BehaviorSubject<number>(0);
+
   constructor(
     private httpClient: HttpClient,
     private websocketService: WebSocketService
@@ -29,15 +34,34 @@ export class NotificationService extends BaseHttpService {
   }
 
   markAsSeen(notificationId: number): Observable<NotificationSeenResponse> {
-    return this.httpClient.post<NotificationSeenResponse>(
-      `${this.API_URL}/notifications/seen/${notificationId}/`,
-      {},
-      { headers: this.getAuthHeaders() }
+    return this.markAsSeenViaPath("seen", notificationId).pipe(
+      catchError((error: unknown) => {
+        const httpError = error as HttpErrorResponse;
+        if (httpError?.status === 404 || httpError?.status === 405) {
+          return this.markAsSeenViaPath("read", notificationId);
+        }
+        return throwError(() => error);
+      })
     );
   }
 
   connectNotificationsSocket(): void {
     this.websocketService.connect("notifications");
+  }
+
+  unreadCount$(): Observable<number> {
+    return this.unreadCountSubject.asObservable();
+  }
+
+  setUnreadCount(count: number): void {
+    this.unreadCountSubject.next(Math.max(0, count));
+  }
+
+  deriveUnreadCount(notifications: Array<{ is_seen: boolean }>): number {
+    return notifications.reduce(
+      (acc, notification) => acc + (notification.is_seen === false ? 1 : 0),
+      0
+    );
   }
 
   onNotificationDbChanges(debounceMs: number = 400): Observable<NotificationSocketEvent> {
@@ -89,5 +113,16 @@ export class NotificationService extends BaseHttpService {
       object_id: candidate.object_id,
       actor_id: candidate.actor_id ?? null,
     };
+  }
+
+  private markAsSeenViaPath(
+    alias: "seen" | "read",
+    notificationId: number
+  ): Observable<NotificationSeenResponse> {
+    return this.httpClient.post<NotificationSeenResponse>(
+      `${this.API_URL}/notifications/${alias}/${notificationId}/`,
+      {},
+      { headers: this.getAuthHeaders() }
+    );
   }
 }

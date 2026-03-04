@@ -1,0 +1,12 @@
+<section class="dashboard-shell">
+  <header class="dashboard-header">
+    <h1>Student Dashboard</h1>
+    <p>View subject-wise marks and percentages.</p>
+  </header>
+
+  <app-student-marks-table
+    [marks]="marks"
+    [loading]="loading"
+    [errorMessage]="errorMessage"
+  ></app-student-marks-table>
+</section>

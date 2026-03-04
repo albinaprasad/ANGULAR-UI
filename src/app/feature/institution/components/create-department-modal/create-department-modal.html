@@ -1,0 +1,23 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="close()">
+  <section class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Create Department">
+    <header class="modal-header">
+      <h2>Create Department</h2>
+      <button type="button" class="close-btn" (click)="close()" [disabled]="loading">&times;</button>
+    </header>
+
+    <div class="modal-body">
+      <label>
+        Department name
+        <input type="text" [(ngModel)]="name" maxlength="80" placeholder="Computer Science" (keyup.enter)="submit()" />
+      </label>
+      <p class="error" *ngIf="nameError">{{ nameError }}</p>
+    </div>
+
+    <footer class="modal-footer">
+      <button app-button variant="secondary" type="button" (click)="close()" [disabled]="loading">Cancel</button>
+      <button app-button variant="primary" type="button" (click)="submit()" [disabled]="loading">
+        {{ loading ? 'Creating...' : 'Create Department' }}
+      </button>
+    </footer>
+  </section>
+</div>

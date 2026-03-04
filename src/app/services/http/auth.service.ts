@@ -12,6 +12,7 @@ import { BaseResponse } from '../../types/base-http.types';
 })
 export class AuthService extends BaseHttpService {
 
+  private readonly USER_ROLES_KEY = 'user_roles';
   public user = new BehaviorSubject<User | null>(null)
   public tokenChanges: BehaviorSubject<string | null>;
   
@@ -31,12 +32,59 @@ export class AuthService extends BaseHttpService {
       return Boolean(currentUser.is_superAdmin || currentUser.role?.includes('admin'));
     }
 
-    return localStorage.getItem(environmentJson.IS_SUPER_ADMIN) === 'true';
+    return localStorage.getItem(environmentJson.IS_SUPER_ADMIN) === 'true'
+      || this.getCurrentRoles().includes('admin');
+  }
+
+  getCurrentRoles(): string[] {
+    const currentUserRoles = this.user.value?.role;
+    if (Array.isArray(currentUserRoles) && currentUserRoles.length) {
+      return currentUserRoles;
+    }
+
+    const storedRoles = this.getStoredRoles();
+    if (storedRoles.length) {
+      return storedRoles;
+    }
+
+    const token = this.getAuthToken();
+    if (!token) return [];
+
+    const payload = this.decodeJwtPayload(token);
+    const payloadRoles = this.extractRoles(payload);
+    if (payloadRoles.length) {
+      localStorage.setItem(this.USER_ROLES_KEY, JSON.stringify(payloadRoles));
+    }
+
+    return payloadRoles;
+  }
+
+  getDefaultRoute(): string {
+    if (this.isSuperAdmin()) {
+      return '/admin/dashboard';
+    }
+
+    const roles = this.getCurrentRoles();
+    if (roles.includes('institution')) {
+      return '/institution/dashboard';
+    }
+    if (roles.includes('teacher')) {
+      return '/teacher/dashboard';
+    }
+    if (roles.includes('student')) {
+      return '/student/dashboard';
+    }
+
+    return '/user/profile';
   }
 
   setAuthToken(token: string): void {
     localStorage.setItem(this.AUTH_TOKEN_KEY, token);
     this.tokenChanges.next(token);
+  }
+
+  getToken(): string | null {
+    return this.getAuthToken();
   }
 
   isAuthenticated(): boolean {
@@ -54,6 +102,7 @@ export class AuthService extends BaseHttpService {
   logout(): void {
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
     localStorage.removeItem(environmentJson.IS_SUPER_ADMIN);
+    localStorage.removeItem(this.USER_ROLES_KEY);
     this.tokenChanges.next(null);
     this.user.next(null);
   }
@@ -71,7 +120,9 @@ export class AuthService extends BaseHttpService {
           tap(response => {
             if (response.message?.token) {
               this.setAuthToken(response.message?.token ?? '');
-              if (response.message.user.is_superAdmin || response.message.user.role.includes('admin'))
+              const roles = this.extractRoles(response.message?.user);
+              localStorage.setItem(this.USER_ROLES_KEY, JSON.stringify(roles));
+              if (response.message.user.is_superAdmin || roles.includes('admin'))
                 localStorage.setItem(environmentJson.IS_SUPER_ADMIN, 'true' );
               else
                 localStorage.setItem(environmentJson.IS_SUPER_ADMIN, 'false');
@@ -82,8 +133,8 @@ export class AuthService extends BaseHttpService {
     );
   }
 
-  register(email: string, password: string, username: string): Promise<BaseResponse<AuthResponse,string>> {
-    const registerRequest = { email, password, username, password_confirmation: password };
+  register(email: string, password: string, username: string, role: string): Promise<BaseResponse<AuthResponse,string>> {
+    const registerRequest = { email, password, username, password_confirmation: password, role };
     
     return firstValueFrom(
       this.httpClient.post<BaseResponse<AuthResponse,string>>(
@@ -124,5 +175,28 @@ export class AuthService extends BaseHttpService {
     } catch {
       return null;
     }
+  }
+
+  private getStoredRoles(): string[] {
+    try {
+      const rawRoles = localStorage.getItem(this.USER_ROLES_KEY);
+      if (!rawRoles) return [];
+
+      const parsed = JSON.parse(rawRoles);
+      return Array.isArray(parsed) ? parsed.filter((role) => typeof role === 'string') : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private extractRoles(payload: any): string[] {
+    if (!payload) return [];
+
+    const candidates: unknown[] = [];
+    if (Array.isArray(payload?.role)) candidates.push(...payload.role);
+    if (Array.isArray(payload?.roles)) candidates.push(...payload.roles);
+    if (typeof payload?.role === 'string') candidates.push(payload.role);
+
+    return candidates.filter((role): role is string => typeof role === 'string' && role.length > 0);
   }
 }

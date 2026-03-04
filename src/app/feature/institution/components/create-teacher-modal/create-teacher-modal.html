@@ -1,0 +1,49 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="close()">
+  <section class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Create Teacher">
+    <header class="modal-header">
+      <h2>Create Teacher</h2>
+      <button type="button" class="close-btn" (click)="close()" [disabled]="loading">&times;</button>
+    </header>
+
+    <div class="modal-body">
+      <label>
+        Username
+        <input type="text" [(ngModel)]="username" minlength="3" placeholder="teacher_anna" />
+      </label>
+      <p class="error" *ngIf="usernameError">{{ usernameError }}</p>
+
+      <label>
+        Email
+        <input type="email" [(ngModel)]="email" placeholder="anna@school.com" />
+      </label>
+      <p class="error" *ngIf="emailError">{{ emailError }}</p>
+
+      <label>
+        Password
+        <input type="password" [(ngModel)]="password" minlength="8" placeholder="Minimum 8 characters" />
+      </label>
+      <p class="error" *ngIf="passwordError">{{ passwordError }}</p>
+
+      <label>
+        Department
+        <select
+          [ngModel]="departmentId === null ? '' : departmentId"
+          (ngModelChange)="onDepartmentChange($event)"
+        >
+          <option value="">Select department</option>
+          <option *ngFor="let department of departments" [value]="department.id">{{ department.name }}</option>
+        </select>
+      </label>
+      <p class="error" *ngIf="departmentError">{{ departmentError }}</p>
+      <p class="hint" *ngIf="departmentsLoading">Loading departments...</p>
+      <p class="hint" *ngIf="!departmentsLoading && departments.length === 0">Create a department first.</p>
+    </div>
+
+    <footer class="modal-footer">
+      <button app-button variant="secondary" type="button" (click)="close()" [disabled]="loading">Cancel</button>
+      <button app-button variant="primary" type="button" (click)="submit()" [disabled]="loading || departments.length === 0">
+        {{ loading ? 'Creating...' : 'Create Teacher' }}
+      </button>
+    </footer>
+  </section>
+</div>

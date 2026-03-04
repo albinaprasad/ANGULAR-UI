@@ -1,0 +1,77 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="close()">
+  <section class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Set Institution Subject">
+    <header class="modal-header">
+      <h2>Set Institution Subject</h2>
+      <button type="button" class="close-btn" (click)="close()" [disabled]="loading">&times;</button>
+    </header>
+
+    <div class="modal-body">
+      <label>
+        Search true subject
+        <input
+          type="text"
+          [ngModel]="trueSubjectSearch"
+          (ngModelChange)="onTrueSubjectSearchChange($event)"
+          placeholder="Search by name or code"
+        />
+      </label>
+
+      <label>
+        True subject
+        <select
+          [ngModel]="trueSubjectId === null ? '' : trueSubjectId"
+          (ngModelChange)="onTrueSubjectChange($event)"
+        >
+          <option value="">Select true subject</option>
+          <option *ngFor="let subject of trueSubjectOptions" [value]="subject.id">
+            {{ getTrueSubjectLabel(subject) }}
+          </option>
+        </select>
+      </label>
+      <p class="error" *ngIf="trueSubjectError">{{ trueSubjectError }}</p>
+      <p class="hint" *ngIf="trueSubjectLoading">Loading true subjects...</p>
+
+      <label>
+        Semester
+        <select [ngModel]="semester === null ? '' : semester" (ngModelChange)="onSemesterChange($event)">
+          <option value="">Select semester</option>
+          <option *ngFor="let s of [1,2,3,4,5,6,7,8]" [value]="s">{{ s }}</option>
+        </select>
+      </label>
+      <p class="error" *ngIf="semesterError">{{ semesterError }}</p>
+
+      <label>
+        Department
+        <select [ngModel]="departmentId === null ? '' : departmentId" (ngModelChange)="onDepartmentChange($event)">
+          <option value="">Select department</option>
+          <option *ngFor="let department of departments" [value]="department.id">{{ department.name }}</option>
+        </select>
+      </label>
+      <p class="error" *ngIf="departmentError">{{ departmentError }}</p>
+
+      <label>
+        Teacher
+        <select [ngModel]="teacherId === null ? '' : teacherId" (ngModelChange)="onTeacherChange($event)">
+          <option value="">Select teacher</option>
+          <option *ngFor="let teacher of teachers" [value]="teacher.id">{{ getTeacherLabel(teacher) }}</option>
+        </select>
+      </label>
+      <p class="error" *ngIf="teacherError">{{ teacherError }}</p>
+      <p class="hint" *ngIf="teacherLoading">Loading teachers...</p>
+      <p class="hint" *ngIf="!teacherLoading && teachers.length === 0">No teachers found for this institution.</p>
+    </div>
+
+    <footer class="modal-footer">
+      <button app-button variant="secondary" type="button" (click)="close()" [disabled]="loading">Cancel</button>
+      <button
+        app-button
+        variant="primary"
+        type="button"
+        (click)="submit()"
+        [disabled]="loading || trueSubjectLoading || teacherLoading"
+      >
+        {{ loading ? 'Saving...' : 'Set Subject' }}
+      </button>
+    </footer>
+  </section>
+</div>

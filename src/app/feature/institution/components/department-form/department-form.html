@@ -1,0 +1,18 @@
+<section class="card">
+  <h2>Add Department</h2>
+  <label>
+    Department name
+    <input
+      type="text"
+      [(ngModel)]="name"
+      placeholder="Computer Science"
+      maxlength="80"
+      (keyup.enter)="submit()"
+    />
+  </label>
+  <p class="error" *ngIf="nameError">{{ nameError }}</p>
+
+  <button app-button variant="primary" type="button" (click)="submit()" [disabled]="loading">
+    {{ loading ? 'Saving...' : 'Add Department' }}
+  </button>
+</section>

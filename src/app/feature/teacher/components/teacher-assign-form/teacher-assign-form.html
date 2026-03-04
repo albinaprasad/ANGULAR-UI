@@ -1,0 +1,65 @@
+<section class="card">
+  <h2>Assign Student To Self</h2>
+
+  <div class="search-row">
+    <label>
+      Search student
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search by username, email, or name"
+        (keyup.enter)="searchStudents()"
+      />
+    </label>
+
+    <button app-button variant="primary" type="button" (click)="searchStudents()" [disabled]="searchLoading || !searchText.trim()">
+      {{ searchLoading ? 'Searching...' : 'Search' }}
+    </button>
+  </div>
+
+  <app-empty-state
+    *ngIf="errorMessage"
+    variant="error"
+    title="Unable to search students"
+    [message]="errorMessage"
+    [compact]="true"
+  ></app-empty-state>
+
+  <div class="results" *ngIf="!errorMessage && users.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users" [class.active]="selectedStudent?.id === user.id">
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.name || '-' }}</td>
+          <td>
+            <button app-button variant="secondary" type="button" (click)="selectStudent(user)">Select</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-empty-state
+    *ngIf="!searchLoading && !errorMessage && users.length === 0 && searchText.trim().length > 0"
+    title="No students found"
+    message="Try a different search text."
+    [compact]="true"
+  ></app-empty-state>
+
+  <p class="selected" *ngIf="selectedStudent">
+    Selected: <strong>{{ selectedStudent.name || selectedStudent.username }}</strong>
+  </p>
+
+  <button app-button variant="primary" type="button" (click)="assignStudent()" [disabled]="assignLoading || !selectedStudent">
+    {{ assignLoading ? 'Assigning...' : 'Assign Student' }}
+  </button>
+</section>

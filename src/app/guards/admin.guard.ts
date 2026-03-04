@@ -20,6 +20,6 @@ export class AdminGuard implements CanActivate{
       return true;
     }
 
-    return this.router.createUrlTree(['/user/profile']);
+    return this.router.parseUrl(this.authService.getDefaultRoute());
   }
 }

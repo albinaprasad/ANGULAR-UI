@@ -1,0 +1,68 @@
+<section class="card">
+  <h2>User Search</h2>
+  <div class="search-controls">
+    <label>
+      Role
+      <select [(ngModel)]="role" (change)="onRoleChange(($any($event.target)).value)">
+        <option value="teacher">Teacher</option>
+        <option value="student">Student</option>
+      </select>
+    </label>
+
+    <label>
+      Search text
+      <input
+        type="text"
+        [(ngModel)]="query"
+        placeholder="Search by username, email, or name"
+        (keyup.enter)="search()"
+      />
+    </label>
+
+    <button app-button variant="primary" type="button" (click)="search()" [disabled]="loading || !query.trim()">
+      {{ loading ? 'Searching...' : 'Search' }}
+    </button>
+  </div>
+
+  <app-empty-state
+    *ngIf="errorMessage"
+    variant="error"
+    title="Search failed"
+    [message]="errorMessage"
+    [compact]="true"
+  ></app-empty-state>
+
+  <div class="results" *ngIf="!errorMessage && users.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users" [class.active]="selectedUserId === user.id">
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.name || '-' }}</td>
+          <td>{{ resolveRole(user) }}</td>
+          <td>
+            <button app-button type="button" variant="secondary" (click)="selectUser(user)">
+              Select
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-empty-state
+    *ngIf="hasSearched && !loading && !errorMessage && users.length === 0"
+    title="No users found"
+    message="Try another role or search text."
+    [compact]="true"
+  ></app-empty-state>
+</section>
