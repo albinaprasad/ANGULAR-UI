@@ -29,7 +29,7 @@ export class AuthService extends BaseHttpService {
   isSuperAdmin(): boolean {
     const currentUser = this.user.value;
     if (currentUser) {
-      return Boolean(currentUser.is_superAdmin || currentUser.role?.includes('admin'));
+      return Boolean(currentUser.is_superAdmin || this.normalizeRoles(currentUser.role).includes('admin'));
     }
 
     return localStorage.getItem(environmentJson.IS_SUPER_ADMIN) === 'true'
@@ -37,8 +37,8 @@ export class AuthService extends BaseHttpService {
   }
 
   getCurrentRoles(): string[] {
-    const currentUserRoles = this.user.value?.role;
-    if (Array.isArray(currentUserRoles) && currentUserRoles.length) {
+    const currentUserRoles = this.normalizeRoles(this.user.value?.role);
+    if (currentUserRoles.length) {
       return currentUserRoles;
     }
 
@@ -183,7 +183,7 @@ export class AuthService extends BaseHttpService {
       if (!rawRoles) return [];
 
       const parsed = JSON.parse(rawRoles);
-      return Array.isArray(parsed) ? parsed.filter((role) => typeof role === 'string') : [];
+      return this.normalizeRoles(parsed);
     } catch {
       return [];
     }
@@ -196,7 +196,38 @@ export class AuthService extends BaseHttpService {
     if (Array.isArray(payload?.role)) candidates.push(...payload.role);
     if (Array.isArray(payload?.roles)) candidates.push(...payload.roles);
     if (typeof payload?.role === 'string') candidates.push(payload.role);
+    if (typeof payload?.roles === 'string') candidates.push(payload.roles);
 
-    return candidates.filter((role): role is string => typeof role === 'string' && role.length > 0);
+    // Some API payloads provide role objects, e.g. { role: [{ name: 'Institution' }] }.
+    const normalized = this.normalizeRoles(candidates);
+    if (normalized.length) {
+      return normalized;
+    }
+
+    // Fallback for JWTs that use different role claim names.
+    if (Array.isArray(payload?.authorities)) {
+      return this.normalizeRoles(payload.authorities);
+    }
+
+    return [];
+  }
+
+  private normalizeRoles(input: unknown): string[] {
+    const items = Array.isArray(input) ? input : [input];
+    const normalized = items
+      .map((item) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          const record = item as Record<string, unknown>;
+          if (typeof record['name'] === 'string') return record['name'];
+          if (typeof record['role'] === 'string') return record['role'];
+          if (typeof record['slug'] === 'string') return record['slug'];
+        }
+        return '';
+      })
+      .map((role) => role.trim().toLowerCase())
+      .filter((role) => role.length > 0);
+
+    return Array.from(new Set(normalized));
   }
 }

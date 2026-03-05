@@ -3,6 +3,8 @@ import { PermissionService } from '../../../../services/http/permission.service'
 import { PermissionAction, Permissions, PermissionToggleChange, TablePermissions } from '../../../../types/permission.types';
 import { SnackbarService } from '../../../../services/modal/snackbar.service';
 import { NavItem } from '../../../../shared/components/sidenav/sidenav';
+import { BaseResponse } from '../../../../types/base-http.types';
+import { Observable, Subscriber } from 'rxjs';
 
 @Component({
   selector: 'app-permissions',
@@ -11,6 +13,9 @@ import { NavItem } from '../../../../shared/components/sidenav/sidenav';
   styleUrl: './permissions.css',
 })
 export class PermissionsComponent implements OnInit {
+  private readonly permissionsPageSize = 200;
+  private readonly maxPermissionPages = 100;
+
   constructor(
     private permissionsService: PermissionService,
     private cdr: ChangeDetectorRef,
@@ -34,9 +39,12 @@ export class PermissionsComponent implements OnInit {
 
   private fetchAllPermissions(): void {
     this.beginRequest();
-    this.permissionsService.getAllPermissions().subscribe({
-      next: (response) => {
-        this.allPermissions = response.message ?? [];
+    this.fetchPermissionsAcrossPages((page, pageSize) =>
+      this.permissionsService.getAllPermissions({ page, pageSize })
+    ).subscribe({
+      next: (permissions) => {
+        this.allPermissions = permissions;
+        console.log('[permissions] all permissions count:', this.allPermissions.length);
         this.refreshTablePermissions();
         this.cdr.markForCheck();
         this.endRequest();
@@ -101,11 +109,14 @@ export class PermissionsComponent implements OnInit {
 
   getPermissionsForGroup(groupName: number) {
     this.beginRequest();
-    this.permissionsService.getGroupPermissions(Number(groupName)).subscribe({
-      next: (response) => {
-        this.currentGroupPermissions = response.message ?? [];
+    this.fetchPermissionsAcrossPages((page, pageSize) =>
+      this.permissionsService.getGroupPermissions(Number(groupName), { page, pageSize })
+    ).subscribe({
+      next: (permissions) => {
+        this.currentGroupPermissions = permissions;
+        console.log('[permissions] current group permissions count:', this.currentGroupPermissions.length, 'groupId:', groupName);
         this.refreshTablePermissions();
-        console.log('Permissions for group fetched successfully:', response);
+        console.log('Permissions for group fetched successfully');
         this.snackbarService.success('Permissions for group fetched successfully');
         this.cdr.markForCheck();
         this.endRequest();
@@ -174,6 +185,7 @@ export class PermissionsComponent implements OnInit {
 
   private refreshTablePermissions(): void {
     this.tablePermissions = this.mapPermissionsByTable(this.allPermissions, this.currentGroupPermissions);
+    console.log('[permissions] rendered table permissions count:', this.tablePermissions.length);
   }
 
   private mapPermissionsByTable(allPermissions: Permissions[], assignedPermissions: Permissions[]): TablePermissions[] {
@@ -231,6 +243,88 @@ export class PermissionsComponent implements OnInit {
     const action: PermissionAction = rawAction;
 
     return { action, table };
+  }
+
+  private fetchPermissionsAcrossPages(
+    fetcher: (page: number, pageSize: number) => Observable<BaseResponse<unknown, string>>
+  ): Observable<Permissions[]> {
+    return new Observable<Permissions[]>((subscriber: Subscriber<Permissions[]>) => {
+      const mergedByCodename = new Map<string, Permissions>();
+      const pageSize = this.permissionsPageSize;
+
+      const fetchPage = (page: number): void => {
+        if (page > this.maxPermissionPages) {
+          subscriber.next(Array.from(mergedByCodename.values()));
+          subscriber.complete();
+          return;
+        }
+
+        fetcher(page, pageSize).subscribe({
+          next: (response) => {
+            const payload = response.message;
+            const pagePermissions = this.extractPermissions(payload);
+            console.log('[permissions] page', page, 'fetched count:', pagePermissions.length);
+            pagePermissions.forEach((permission) => mergedByCodename.set(permission.codename, permission));
+
+            if (this.hasNextPermissionPage(payload, page, pageSize, pagePermissions.length)) {
+              fetchPage(page + 1);
+              return;
+            }
+
+            subscriber.next(Array.from(mergedByCodename.values()));
+            console.log('[permissions] merged unique permissions count:', mergedByCodename.size);
+            subscriber.complete();
+          },
+          error: (err) => subscriber.error(err)
+        });
+      };
+
+      fetchPage(1);
+    });
+  }
+
+  private extractPermissions(message: unknown): Permissions[] {
+    if (Array.isArray(message)) return this.normalizePermissionArray(message);
+    if (!message || typeof message !== 'object') return [];
+
+    const payload = message as Record<string, unknown>;
+    const list = payload['results'] ?? payload['data'] ?? payload['permissions'] ?? payload['items'];
+    if (Array.isArray(list)) return this.normalizePermissionArray(list);
+    return [];
+  }
+
+  private normalizePermissionArray(rawItems: unknown[]): Permissions[] {
+    return rawItems
+      .map((item) => this.normalizePermission(item))
+      .filter((item): item is Permissions => item !== null);
+  }
+
+  private normalizePermission(raw: unknown): Permissions | null {
+    if (!raw || typeof raw !== 'object') return null;
+
+    const item = raw as Record<string, unknown>;
+    const id = Number(item['id']);
+    const name = typeof item['name'] === 'string' ? item['name'] : '';
+    const codename = typeof item['codename'] === 'string' ? item['codename'] : '';
+
+    if (!Number.isFinite(id) || !codename) return null;
+    return { id, name, codename };
+  }
+
+  private hasNextPermissionPage(message: unknown, page: number, defaultPageSize: number, currentPageCount: number): boolean {
+    if (!message || typeof message !== 'object') {
+      return currentPageCount >= defaultPageSize;
+    }
+
+    const payload = message as Record<string, unknown>;
+    if (typeof payload['has_more'] === 'boolean') return payload['has_more'];
+    if (typeof payload['next'] === 'string') return payload['next'].length > 0;
+
+    const pageSize = Number(payload['page_size'] ?? payload['pageSize'] ?? defaultPageSize);
+    const total = Number(payload['count'] ?? payload['total']);
+    if (Number.isFinite(total)) return page * pageSize < total;
+
+    return currentPageCount >= pageSize;
   }
 
   shouldShowPageState(): boolean {

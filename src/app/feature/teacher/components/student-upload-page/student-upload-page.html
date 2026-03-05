@@ -1,0 +1,33 @@
+<section class="upload-shell">
+  <header class="upload-header">
+    <div class="title-wrap">
+      <h1>Upload Student PDF</h1>
+      <p>{{ studentName || 'Student' }} <span *ngIf="studentEmail">({{ studentEmail }})</span></p>
+    </div>
+    <button app-button variant="secondary" type="button" (click)="goBack()">Back to Students</button>
+  </header>
+
+  <section class="upload-card">
+    <div class="upload-form">
+      <label for="teacher-student-upload">Choose PDF File</label>
+      <input
+        id="teacher-student-upload"
+        type="file"
+        accept=".pdf,application/pdf"
+        (change)="onFileChange($event)"
+        [disabled]="loading"
+      />
+
+      <p class="hint" *ngIf="selectedFile">Selected file: {{ selectedFile.name }}</p>
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+    </div>
+
+    <div class="actions">
+      <button app-button variant="secondary" type="button" (click)="goBack()" [disabled]="loading">Cancel</button>
+      <button app-button variant="primary" type="button" (click)="submitUpload()" [disabled]="!selectedFile || loading">
+        {{ loading ? 'Uploading...' : 'Upload PDF' }}
+      </button>
+    </div>
+  </section>
+</section>

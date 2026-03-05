@@ -1,0 +1,94 @@
+<section class="students-shell">
+  <header class="students-header">
+    <div>
+      <h1>Teacher Students</h1>
+      <p>Students from departments of subjects assigned to you.</p>
+    </div>
+    <div class="students-summary">
+      <span class="students-total">{{ subjectCount }} subjects</span>
+      <span class="students-total">{{ studentCount }} unique students</span>
+    </div>
+  </header>
+
+  <section class="students-card">
+    <div class="students-toolbar">
+      <input
+        id="teacher-students-search"
+        type="text"
+        aria-label="Search students"
+        [ngModel]="searchText"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Search by username, email, or name"
+      />
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+      <p class="hint">Loading subjects and students...</p>
+      <div class="skeleton-list">
+        <div class="skeleton-card" *ngFor="let _item of [1,2,3]">
+          <div class="skeleton-line lg"></div>
+          <div class="skeleton-line sm"></div>
+          <div class="skeleton-line md"></div>
+        </div>
+      </div>
+    </div>
+
+    <app-empty-state
+      *ngIf="!loading && !!errorMessage"
+      variant="error"
+      title="Unable to load students"
+      [message]="errorMessage"
+      [compact]="true"
+    ></app-empty-state>
+
+    <app-empty-state
+      *ngIf="!loading && !errorMessage && subjectGroups.length === 0"
+      title="No subjects or students found"
+      message="Try a different search text."
+      [compact]="true"
+    ></app-empty-state>
+
+    <div class="subject-groups" *ngIf="!loading && !errorMessage && subjectGroups.length > 0">
+      <details class="subject-group" *ngFor="let group of subjectGroups; let idx = index" [open]="idx < 2">
+        <summary class="subject-header">
+          <div class="subject-title">
+            <h3>{{ group.subject_name || 'Untitled Subject' }} <span>({{ group.subject_code || '-' }})</span></h3>
+            <p>Semester {{ group.semester || '-' }} • {{ group.department_name || ('Department #' + group.department_id) }}</p>
+          </div>
+          <span class="subject-count">{{ group.student_count }} students</span>
+        </summary>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Department</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let student of group.students">
+                <td>{{ student.username || '-' }}</td>
+                <td>{{ student.email || '-' }}</td>
+                <td>{{ student.first_name || '-' }}</td>
+                <td>{{ student.last_name || '-' }}</td>
+                <td>{{ student.department_name || ('Department #' + student.department_id) }}</td>
+                <td class="student-actions">
+                  <button app-button variant="secondary" type="button" (click)="openMarksPage(student)">View</button>
+                  <button app-button variant="secondary" type="button" (click)="openUploadPage(student)">Upload</button>
+                </td>
+              </tr>
+              <tr *ngIf="group.students.length === 0">
+                <td colspan="6" class="empty-row">No students found in this subject.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </section>
+</section>
