@@ -45,16 +45,56 @@
   gap: 0.55rem;
 }
 
-.upload-form label {
+.upload-controls {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.upload-controls label {
   color: #334155;
   font-weight: 600;
 }
 
-.upload-form input[type="file"] {
+.upload-controls select {
   border: 1px solid #cdd8ff;
   border-radius: 10px;
   background: #f8faff;
-  padding: 0.6rem 0.7rem;
+  padding: 0.55rem 0.65rem;
+  color: #334155;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.dropzone {
+  border: 2px dashed #b9c8ff;
+  border-radius: 12px;
+  background: #f8faff;
+  padding: 1rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dropzone.drag-over {
+  border-color: #4f6ad9;
+  background: #ecf2ff;
+}
+
+.dropzone.disabled {
+  opacity: 0.7;
+}
+
+.dropzone p {
+  margin: 0;
+  color: #334155;
+}
+
+.dropzone-subtext {
+  color: #64748b;
 }
 
 .hint {
@@ -70,6 +110,26 @@
 .success {
   margin: 0;
   color: #166534;
+}
+
+.upload-result {
+  border: 1px solid #dbe4ff;
+  border-radius: 10px;
+  background: #f8faff;
+  padding: 0.65rem 0.8rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.upload-result p {
+  margin: 0;
+  color: #334155;
+  word-break: break-word;
+}
+
+.upload-result a {
+  color: #1d4ed8;
+  text-decoration: underline;
 }
 
 .actions {

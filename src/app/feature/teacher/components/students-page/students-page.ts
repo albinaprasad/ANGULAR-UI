@@ -72,8 +72,21 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     const studentId = student.user_id || student.id;
     this.router.navigate(['/teacher/students', studentId, 'upload'], {
       queryParams: {
+        uploadType: 'general',
         username: student.username || '',
         email: student.email || '',
+      },
+    });
+  }
+
+  openSubjectAnswerUpload(group: TeacherSubjectGroup): void {
+    if (!group.subject_id) return;
+    console.log(group.subject_name)
+
+    this.router.navigate(['/teacher/uploads'], {
+      queryParams: {
+        uploadType: 'answerKey',
+        subjectId: group.subject_id,
       },
     });
   }

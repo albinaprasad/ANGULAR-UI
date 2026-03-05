@@ -3,6 +3,8 @@ import { NotificationService } from '../../../../services/http/notification.serv
 import { AuthService } from '../../../../services/http/auth.service';
 import { Subject, of } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 type PanelNavItem = {
   label: string;
@@ -21,6 +23,7 @@ type PanelRoleType = 'admin' | 'institution' | 'teacher' | 'student' | 'user';
   styleUrl: './panel.css',
 })
 export class Panel implements OnInit, OnDestroy {
+  showPanel = true;
   roleType: PanelRoleType = 'user';
   panelTitle = 'User Panel';
   panelSubtitle = 'Manage your profile and notifications';
@@ -76,14 +79,24 @@ export class Panel implements OnInit, OnDestroy {
 
   constructor(
     private notificationService: NotificationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     document.body.style.overflow = 'auto';
+    this.updatePanelVisibility();
     this.initializePanelByRole();
     this.notificationService.connectNotificationsSocket();
     this.loadUnreadCount();
+
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => this.updatePanelVisibility());
 
     this.notificationService
       .unreadCount$()
@@ -175,5 +188,14 @@ export class Panel implements OnInit, OnDestroy {
     this.navItems = this.userPanel;
     this.panelTitle = 'User Panel';
     this.panelSubtitle = 'Manage your profile and notifications';
+  }
+
+  private updatePanelVisibility(): void {
+    let currentRoute = this.activatedRoute;
+    while (currentRoute.firstChild) {
+      currentRoute = currentRoute.firstChild;
+    }
+
+    this.showPanel = currentRoute.snapshot.data['hidePanel'] !== true;
   }
 }

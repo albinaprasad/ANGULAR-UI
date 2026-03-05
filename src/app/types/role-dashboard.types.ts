@@ -69,3 +69,22 @@ export interface TeacherStudentsGroupedResponse {
   subject_count: number;
   student_count: number;
 }
+
+export interface TeacherPdfUploadResponse {
+  id: number;
+  teacher_user_id: number;
+  original_filename: string;
+  stored_filename: string;
+  file_path: string;
+  file_url: string;
+}
+
+export interface TeacherAnswerKeyUploadResponse extends TeacherPdfUploadResponse {
+  subject_id: number;
+}
+
+export interface TeacherOwnedSubject {
+  subject_id: number;
+  subject_name: string;
+  subject_code: string;
+}

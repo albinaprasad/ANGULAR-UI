@@ -3,10 +3,13 @@
   margin: 0 auto;
   padding: 2rem;
   display: grid;
+  grid-template-rows: auto auto;
   gap: 0.75rem;
-  min-height: calc(100vh - 64px);
+  height: calc(100vh - 200px);
   align-content: start;
   background: linear-gradient(135deg, #eef2ff 0%, #ede9fe 100%);
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .students-header {
@@ -61,9 +64,11 @@
   border: 1px solid #dbe4ff;
   border-radius: 14px;
   box-shadow: 0 10px 28px rgba(51, 65, 85, 0.1);
-  padding: 0.85rem 0.95rem;
+  padding: 0.85rem 0.95rem 1.25rem;
   display: grid;
+  grid-template-rows: auto auto;
   gap: 0.8rem;
+ 
 }
 
 .students-toolbar {
@@ -74,6 +79,7 @@
   display: grid;
   grid-template-columns: minmax(260px, 520px);
   justify-content: start;
+  overflow: visible;
 }
 
 .students-toolbar input {
@@ -138,14 +144,65 @@
 }
 
 .table-wrap {
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
   border: 1px solid #d8e2ff;
   border-radius: 12px;
+  max-height: none;
+  padding-bottom: 0;
+}
+
+.table-wrap table {
+  margin-bottom: 0;
 }
 
 .subject-groups {
   display: grid;
   gap: 0.7rem;
+  overflow: visible;
+}
+
+.subjects-list,
+.students-list {
+  max-height: none;
+  height: auto;
+  overflow: visible;
+  padding-right: 0;
+  padding-bottom: 0.35rem;
+}
+
+.students-list .subject-group:last-child,
+.subjects-list .subject-group:last-child {
+  margin-bottom: 0.25rem;
+}
+
+.upload-sections {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+  overflow: visible;
+}
+
+.upload-section {
+  border: 1px solid #d8e2ff;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.7rem;
+  overflow: visible;
+}
+
+.section-header h2 {
+  margin: 0 0 0.12rem;
+  color: #1f2a44;
+  font-size: 1.02rem;
+}
+
+.section-header p {
+  margin: 0;
+  color: #5b6d8e;
+  font-size: 0.86rem;
 }
 
 .subject-group {
@@ -157,7 +214,6 @@
 
 .subject-header {
   list-style: none;
-  cursor: pointer;
   padding: 0.8rem 0.9rem;
   display: flex;
   align-items: center;
@@ -166,8 +222,24 @@
   background: linear-gradient(180deg, #f7f9ff 0%, #eef3ff 100%);
 }
 
+.student-group > .subject-header {
+  cursor: pointer;
+}
+
+.student-group > .subject-header::-webkit-details-marker {
+  display: none;
+}
+
 .subject-header::-webkit-details-marker {
   display: none;
+}
+
+.subject-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .subject-title h3 {
@@ -252,6 +324,8 @@ tbody tr:hover {
     width: 100%;
     margin: 0;
     padding: 1.25rem;
+    min-height: calc(100vh - 64px);
+    overflow: visible;
   }
 
   .students-header {
@@ -261,6 +335,18 @@ tbody tr:hover {
 
   .students-card {
     padding: 0.95rem;
+    grid-template-rows: auto auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .subject-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .subject-meta {
+    justify-content: flex-start;
   }
 
   .students-toolbar {

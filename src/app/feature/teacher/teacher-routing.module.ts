@@ -24,11 +24,18 @@ const routes: Routes = [
       },
       {
         path: 'students/:studentId/marks',
-        component: StudentMarksPageComponent
+        component: StudentMarksPageComponent,
+        data: { hidePanel: true }
       },
       {
         path: 'students/:studentId/upload',
-        component: StudentUploadPageComponent
+        component: StudentUploadPageComponent,
+        data: { hidePanel: true }
+      },
+      {
+        path: 'uploads',
+        component: StudentUploadPageComponent,
+        data: { hidePanel: true }
       },
       {
         path: 'profile',

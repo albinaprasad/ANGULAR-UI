@@ -26,6 +26,7 @@ import { FloatingActionBar } from './components/floating-action-bar/floating-act
 import { ButtonComponent } from './components/button/button';
 import { StudentMarksViewerComponent } from './components/student-marks-viewer/student-marks-viewer';
 import { PdfUploadModalComponent } from './components/pdf-upload-modal/pdf-upload-modal';
+import { UploadStatusTrackerComponent } from './components/upload-status-tracker/upload-status-tracker';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { PdfUploadModalComponent } from './components/pdf-upload-modal/pdf-uploa
     FloatingActionBar,
     ButtonComponent,
     StudentMarksViewerComponent,
-    PdfUploadModalComponent
+    PdfUploadModalComponent,
+    UploadStatusTrackerComponent
   ],
   imports: [
     CommonModule,
@@ -86,7 +88,8 @@ import { PdfUploadModalComponent } from './components/pdf-upload-modal/pdf-uploa
     FloatingActionBar,
     ButtonComponent,
     StudentMarksViewerComponent,
-    PdfUploadModalComponent
+    PdfUploadModalComponent,
+    UploadStatusTrackerComponent
   ]
 })
 export class SharedModule { }
