@@ -2,10 +2,14 @@ export type MemberRole = 'teacher' | 'student';
 
 export interface InstitutionMember {
   id: number;
+  user_id?: number;
+  teacher_id?: number;
+  student_id?: number;
   username: string;
   email: string;
   first_name: string;
   last_name: string;
+  department_id?: number;
   department_name: string;
 }
 

@@ -125,13 +125,21 @@ export class InstitutionMembersService extends BaseHttpService {
       ?? user['id']
       ?? 0
     );
+    const teacherId = Number(item['teacher_id'] ?? 0);
+    const studentId = Number(item['student_id'] ?? 0);
+    const userId = Number(item['user_id'] ?? user['id'] ?? 0);
+    const departmentId = Number(item['department_id'] ?? department['id'] ?? 0);
 
     return {
       id: Number.isFinite(resolvedId) ? resolvedId : 0,
+      user_id: Number.isFinite(userId) && userId > 0 ? userId : undefined,
+      teacher_id: Number.isFinite(teacherId) && teacherId > 0 ? teacherId : undefined,
+      student_id: Number.isFinite(studentId) && studentId > 0 ? studentId : undefined,
       username: String(user['username'] ?? item['username'] ?? ''),
       email: String(user['email'] ?? item['email'] ?? ''),
       first_name: String(user['first_name'] ?? item['first_name'] ?? ''),
       last_name: String(user['last_name'] ?? item['last_name'] ?? ''),
+      department_id: Number.isFinite(departmentId) && departmentId > 0 ? departmentId : undefined,
       department_name: String(item['department_name'] ?? department['name'] ?? ''),
     };
   }

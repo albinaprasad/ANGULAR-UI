@@ -1,0 +1,73 @@
+<section class="upload-shell">
+  <header class="upload-header">
+    <div class="title-wrap">
+      <h1>{{ uploadType === 'answerKey' ? 'Upload Subject Answer Schema' : 'Upload Student Marks PDF' }}</h1>
+      <p *ngIf="uploadType === 'general'">
+        {{ studentName || 'Student' }} <span *ngIf="studentEmail">({{ studentEmail }})</span>
+      </p>
+      <p *ngIf="uploadType === 'answerKey'">Select subject and upload answer schema PDF.</p>
+    </div>
+    <button app-button variant="secondary" type="button" (click)="goBack()">Back to Students</button>
+  </header>
+
+  <app-upload-status-tracker
+    [steps]="uploadStatusSteps"
+    [currentStep]="currentStatusStep"
+    [isComplete]="statusComplete"
+    [hasError]="statusError"
+  ></app-upload-status-tracker>
+
+  <section class="upload-card">
+    <div class="upload-form">
+
+      <div
+        class="dropzone"
+        [class.drag-over]="isDragOver"
+        [class.disabled]="loading"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <p>Drag and drop PDF here</p>
+        <p class="dropzone-subtext">or</p>
+        <button
+          app-button
+          variant="secondary"
+          type="button"
+          (click)="fileInput.click()"
+          [disabled]="loading"
+        >
+          Browse File
+        </button>
+      </div>
+      <input
+        #fileInput
+        class="file-input-hidden"
+        id="teacher-student-upload"
+        type="file"
+        accept=".pdf"
+        (change)="onFileChange($event)"
+        [disabled]="loading"
+      />
+
+      <p class="hint" *ngIf="selectedFile">Selected file: {{ selectedFile.name }}</p>
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+
+      <section class="upload-result" *ngIf="uploadedFileName || uploadedFileUrl">
+        <p><strong>Uploaded file:</strong> {{ uploadedFileName || 'N/A' }}</p>
+        <p *ngIf="uploadedFileUrl">
+          <strong>File URL:</strong>
+          <a [href]="uploadedFileUrl" target="_blank" rel="noopener noreferrer">{{ uploadedFileUrl }}</a>
+        </p>
+      </section>
+    </div>
+
+    <div class="actions">
+      <button app-button variant="secondary" type="button" (click)="goBack()" [disabled]="loading">Cancel</button>
+      <button app-button variant="primary" type="button" (click)="submitUpload()" [disabled]="!selectedFile || loading">
+        {{ loading ? 'Uploading...' : 'Upload PDF' }}
+      </button>
+    </div>
+  </section>
+</section>

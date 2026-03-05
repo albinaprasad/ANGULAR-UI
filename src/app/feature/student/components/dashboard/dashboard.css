@@ -1,5 +1,6 @@
 .dashboard-shell {
-  margin-left: 220px;
+  width: 80%;
+  margin: 0 auto;
   padding: 2rem;
   display: grid;
   gap: 1rem;
@@ -39,7 +40,8 @@ app-student-marks-table {
 
 @media (max-width: 960px) {
   .dashboard-shell {
-    margin-left: 0;
+    width: 100%;
+    margin: 0;
     padding: 1.25rem;
   }
 }

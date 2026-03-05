@@ -24,6 +24,9 @@ import { InfiniteScrollDirective } from './directives/infinite-scroll/infinite-s
 import { EmptyStateComponent } from './components/empty-state/empty-state';
 import { FloatingActionBar } from './components/floating-action-bar/floating-action-bar';
 import { ButtonComponent } from './components/button/button';
+import { StudentMarksViewerComponent } from './components/student-marks-viewer/student-marks-viewer';
+import { PdfUploadModalComponent } from './components/pdf-upload-modal/pdf-upload-modal';
+import { UploadStatusTrackerComponent } from './components/upload-status-tracker/upload-status-tracker';
 
 @NgModule({
   declarations: [
@@ -48,7 +51,10 @@ import { ButtonComponent } from './components/button/button';
     InfiniteScrollDirective,
     EmptyStateComponent,
     FloatingActionBar,
-    ButtonComponent
+    ButtonComponent,
+    StudentMarksViewerComponent,
+    PdfUploadModalComponent,
+    UploadStatusTrackerComponent
   ],
   imports: [
     CommonModule,
@@ -80,7 +86,10 @@ import { ButtonComponent } from './components/button/button';
     InfiniteScrollDirective,
     EmptyStateComponent,
     FloatingActionBar,
-    ButtonComponent
+    ButtonComponent,
+    StudentMarksViewerComponent,
+    PdfUploadModalComponent,
+    UploadStatusTrackerComponent
   ]
 })
 export class SharedModule { }

@@ -1,0 +1,31 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="close()">
+  <section class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Upload PDF">
+    <header class="modal-header">
+      <h3>{{ title }}</h3>
+      <button type="button" class="close-btn" (click)="close()" [disabled]="loading">x</button>
+    </header>
+
+    <div class="modal-body">
+      <p class="hint" *ngIf="studentName">Student: {{ studentName }}</p>
+
+      <label class="file-label" for="student-pdf-upload">Choose PDF file</label>
+      <input
+        id="student-pdf-upload"
+        type="file"
+        accept=".pdf,application/pdf"
+        (change)="onFileChange($event)"
+        [disabled]="loading"
+      />
+
+      <p class="hint" *ngIf="selectedFile">Selected: {{ selectedFile.name }}</p>
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    </div>
+
+    <footer class="modal-footer">
+      <button app-button variant="secondary" type="button" (click)="close()" [disabled]="loading">Cancel</button>
+      <button app-button variant="primary" type="button" (click)="submit()" [disabled]="!selectedFile || loading">
+        {{ loading ? 'Uploading...' : 'Upload PDF' }}
+      </button>
+    </footer>
+  </section>
+</div>

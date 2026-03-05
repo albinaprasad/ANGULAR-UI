@@ -1,0 +1,37 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="close()">
+  <section class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Student Marks">
+    <header class="modal-header">
+      <h3>Marks: {{ studentName || 'Student' }}</h3>
+      <button type="button" class="close-btn" (click)="close()">x</button>
+    </header>
+
+    <div class="modal-body">
+      <p class="hint" *ngIf="loading">Loading marks...</p>
+      <p class="error" *ngIf="!loading && errorMessage">{{ errorMessage }}</p>
+      <p class="hint" *ngIf="!loading && !errorMessage && marks.length === 0">No marks available for this student.</p>
+
+      <div class="table-wrap" *ngIf="!loading && !errorMessage && marks.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Code</th>
+              <th>Acquired</th>
+              <th>Total</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let mark of marks">
+              <td>{{ mark.subject_name || '-' }}</td>
+              <td>{{ mark.subject_code || '-' }}</td>
+              <td>{{ mark.acquired_mark }}</td>
+              <td>{{ mark.total_mark }}</td>
+              <td>{{ getPercentage(mark) | number:'1.0-2' }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,51 @@
+<section class="marks-shell">
+  <header class="marks-header">
+    <div class="title-wrap">
+      <h1>Student Marks</h1>
+      <p>{{ studentName || 'Student' }} <span *ngIf="studentEmail">({{ studentEmail }})</span></p>
+    </div>
+    <button app-button variant="secondary" type="button" (click)="goBack()">Back to Students</button>
+  </header>
+
+  <section class="marks-card">
+    <p class="hint" *ngIf="loading">Loading marks...</p>
+
+    <app-empty-state
+      *ngIf="!loading && !!errorMessage"
+      variant="error"
+      title="Unable to load marks"
+      [message]="errorMessage"
+      [compact]="true"
+    ></app-empty-state>
+
+    <app-empty-state
+      *ngIf="!loading && !errorMessage && marks.length === 0"
+      title="No marks available"
+      message="This student has no marks yet."
+      [compact]="true"
+    ></app-empty-state>
+
+    <div class="table-wrap" *ngIf="!loading && !errorMessage && marks.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Code</th>
+            <th>Acquired</th>
+            <th>Total</th>
+            <th>Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mark of marks">
+            <td>{{ mark.subject_name || '-' }}</td>
+            <td>{{ mark.subject_code || '-' }}</td>
+            <td>{{ mark.acquired_mark }}</td>
+            <td>{{ mark.total_mark }}</td>
+            <td>{{ getPercentage(mark) | number:'1.0-2' }}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

@@ -1,0 +1,156 @@
+.upload-shell {
+  width: 80%;
+  margin: 0 auto;
+  padding: 2rem;
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(135deg, #eef2ff 0%, #ede9fe 100%);
+}
+
+.upload-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid #d9e4ff;
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.title-wrap h1 {
+  margin: 0 0 0.2rem;
+  color: #4f6ad9;
+}
+
+.title-wrap p {
+  margin: 0;
+  color: #52607a;
+}
+
+.upload-card {
+  background: #ffffff;
+  border: 1px solid #dbe4ff;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(51, 65, 85, 0.08);
+  padding: 1rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.upload-form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.upload-controls {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.upload-controls label {
+  color: #334155;
+  font-weight: 600;
+}
+
+.upload-controls select {
+  border: 1px solid #cdd8ff;
+  border-radius: 10px;
+  background: #f8faff;
+  padding: 0.55rem 0.65rem;
+  color: #334155;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.dropzone {
+  border: 2px dashed #b9c8ff;
+  border-radius: 12px;
+  background: #f8faff;
+  padding: 1rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dropzone.drag-over {
+  border-color: #4f6ad9;
+  background: #ecf2ff;
+}
+
+.dropzone.disabled {
+  opacity: 0.7;
+}
+
+.dropzone p {
+  margin: 0;
+  color: #334155;
+}
+
+.dropzone-subtext {
+  color: #64748b;
+}
+
+.hint {
+  margin: 0;
+  color: #475569;
+}
+
+.error {
+  margin: 0;
+  color: #b91c1c;
+}
+
+.success {
+  margin: 0;
+  color: #166534;
+}
+
+.upload-result {
+  border: 1px solid #dbe4ff;
+  border-radius: 10px;
+  background: #f8faff;
+  padding: 0.65rem 0.8rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.upload-result p {
+  margin: 0;
+  color: #334155;
+  word-break: break-word;
+}
+
+.upload-result a {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+@media (max-width: 960px) {
+  .upload-shell {
+    width: 100%;
+    margin: 0;
+    padding: 1.25rem;
+  }
+
+  .upload-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
+}

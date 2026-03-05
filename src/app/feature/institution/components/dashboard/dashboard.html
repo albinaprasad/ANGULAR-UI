@@ -34,8 +34,59 @@
       <article class="department-tile" *ngFor="let department of departments; let idx = index">
         <div class="department-badge">{{ idx + 1 }}</div>
         <div class="department-content">
-          <h3>{{ department.name }}</h3>
-          <p>Active Department</p>
+          <h3 *ngIf="editingDepartmentId !== department.id">{{ department.name }}</h3>
+          <div *ngIf="editingDepartmentId === department.id" class="department-edit-row">
+            <input
+              type="text"
+              [ngModel]="editingDepartmentName"
+              (ngModelChange)="editingDepartmentName = $event"
+              maxlength="80"
+            />
+          </div>
+          <p>ID: {{ department.id }}</p>
+        </div>
+        <div class="department-actions">
+          <button
+            class="department-icon-btn"
+            type="button"
+            *ngIf="editingDepartmentId !== department.id"
+            (click)="startRenameDepartment(department)"
+            [disabled]="departmentActionLoadingId === department.id"
+            aria-label="Rename department"
+            title="Rename department"
+          >
+            ✎
+          </button>
+          <button
+            app-button
+            variant="secondary"
+            type="button"
+            *ngIf="editingDepartmentId === department.id"
+            (click)="saveDepartmentName(department)"
+            [disabled]="departmentActionLoadingId === department.id"
+          >
+            {{ departmentActionLoadingId === department.id ? 'Saving...' : 'Save' }}
+          </button>
+          <button
+            app-button
+            variant="secondary"
+            type="button"
+            *ngIf="editingDepartmentId === department.id"
+            (click)="cancelRenameDepartment()"
+            [disabled]="departmentActionLoadingId === department.id"
+          >
+            Cancel
+          </button>
+          <button
+            class="department-icon-btn danger"
+            type="button"
+            (click)="removeDepartment(department)"
+            [disabled]="departmentActionLoadingId === department.id"
+            aria-label="Remove department"
+            title="Remove department"
+          >
+            {{ departmentActionLoadingId === department.id ? '…' : '🗑' }}
+          </button>
         </div>
       </article>
     </div>
@@ -44,9 +95,26 @@
   <section class="departments-card">
     <div class="departments-header">
       <h2>Subjects And Assigned Teachers</h2>
-      <button app-button variant="secondary" type="button" (click)="fetchSubjects()" [disabled]="loadingSubjects">
+      <button app-button variant="secondary" type="button" (click)="fetchSubjects(subjectPage)" [disabled]="loadingSubjects">
         {{ loadingSubjects ? 'Refreshing...' : 'Refresh' }}
       </button>
+    </div>
+    <div class="subjects-toolbar">
+      <label class="subject-search-field">
+        <span>Search</span>
+        <input
+          class="subject-search-input"
+          type="text"
+          [ngModel]="subjectQuery"
+          (ngModelChange)="updateSubjectSearch($event)"
+          (keyup.enter)="searchSubjects()"
+          placeholder="Search by subject name or code"
+        />
+      </label>
+      <button app-button class="subject-search-btn" variant="secondary" type="button" (click)="searchSubjects()" [disabled]="loadingSubjects">
+        Search
+      </button>
+      <button app-button class="subject-create-btn" variant="primary" type="button" (click)="openSubjectModal()">Create Assignment</button>
     </div>
 
     <p *ngIf="loadingSubjects" class="hint">Loading subjects...</p>
@@ -75,6 +143,7 @@
             <th>Semester</th>
             <th>Department</th>
             <th>Assigned Teacher</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -83,10 +152,53 @@
             <td>{{ subject.code || '-' }}</td>
             <td>{{ subject.semester || '-' }}</td>
             <td>{{ subject.department_name || ('Department #' + subject.department_id) }}</td>
-            <td>{{ getTeacherDisplay(subject) }}</td>
+            <td>
+              <select
+                [ngModel]="subjectTeacherDraft[subject.id]"
+                (ngModelChange)="onSubjectTeacherDraftChange(subject.id, $event)"
+                [disabled]="subjectActionLoadingId === subject.id"
+              >
+                <option [ngValue]="null">Select teacher</option>
+                <option *ngFor="let teacher of teacherOptions" [ngValue]="teacher.teacher_id || teacher.id">
+                  {{ getTeacherLabel(teacher) }}
+                </option>
+              </select>
+              <div class="hint">{{ getTeacherDisplay(subject) }}</div>
+            </td>
+            <td class="subject-actions">
+              <div class="subject-actions-row">
+                <button
+                  app-button
+                  variant="secondary"
+                  type="button"
+                  (click)="reassignSubjectTeacher(subject)"
+                  [disabled]="subjectActionLoadingId === subject.id || teacherOptions.length === 0"
+                >
+                  {{ subjectActionLoadingId === subject.id ? 'Saving...' : 'Reassign' }}
+                </button>
+                <button
+                  app-button
+                  variant="secondary"
+                  type="button"
+                  (click)="removeSubject(subject)"
+                  [disabled]="subjectActionLoadingId === subject.id"
+                >
+                  {{ subjectActionLoadingId === subject.id ? 'Removing...' : 'Remove' }}
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
+      <div class="subjects-pagination">
+        <button app-button class="pagination-btn pagination-btn--prev" variant="secondary" type="button" (click)="goToPreviousSubjectPage()" [disabled]="subjectPage <= 1 || loadingSubjects">
+          Previous
+        </button>
+        <span class="subjects-pagination-status">Page {{ subjectPage }} • Total {{ subjectTotal }}</span>
+        <button app-button class="pagination-btn pagination-btn--next" variant="secondary" type="button" (click)="goToNextSubjectPage()" [disabled]="!subjectHasMore || loadingSubjects">
+          Next
+        </button>
+      </div>
     </div>
   </section>
 
