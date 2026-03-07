@@ -35,6 +35,36 @@ export interface StudentMark {
   acquired_mark: number;
 }
 
+export interface StudentMarkRow {
+  id: number;
+  subject_id: number;
+  subject__semester: number;
+  subject__true_subject__name: string;
+  subject__true_subject__code: string;
+  total_mark: number;
+  acquired_mark: number;
+  created_at?: string;
+}
+
+export interface StudentMarksFilterParams {
+  semester?: number;
+  subject_id?: number;
+}
+
+export interface StudentMarkOptionSubject {
+  id: number;
+  true_subject_id: number;
+  name: string;
+  code: string;
+  semester: number;
+}
+
+export interface StudentMarksOptionsPayload {
+  semesters: number[];
+  subjects: StudentMarkOptionSubject[];
+  subject_count: number;
+}
+
 export interface TeacherStudent {
   id: number;
   user_id: number;
@@ -45,6 +75,7 @@ export interface TeacherStudent {
   department_id: number;
   department_name: string;
   role: string;
+  mark_completed: boolean;
 }
 
 export interface GetTeacherStudentsParams {
@@ -88,3 +119,76 @@ export interface TeacherOwnedSubject {
   subject_name: string;
   subject_code: string;
 }
+
+export interface EngineTriggerRequest {
+  subject_id: number;
+  student_id: number;
+  marks: number[];
+}
+
+export interface EngineTriggerResponse {
+  task_id: string;
+  ws_path?: string;
+  subject_id?: number;
+  student_id?: number;
+  state?: string;
+  message?: string;
+}
+
+export interface EngineResultPayload {
+  scores: number[];
+  total_score: number;
+  student_answers_count: number;
+  teacher_answers_count: number;
+  student_mark_id: number;
+}
+
+export interface EngineStatusResponse {
+  task_id: string;
+  state: string;
+  stage: string;
+  progress: number;
+  message: string;
+  result?: EngineResultPayload | null;
+  error?: string | null;
+}
+
+export interface EngineSocketConnectedEvent {
+  event: 'connected';
+  task_id: string;
+  message?: string;
+}
+
+export interface EngineSocketProgressEvent {
+  event: 'progress';
+  task_id: string;
+  stage?: string;
+  progress?: number;
+  message?: string;
+}
+
+export interface EngineSocketSuccessEvent {
+  event: 'success';
+  task_id: string;
+  subject_id?: number;
+  student_id?: number;
+  scores: number[];
+  total_score: number;
+  student_mark_id: number;
+}
+
+export interface EngineSocketFailureEvent {
+  event: 'failure';
+  task_id: string;
+  stage?: string;
+  progress?: number;
+  message?: string;
+  status?: number;
+  details?: string;
+}
+
+export type EngineSocketEvent =
+  | EngineSocketConnectedEvent
+  | EngineSocketProgressEvent
+  | EngineSocketSuccessEvent
+  | EngineSocketFailureEvent;

@@ -77,12 +77,15 @@
   border-radius: 12px;
   padding: 0.8rem 0.9rem;
   display: grid;
-  grid-template-columns: minmax(260px, 520px);
-  justify-content: start;
+  grid-template-columns: minmax(220px, 420px) minmax(170px, 220px) auto;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.7rem;
   overflow: visible;
 }
 
-.students-toolbar input {
+.students-toolbar input,
+.semester-filter {
   width: 100%;
   border: 1px solid #b8c8f7;
   border-radius: 10px;
@@ -97,6 +100,42 @@
   outline: none;
   border-color: #4f6ff7;
   box-shadow: 0 0 0 3px rgba(79, 111, 247, 0.22);
+}
+
+.semester-filter:focus {
+  outline: none;
+  border-color: #4f6ff7;
+  box-shadow: 0 0 0 3px rgba(79, 111, 247, 0.22);
+}
+
+.toolbar-actions {
+  display: inline-flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.toolbar-btn {
+  border: 1px solid #c5d3ff;
+  background: #edf2ff;
+  color: #2f468f;
+  min-height: 40px;
+  padding: 0.48rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.toolbar-btn:hover {
+  background: #e0e9ff;
+  border-color: #a8bcff;
+  color: #1e3a8a;
+}
+
+.toolbar-btn.secondary {
+  background: #ffffff;
 }
 
 .hint {
@@ -144,16 +183,10 @@
 }
 
 .table-wrap {
-  overflow-x: auto;
-  overflow-y: visible;
-  border: 1px solid #d8e2ff;
+  overflow: hidden;
   border-radius: 12px;
   max-height: none;
   padding-bottom: 0;
-}
-
-.table-wrap table {
-  margin-bottom: 0;
 }
 
 .subject-groups {
@@ -276,48 +309,6 @@
   font-style: italic;
 }
 
-.student-actions {
-  white-space: normal;
-  display: inline-flex;
-  gap: 0.45rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #ffffff;
-}
-
-th,
-td {
-  text-align: left;
-  padding: 0.75rem 0.55rem;
-  border-bottom: 1px solid #e7edff;
-  white-space: nowrap;
-}
-
-th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: #eff4ff;
-  color: #1e293b;
-  font-weight: 700;
-}
-
-tbody tr:nth-child(odd) {
-  background: #ffffff;
-}
-
-tbody tr:nth-child(even) {
-  background: #f9fbff;
-}
-
-tbody tr:hover {
-  background: #eef4ff;
-}
 
 @media (max-width: 960px) {
   .students-shell {
@@ -353,6 +344,10 @@ tbody tr:hover {
     grid-template-columns: 1fr;
     align-items: stretch;
     gap: 0.45rem;
+  }
+
+  .toolbar-actions {
+    justify-content: flex-start;
   }
 }
 

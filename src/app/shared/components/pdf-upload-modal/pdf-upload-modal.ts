@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
+import { ModalCloseService } from '../../../services/modal/modal-close.service';
 
 @Component({
   selector: 'app-pdf-upload-modal',
@@ -6,7 +8,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
   templateUrl: './pdf-upload-modal.html',
   styleUrl: './pdf-upload-modal.css',
 })
-export class PdfUploadModalComponent implements OnChanges {
+export class PdfUploadModalComponent implements OnChanges, OnInit, OnDestroy {
   @Input() isOpen = false;
   @Input() title = 'Upload PDF';
   @Input() studentName = '';
@@ -16,12 +18,27 @@ export class PdfUploadModalComponent implements OnChanges {
 
   selectedFile: File | null = null;
   errorMessage = '';
+  private readonly destroy$ = new Subject<void>();
+
+  constructor(private readonly modalCloseService: ModalCloseService) {}
+
+  ngOnInit(): void {
+    this.modalCloseService.closeAll$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      if (!this.isOpen) return;
+      this.forceClose();
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']?.currentValue === true) {
       this.selectedFile = null;
       this.errorMessage = '';
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   close(): void {
@@ -50,5 +67,11 @@ export class PdfUploadModalComponent implements OnChanges {
   submit(): void {
     if (!this.selectedFile || this.loading) return;
     this.upload.emit(this.selectedFile);
+  }
+
+  private forceClose(): void {
+    this.selectedFile = null;
+    this.errorMessage = '';
+    this.closed.emit();
   }
 }

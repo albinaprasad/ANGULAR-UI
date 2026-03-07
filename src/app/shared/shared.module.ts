@@ -27,6 +27,7 @@ import { ButtonComponent } from './components/button/button';
 import { StudentMarksViewerComponent } from './components/student-marks-viewer/student-marks-viewer';
 import { PdfUploadModalComponent } from './components/pdf-upload-modal/pdf-upload-modal';
 import { UploadStatusTrackerComponent } from './components/upload-status-tracker/upload-status-tracker';
+import { Table } from './components/table/table';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { UploadStatusTrackerComponent } from './components/upload-status-tracker
     ButtonComponent,
     StudentMarksViewerComponent,
     PdfUploadModalComponent,
-    UploadStatusTrackerComponent
+    UploadStatusTrackerComponent,
+    Table
   ],
   imports: [
     CommonModule,
@@ -89,7 +91,8 @@ import { UploadStatusTrackerComponent } from './components/upload-status-tracker
     ButtonComponent,
     StudentMarksViewerComponent,
     PdfUploadModalComponent,
-    UploadStatusTrackerComponent
+    UploadStatusTrackerComponent,
+    Table
   ]
 })
 export class SharedModule { }

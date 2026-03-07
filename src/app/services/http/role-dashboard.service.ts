@@ -6,6 +6,9 @@ import {
   GetTeacherStudentsParams,
   DashboardUser,
   StudentMark,
+  StudentMarkRow,
+  StudentMarksFilterParams,
+  StudentMarksOptionsPayload,
   SubjectPayload,
   TeacherSubjectGroup,
   TeacherStudent,
@@ -13,6 +16,10 @@ import {
   TeacherAnswerKeyUploadResponse,
   TeacherOwnedSubject,
   TeacherPdfUploadResponse,
+  EngineTriggerRequest,
+  EngineTriggerResponse,
+  EngineStatusResponse,
+  EngineResultPayload,
   UserRole,
 } from '../../types/role-dashboard.types';
 import { BaseHttpService } from './base.service';
@@ -86,10 +93,33 @@ export class RoleDashboardService extends BaseHttpService {
       .pipe(catchError((err) => this.handleError(err)));
   }
 
-  getStudentMarks(): Observable<BaseResponse<StudentMark[], string>> {
+  getStudentMarks(params?: StudentMarksFilterParams): Observable<BaseResponse<StudentMarkRow[], string>> {
+    let httpParams = new HttpParams();
+    if (params?.semester && params.semester > 0) {
+      httpParams = httpParams.set('semester', String(params.semester));
+    }
+    if (params?.subject_id && params.subject_id > 0) {
+      httpParams = httpParams.set('subject_id', String(params.subject_id));
+    }
+
     return this.http
-      .get<BaseResponse<StudentMark[], string>>(`${this.API_URL}/core/student/marks`, {
+      .get<BaseResponse<StudentMarkRow[], string>>(`${this.API_URL}/core/student/marks`, {
         headers: this.getAuthHeaders(),
+        params: httpParams,
+      })
+      .pipe(catchError((err) => this.handleError(err)));
+  }
+
+  getStudentMarksOptions(semester?: number): Observable<BaseResponse<StudentMarksOptionsPayload, string>> {
+    let httpParams = new HttpParams();
+    if (semester && semester > 0) {
+      httpParams = httpParams.set('semester', String(semester));
+    }
+
+    return this.http
+      .get<BaseResponse<StudentMarksOptionsPayload, string>>(`${this.API_URL}/core/student/marks/options`, {
+        headers: this.getAuthHeaders(),
+        params: httpParams,
       })
       .pipe(catchError((err) => this.handleError(err)));
   }
@@ -105,8 +135,10 @@ export class RoleDashboardService extends BaseHttpService {
       );
   }
 
-  uploadTeacherPdf(file: File): Observable<TeacherPdfUploadResponse> {
+  uploadTeacherPdf(subjectId: number, studentId: number, file: File): Observable<TeacherPdfUploadResponse> {
     const formData = new FormData();
+    formData.append('subject_id', String(subjectId));
+    formData.append('student_id', String(studentId));
     formData.append('pdf', file);
 
     return this.http
@@ -127,6 +159,52 @@ export class RoleDashboardService extends BaseHttpService {
             file_url: String(payload.file_url ?? ''),
           };
         }),
+        catchError((err) => this.handleError(err))
+      );
+  }
+
+  triggerEngine(payload: EngineTriggerRequest): Observable<EngineTriggerResponse> {
+    return this.http
+      .post<BaseResponse<EngineTriggerResponse, string> | Record<string, unknown>>(
+        `${this.API_URL}/core/engine/trigger`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((response) => {
+          const res = response as Record<string, unknown>;
+          const rawMessage = res['message'];
+          const rawData = res['data'];
+          const messagePayload = rawMessage && typeof rawMessage === 'object'
+            ? (rawMessage as Record<string, unknown>)
+            : null;
+          const dataPayload = rawData && typeof rawData === 'object'
+            ? (rawData as Record<string, unknown>)
+            : null;
+          const source = (messagePayload || dataPayload || res) as Partial<EngineTriggerResponse> & Record<string, unknown>;
+
+          return {
+            task_id: String(source.task_id ?? source['taskId'] ?? ''),
+            ws_path: typeof source.ws_path === 'string'
+              ? source.ws_path
+              : (typeof source['wsPath'] === 'string' ? String(source['wsPath']) : undefined),
+            subject_id: Number(source.subject_id ?? source['subjectId'] ?? 0) || undefined,
+            student_id: Number(source.student_id ?? source['studentId'] ?? 0) || undefined,
+            state: typeof source.state === 'string' ? source.state : undefined,
+            message: typeof source.message === 'string' ? source.message : undefined,
+          };
+        }),
+        catchError((err) => this.handleError(err))
+      );
+  }
+
+  getEngineTaskStatus(taskId: string): Observable<EngineStatusResponse> {
+    return this.http
+      .get<BaseResponse<unknown, string>>(`${this.API_URL}/core/engine/status/${taskId}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        map((response) => this.normalizeEngineStatus(taskId, response.message)),
         catchError((err) => this.handleError(err))
       );
   }
@@ -231,6 +309,13 @@ export class RoleDashboardService extends BaseHttpService {
       const rawStudents = Array.isArray(subject['students']) ? subject['students'] : [];
       const students: TeacherStudent[] = rawStudents.map((rawStudent) => {
         const row = (rawStudent ?? {}) as Record<string, unknown>;
+        const markCompletedRaw =
+          row['mark_completed']
+          ?? row['mark_uploaded']
+          ?? row['has_mark_uploaded']
+          ?? row['is_mark_uploaded']
+          ?? row['has_mark_for_subject'];
+
         return {
           id: Number(row['id'] ?? 0),
           user_id: Number(row['user_id'] ?? 0),
@@ -241,6 +326,10 @@ export class RoleDashboardService extends BaseHttpService {
           department_id: Number(row['department_id'] ?? 0),
           department_name: String(row['department_name'] ?? ''),
           role: String(row['role'] ?? 'student'),
+          mark_completed:
+            markCompletedRaw === true
+            || markCompletedRaw === 1
+            || String(markCompletedRaw ?? '').toLowerCase() === 'true',
         };
       });
 
@@ -268,6 +357,32 @@ export class RoleDashboardService extends BaseHttpService {
       subjects,
       subject_count: Number.isFinite(subjectCount) ? subjectCount : subjects.length,
       student_count: Number.isFinite(studentCount) ? studentCount : 0,
+    };
+  }
+
+  private normalizeEngineStatus(taskId: string, message: unknown): EngineStatusResponse {
+    const payload = (message ?? {}) as Record<string, unknown>;
+    const resultPayload = (payload['result'] ?? null) as Record<string, unknown> | null;
+    const result: EngineResultPayload | null = resultPayload
+      ? {
+          scores: Array.isArray(resultPayload['scores'])
+            ? resultPayload['scores'].map((score) => Number(score ?? 0))
+            : [],
+          total_score: Number(resultPayload['total_score'] ?? 0),
+          student_answers_count: Number(resultPayload['student_answers_count'] ?? 0),
+          teacher_answers_count: Number(resultPayload['teacher_answers_count'] ?? 0),
+          student_mark_id: Number(resultPayload['student_mark_id'] ?? 0),
+        }
+      : null;
+
+    return {
+      task_id: String(payload['task_id'] ?? taskId),
+      state: String(payload['state'] ?? 'PENDING'),
+      stage: String(payload['stage'] ?? ''),
+      progress: Number(payload['progress'] ?? 0),
+      message: String(payload['message'] ?? ''),
+      result,
+      error: payload['error'] ? String(payload['error']) : null,
     };
   }
 }

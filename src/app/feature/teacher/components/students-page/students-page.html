@@ -11,39 +11,58 @@
   </header>
 
   <section class="upload-section">
-        <header class="section-header">
-          <h2>Assigned Subjects</h2>
-          <p>Upload answer schema for your subjects.</p>
-        </header>
-        <div class="subject-groups subjects-list">
-          <article class="subject-group" *ngFor="let group of subjectGroups">
-            <div class="subject-header">
-              <div class="subject-title">
-                <h3>{{ group.subject_name || 'Untitled Subject' }} <span>({{ group.subject_code || '-' }})</span></h3>
-                <p>Semester {{ group.semester || '-' }} • {{ group.department_name || ('Department #' + group.department_id) }}</p>
-              </div>
-              <div class="subject-meta">
-                <span class="subject-count">{{ group.student_count }} students</span>
-                <button app-button variant="secondary" type="button" (click)="openSubjectAnswerUpload(group)">
-                  Upload Answer Schema
-                </button>
-              </div>
-            </div>
-          </article>
-          <p *ngIf="subjectGroups.length === 0" class="empty-row">No assigned subjects found.</p>
+    <header class="section-header">
+      <h2>Assigned Subjects</h2>
+      <p>Upload answer schema for your subjects.</p>
+    </header>
+    <div class="subject-groups subjects-list">
+      <article class="subject-group" *ngFor="let group of filteredSubjectGroups">
+        <div class="subject-header">
+          <div class="subject-title">
+            <h3>{{ group.subject_name || 'Untitled Subject' }} <span>({{ group.subject_code || '-' }})</span></h3>
+            <p>Semester {{ group.semester || '-' }} • {{ group.department_name || ('Department #' + group.department_id) }}</p>
+          </div>
+          <div class="subject-meta">
+            <span class="subject-count">{{ group.student_count }} students</span>
+            <button app-button variant="secondary" type="button" (click)="openSubjectAnswerUpload(group)">
+              Upload Answer Schema
+            </button>
+          </div>
         </div>
-      </section>
-
-    <div class="students-toolbar">
-      <input
-        id="teacher-students-search"
-        type="text"
-        aria-label="Search students"
-        [ngModel]="searchText"
-        (ngModelChange)="onSearchChange($event)"
-        placeholder="Search by username, email, or name"
-      />
+      </article>
+      <p *ngIf="filteredSubjectGroups.length === 0" class="empty-row">No assigned subjects found for this filter.</p>
     </div>
+  </section>
+
+  <div class="students-toolbar">
+    <input
+      id="teacher-students-search"
+      type="text"
+      aria-label="Search students"
+      [ngModel]="searchText"
+      (ngModelChange)="onSearchChange($event)"
+      placeholder="Search by username, email, or name"
+    />
+
+    <select
+      class="semester-filter"
+      [ngModel]="semesterFilter"
+      (ngModelChange)="onSemesterFilterChange($event)"
+      aria-label="Filter by semester"
+    >
+      <option value="all">All semesters</option>
+      <option *ngFor="let sem of availableSemesters" [value]="sem">Semester {{ sem }}</option>
+    </select>
+
+    <div class="toolbar-actions">
+      <button type="button" class="toolbar-btn" (click)="toggleAllSubjectGroups(!isAllGroupsExpanded)">
+        {{ isAllGroupsExpanded ? 'Collapse All' : 'Expand All' }}
+      </button>
+      <button type="button" class="toolbar-btn secondary" (click)="clearSearch()" *ngIf="searchText">
+        Clear Search
+      </button>
+    </div>
+  </div>
 
   <section class="students-card">
     
@@ -86,7 +105,12 @@
           class="subject-groups students-list"
           style="max-height: 58vh; overflow-y: auto; overflow-x: hidden; padding-right: 0.35rem;"
         >
-          <details class="subject-group student-group" *ngFor="let group of subjectGroups; let idx = index" [open]="idx === 0">
+          <details
+            class="subject-group student-group"
+            *ngFor="let group of filteredSubjectGroups"
+            [open]="isGroupExpanded(group)"
+            (toggle)="onGroupToggle(group, $event)"
+          >
             <summary class="subject-header">
               <div class="subject-title">
                 <h3>{{ group.subject_name || 'Untitled Subject' }} <span>({{ group.subject_code || '-' }})</span></h3>
@@ -94,38 +118,16 @@
               </div>
               <span class="subject-count">{{ group.student_count }} students</span>
             </summary>
-
             <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>First name</th>
-                    <th>Last name</th>
-                    <th>Department</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let student of group.students">
-                    <td>{{ student.username || '-' }}</td>
-                    <td>{{ student.email || '-' }}</td>
-                    <td>{{ student.first_name || '-' }}</td>
-                    <td>{{ student.last_name || '-' }}</td>
-                    <td>{{ student.department_name || ('Department #' + student.department_id) }}</td>
-                    <td class="student-actions">
-                      <button app-button variant="secondary" type="button" (click)="openMarksPage(student)">View</button>
-                      <button app-button variant="secondary" type="button" (click)="openUploadPage(student)">Upload Marks</button>
-                    </td>
-                  </tr>
-                  <tr *ngIf="group.students.length === 0">
-                    <td colspan="6" class="empty-row">No students found for this subject.</td>
-                  </tr>
-                </tbody>
-              </table>
+              <app-table
+                [columns]="studentColumns"
+                [data]="group.students"
+                [actions]="studentActions"
+                (actionTriggered)="onStudentAction($event, group)"
+              ></app-table>
             </div>
           </details>
+          <p *ngIf="filteredSubjectGroups.length === 0" class="empty-row">No student groups found for the selected semester.</p>
         </div>
       </section>
     </div>

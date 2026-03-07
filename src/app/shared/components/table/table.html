@@ -1,0 +1,50 @@
+<section class="table-card">
+  <header class="table-head" *ngIf="tableName || description">
+    <div>
+      <h3 class="table-title">{{ tableName }}</h3>
+      <p class="table-description" *ngIf="description">{{ description }}</p>
+    </div>
+  </header>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th *ngFor="let column of columns">{{ getHeaderLabel(column.name) }}</th>
+          <th *ngFor="let action of actions">{{ action.header }}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of data">
+          <td *ngFor="let col of columns">
+            <ng-container *ngIf="col.type === 'boolean'; else textCell">
+              <span class="status-check" [class.checked]="getBooleanValue(row, col.name)" [attr.aria-label]="getHeaderLabel(col.name)">
+                <span class="status-check-mark" *ngIf="getBooleanValue(row, col.name)">✓</span>
+              </span>
+            </ng-container>
+            <ng-template #textCell>{{ getCellValue(row, col.name) }}</ng-template>
+          </td>
+
+          <td class="actions-cell" *ngFor="let action of actions">
+            <button
+              class="action-btn"
+              type="button"
+              (click)="triggerAction(action, row)"
+              [disabled]="isActionDisabled(action, row)"
+              [attr.title]="getActionHint(action, row)"
+            >
+              {{ action.name }}
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="data.length === 0">
+          <td class="empty-row" [attr.colspan]="columns.length + actions.length">
+            No records found.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

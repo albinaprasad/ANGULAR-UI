@@ -3,6 +3,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { RoleDashboardService } from '../../../../services/http/role-dashboard.service';
 import { GetTeacherStudentsParams, TeacherStudent, TeacherSubjectGroup } from '../../../../types/role-dashboard.types';
+import { Action, ActionEmit, Column } from '../../../../types/table.types';
 
 @Component({
   selector: 'app-teacher-students-page',
@@ -14,6 +15,28 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
   subjectGroups: TeacherSubjectGroup[] = [];
   loading = false;
   errorMessage = '';
+  semesterFilter = 'all';
+  expandedSubjectIds = new Set<number>();
+  readonly studentColumns: Column[] = [
+    { name: 'username', type: 'string' },
+    { name: 'email', type: 'string' },
+    { name: 'first_name', type: 'string' },
+    { name: 'last_name', type: 'string' },
+    { name: 'department_name', type: 'string' },
+    { name: 'mark_completed', type: 'boolean' },
+  ];
+  readonly studentActions: Action<TeacherStudent, 'view' | 'upload'>[] = [
+    {
+      header: 'View',
+      name: 'View',
+      callback: () => 'view',
+    },
+    {
+      header: 'Upload Marks',
+      name: 'Upload Marks',
+      callback: () => 'upload',
+    },
+  ];
 
   searchText = '';
   subjectCount = 0;
@@ -58,6 +81,16 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     this.search$.next(value.trim());
   }
 
+  onSemesterFilterChange(value: string): void {
+    this.semesterFilter = value || 'all';
+    this.ensureExpandedState();
+  }
+
+  clearSearch(): void {
+    this.searchText = '';
+    this.updateSearchQueryParam(null);
+  }
+
   openMarksPage(student: TeacherStudent): void {
     const studentId = student.user_id || student.id;
     this.router.navigate(['/teacher/students', studentId, 'marks'], {
@@ -68,20 +101,32 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  openUploadPage(student: TeacherStudent): void {
-    const studentId = student.user_id || student.id;
+  openUploadPage(student: TeacherStudent, subjectId?: number): void {
+    const studentId = student.id || student.user_id;
     this.router.navigate(['/teacher/students', studentId, 'upload'], {
       queryParams: {
         uploadType: 'general',
+        subjectId: subjectId || null,
         username: student.username || '',
         email: student.email || '',
       },
     });
   }
 
+  onStudentAction(event: ActionEmit<TeacherStudent, 'view' | 'upload'>, group?: TeacherSubjectGroup): void {
+    const student = event.row as TeacherStudent;
+    const actionType = event.action.callback(student);
+
+    if (actionType === 'view') {
+      this.openMarksPage(student);
+      return;
+    }
+
+    this.openUploadPage(student, group?.subject_id);
+  }
+
   openSubjectAnswerUpload(group: TeacherSubjectGroup): void {
     if (!group.subject_id) return;
-    console.log(group.subject_name)
 
     this.router.navigate(['/teacher/uploads'], {
       queryParams: {
@@ -89,6 +134,50 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
         subjectId: group.subject_id,
       },
     });
+  }
+
+  toggleAllSubjectGroups(expand: boolean): void {
+    if (!expand) {
+      this.expandedSubjectIds.clear();
+      return;
+    }
+
+    this.filteredSubjectGroups.forEach((group) => {
+      this.expandedSubjectIds.add(group.subject_id);
+    });
+  }
+
+  onGroupToggle(group: TeacherSubjectGroup, event: Event): void {
+    const element = event.target as HTMLDetailsElement;
+    if (element.open) {
+      this.expandedSubjectIds.add(group.subject_id);
+      return;
+    }
+
+    this.expandedSubjectIds.delete(group.subject_id);
+  }
+
+  isGroupExpanded(group: TeacherSubjectGroup): boolean {
+    return this.expandedSubjectIds.has(group.subject_id);
+  }
+
+  get filteredSubjectGroups(): TeacherSubjectGroup[] {
+    if (this.semesterFilter === 'all') return this.subjectGroups;
+    const semester = Number(this.semesterFilter);
+    return this.subjectGroups.filter((group) => group.semester === semester);
+  }
+
+  get availableSemesters(): number[] {
+    const unique = new Set<number>();
+    this.subjectGroups.forEach((group) => {
+      if (typeof group.semester === 'number') unique.add(group.semester);
+    });
+    return Array.from(unique).sort((a, b) => a - b);
+  }
+
+  get isAllGroupsExpanded(): boolean {
+    const groups = this.filteredSubjectGroups;
+    return groups.length > 0 && groups.every((group) => this.expandedSubjectIds.has(group.subject_id));
   }
 
   private fetchStudents(params: GetTeacherStudentsParams): void {
@@ -100,6 +189,7 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
         this.subjectGroups = response.subjects;
         this.subjectCount = response.subject_count;
         this.studentCount = response.student_count;
+        this.ensureExpandedState();
         this.loading = false;
         this.requestViewUpdate();
       },
@@ -141,6 +231,17 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     this.fetchStudents({
       q: q || undefined,
     });
+  }
+
+  private ensureExpandedState(): void {
+    const validIds = new Set(this.subjectGroups.map((group) => group.subject_id));
+    this.expandedSubjectIds.forEach((id) => {
+      if (!validIds.has(id)) this.expandedSubjectIds.delete(id);
+    });
+
+    if (this.expandedSubjectIds.size === 0 && this.filteredSubjectGroups.length > 0) {
+      this.expandedSubjectIds.add(this.filteredSubjectGroups[0].subject_id);
+    }
   }
 
   private requestViewUpdate(): void {
