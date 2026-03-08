@@ -39,6 +39,10 @@
             type="password"
             placeholder="Create password"
             [required]="true"
+            validationType="custom"
+            [validationPattern]="passwordValidationPattern"
+            [customErrorMessage]="passwordValidationMessage"
+            [showValidation]="true"
             [value]="password"
             (valueChange)="passwordChanged($event)"
           ></app-text-input>

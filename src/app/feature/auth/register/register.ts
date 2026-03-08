@@ -10,6 +10,9 @@ import { SnackbarService } from '../../../services/modal/snackbar.service';
   styleUrl: './register.css',
 })
 export class RegisterComponent implements AfterViewInit, OnDestroy {
+  readonly passwordValidationPattern = '^(?=.*\\d)(?=.*[^A-Za-z0-9]).+$';
+  readonly passwordValidationMessage = 'Password must include at least one number and one special character.';
+
   fullName = '';
   email = '';
   password = '';
@@ -96,6 +99,11 @@ export class RegisterComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
+    if (!this.hasRequiredPasswordComplexity(this.password)) {
+      this.errorMessage = this.passwordValidationMessage;
+      return;
+    }
+
     if (this.password !== this.confirmPassword) {
       this.errorMessage = 'Passwords do not match.';
       return;
@@ -120,5 +128,9 @@ export class RegisterComponent implements AfterViewInit, OnDestroy {
   goToLogin() {
     document.body.style.overflow = 'initial';
     this.router.navigate(['/auth/login']);
+  }
+
+  private hasRequiredPasswordComplexity(password: string): boolean {
+    return /^(?=.*\d)(?=.*[^A-Za-z0-9]).+$/.test(password);
   }
 }
