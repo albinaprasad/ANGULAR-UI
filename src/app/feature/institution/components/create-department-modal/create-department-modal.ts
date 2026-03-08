@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { InstitutionService } from '../../../../services/http/institution.service';
+import { ModalCloseService } from '../../../../services/modal/modal-close.service';
 import { SnackbarService } from '../../../../services/modal/snackbar.service';
 import { Department } from '../../../../types/institution.types';
 
@@ -9,7 +11,7 @@ import { Department } from '../../../../types/institution.types';
   templateUrl: './create-department-modal.html',
   styleUrl: './create-department-modal.css'
 })
-export class CreateDepartmentModalComponent {
+export class CreateDepartmentModalComponent implements OnInit, OnDestroy {
   @Input() isOpen = false;
   @Output() closed = new EventEmitter<void>();
   @Output() created = new EventEmitter<Department>();
@@ -17,11 +19,25 @@ export class CreateDepartmentModalComponent {
   name = '';
   loading = false;
   submitted = false;
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private institutionService: InstitutionService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private modalCloseService: ModalCloseService
   ) {}
+
+  ngOnInit(): void {
+    this.modalCloseService.closeAll$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      if (!this.isOpen) return;
+      this.forceClose();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   close(): void {
     if (this.loading) return;
@@ -61,5 +77,11 @@ export class CreateDepartmentModalComponent {
     this.name = '';
     this.submitted = false;
     this.loading = false;
+  }
+
+  private forceClose(): void {
+    this.loading = false;
+    this.resetForm();
+    this.closed.emit();
   }
 }

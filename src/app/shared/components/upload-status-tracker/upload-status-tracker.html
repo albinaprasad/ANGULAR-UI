@@ -1,0 +1,13 @@
+<section class="status-shell" *ngIf="steps.length">
+  <h2>Upload Status</h2>
+  <ol class="status-list">
+    <li
+      *ngFor="let step of steps; let index = index"
+      class="status-item"
+      [ngClass]="getStepState(index)"
+    >
+      <span class="dot" aria-hidden="true"></span>
+      <span class="label">{{ step }}</span>
+    </li>
+  </ol>
+</section>

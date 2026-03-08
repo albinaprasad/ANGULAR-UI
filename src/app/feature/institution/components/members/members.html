@@ -1,7 +1,7 @@
 <section class="members-shell">
   <header class="members-header">
     <h1>Institution Members</h1>
-    <p>Browse teachers and students with infinite pagination.</p>
+    <p>Manage teachers and students with search, create, update and remove actions.</p>
   </header>
 
   <section class="toolbar-card">
@@ -23,7 +23,7 @@
     </div>
 
     <label class="search-field">
-      <span>Search</span>
+      <span>List Search</span>
       <input
         type="text"
         [ngModel]="searchText"
@@ -31,6 +31,78 @@
         placeholder="Search by name, email or username"
       />
     </label>
+  </section>
+
+  <section class="toolbar-card">
+    <h2>Add Existing {{ activeTab === 'teacher' ? 'Teacher' : 'Student' }}</h2>
+    <div class="search-controls">
+      <label>
+        Search user
+        <input
+          type="text"
+          [ngModel]="existingQuery"
+          (ngModelChange)="existingQuery = $event"
+          (keyup.enter)="searchExistingUsers()"
+          placeholder="Search by username or email"
+        />
+      </label>
+      <label>
+        Department
+        <select [ngModel]="selectedExistingDepartmentId" (ngModelChange)="onExistingDepartmentChange($event)">
+          <option [ngValue]="null">Select department</option>
+          <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
+        </select>
+      </label>
+      <button app-button variant="secondary" type="button" (click)="searchExistingUsers()" [disabled]="existingUsersLoading || !existingQuery.trim()">
+        {{ existingUsersLoading ? 'Searching...' : 'Search' }}
+      </button>
+      <button app-button variant="primary" type="button" (click)="addExistingMember()" [disabled]="addingExisting || !selectedExistingUserId || !selectedExistingDepartmentId">
+        {{ addingExisting ? 'Adding...' : 'Add Existing' }}
+      </button>
+    </div>
+
+    <app-empty-state
+      *ngIf="existingUsersError"
+      variant="error"
+      title="Search failed"
+      [message]="existingUsersError"
+      [compact]="true"
+    ></app-empty-state>
+
+    <div class="results" *ngIf="!existingUsersError && existingUsers.length">
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of existingUsers" [class.active]="selectedExistingUserId === user.id">
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.name || '-' }}</td>
+            <td>{{ user.role }}</td>
+            <td>
+              <button app-button variant="secondary" type="button" (click)="selectExistingUser(user.id)">Select</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="toolbar-card create-card">
+    <h2>Create New {{ activeTab === 'teacher' ? 'Teacher' : 'Student' }}</h2>
+    <p>
+      Open a dedicated form modal to create and assign a new {{ activeTab }}.
+    </p>
+    <button app-button variant="primary" type="button" (click)="openCreateModal()">
+      Create {{ activeTab === 'teacher' ? 'Teacher' : 'Student' }}
+    </button>
   </section>
 
   <section class="list-card" [hidden]="activeTab !== 'teacher'">
@@ -50,6 +122,7 @@
             <th>First name</th>
             <th>Last name</th>
             <th>Department</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -58,7 +131,35 @@
             <td>{{ row.email }}</td>
             <td>{{ row.first_name || '-' }}</td>
             <td>{{ row.last_name || '-' }}</td>
-            <td>{{ row.department_name || '-' }}</td>
+            <td>
+              <select
+                [ngModel]="getDepartmentDraft(row, 'teacher')"
+                (ngModelChange)="onMemberDepartmentDraftChange(row, 'teacher', $event)"
+                [disabled]="rowActionLoadingKey === ('teacher:' + (row.teacher_id || row.id || row.email || row.username))"
+              >
+                <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
+              </select>
+            </td>
+            <td class="member-actions">
+              <button
+                app-button
+                variant="secondary"
+                type="button"
+                (click)="updateMemberDepartment(row, 'teacher')"
+                [disabled]="rowActionLoadingKey === ('teacher:' + (row.teacher_id || row.id || row.email || row.username))"
+              >
+                Save
+              </button>
+              <button
+                app-button
+                variant="secondary"
+                type="button"
+                (click)="removeMember(row, 'teacher')"
+                [disabled]="rowActionLoadingKey === ('teacher:' + (row.teacher_id || row.id || row.email || row.username))"
+              >
+                Remove
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -105,6 +206,7 @@
             <th>First name</th>
             <th>Last name</th>
             <th>Department</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -113,7 +215,35 @@
             <td>{{ row.email }}</td>
             <td>{{ row.first_name || '-' }}</td>
             <td>{{ row.last_name || '-' }}</td>
-            <td>{{ row.department_name || '-' }}</td>
+            <td>
+              <select
+                [ngModel]="getDepartmentDraft(row, 'student')"
+                (ngModelChange)="onMemberDepartmentDraftChange(row, 'student', $event)"
+                [disabled]="rowActionLoadingKey === ('student:' + (row.student_id || row.id || row.email || row.username))"
+              >
+                <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
+              </select>
+            </td>
+            <td class="member-actions">
+              <button
+                app-button
+                variant="secondary"
+                type="button"
+                (click)="updateMemberDepartment(row, 'student')"
+                [disabled]="rowActionLoadingKey === ('student:' + (row.student_id || row.id || row.email || row.username))"
+              >
+                Save
+              </button>
+              <button
+                app-button
+                variant="secondary"
+                type="button"
+                (click)="removeMember(row, 'student')"
+                [disabled]="rowActionLoadingKey === ('student:' + (row.student_id || row.id || row.email || row.username))"
+              >
+                Remove
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -142,4 +272,18 @@
       <p class="loading-more" *ngIf="studentState.loading && studentState.items.length > 0">Loading more...</p>
     </div>
   </section>
+
+  <app-create-teacher-modal
+    [isOpen]="showCreateTeacherModal"
+    [departments]="departments"
+    (closed)="showCreateTeacherModal = false"
+    (created)="onTeacherCreated()"
+  ></app-create-teacher-modal>
+
+  <app-create-student-modal
+    [isOpen]="showCreateStudentModal"
+    [departments]="departments"
+    (closed)="showCreateStudentModal = false"
+    (created)="onStudentCreated()"
+  ></app-create-student-modal>
 </section>

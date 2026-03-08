@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleCha
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { InstitutionService } from '../../../../services/http/institution.service';
 import { InstitutionMembersService } from '../../../../services/http/institution-members.service';
+import { ModalCloseService } from '../../../../services/modal/modal-close.service';
 import { SnackbarService } from '../../../../services/modal/snackbar.service';
 import { InstitutionMember } from '../../../../types/institution-members.types';
 import {
@@ -43,13 +44,19 @@ export class CreateSubjectMappingModalComponent implements OnChanges, OnDestroy 
   constructor(
     private institutionService: InstitutionService,
     private institutionMembersService: InstitutionMembersService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private modalCloseService: ModalCloseService
   ) {
     this.trueSubjectSearch$
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((query) => {
         this.fetchTrueSubjects(query);
       });
+
+    this.modalCloseService.closeAll$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      if (!this.isOpen) return;
+      this.forceClose();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -208,5 +215,11 @@ export class CreateSubjectMappingModalComponent implements OnChanges, OnDestroy 
     this.trueSubjectSearch = '';
     this.submitted = false;
     this.loading = false;
+  }
+
+  private forceClose(): void {
+    this.loading = false;
+    this.resetForm();
+    this.closed.emit();
   }
 }

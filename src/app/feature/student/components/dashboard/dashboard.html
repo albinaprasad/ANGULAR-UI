@@ -4,6 +4,55 @@
     <p>View subject-wise marks and percentages.</p>
   </header>
 
+  <section class="stats-grid">
+    <article class="stat-card">
+      <span class="stat-label">Subjects</span>
+      <strong class="stat-value">{{ totalSubjects }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Overall Score</span>
+      <strong class="stat-value">{{ totalAcquiredMarks }}/{{ totalPossibleMarks || 0 }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Average</span>
+      <strong class="stat-value">{{ averagePercentage | number:'1.0-2' }}%</strong>
+    </article>
+  </section>
+
+  <section class="filters-card">
+    <h2>Filter Marks</h2>
+    <div class="filters-grid">
+      <label>
+        <span>Semester</span>
+        <select [value]="selectedSemester ?? ''" (change)="onSemesterChange(($any($event.target)).value)" [disabled]="loadingOptions">
+          <option value="">All semesters</option>
+          <option *ngFor="let semester of semesters" [value]="semester">Semester {{ semester }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Subject</span>
+        <select [value]="selectedSubjectId ?? ''" (change)="onSubjectChange(($any($event.target)).value)" [disabled]="loadingOptions">
+          <option value="">All subjects</option>
+          <option *ngFor="let subject of subjects" [value]="subject.id">
+            {{ subject.name }} ({{ subject.code }})
+          </option>
+        </select>
+      </label>
+
+      <button
+        app-button
+        class="clear-filters-btn"
+        variant="secondary"
+        type="button"
+        (click)="clearFilters()"
+        [disabled]="loading"
+      >
+        Clear Filters
+      </button>
+    </div>
+  </section>
+
   <app-student-marks-table
     [marks]="marks"
     [loading]="loading"

@@ -7,6 +7,15 @@ export interface DepartmentCreatePayload {
   name: string;
 }
 
+export interface DepartmentUpdatePayload {
+  department_id: number;
+  name: string;
+}
+
+export interface DepartmentRemovePayload {
+  department_id: number;
+}
+
 export interface DepartmentCreateResponse {
   id: number;
   name: string;
@@ -61,6 +70,24 @@ export interface AddExistingStudentPayload {
   department_id: number;
 }
 
+export interface UpdateTeacherDepartmentPayload {
+  teacher_id: number;
+  department_id: number;
+}
+
+export interface RemoveTeacherPayload {
+  teacher_id: number;
+}
+
+export interface UpdateStudentDepartmentPayload {
+  student_id: number;
+  department_id: number;
+}
+
+export interface RemoveStudentPayload {
+  student_id: number;
+}
+
 export interface TrueSubject {
   id: number;
   name: string;
@@ -95,4 +122,44 @@ export interface InstitutionSubject {
   department_name?: string;
   teacher_name?: string;
   teacher_email?: string;
+}
+
+export interface GetInstitutionSubjectsParams {
+  q?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface InstitutionSubjectsListResponse {
+  subjects: InstitutionSubject[];
+  page: number;
+  pageSize: number;
+  total: number;
+  hasMore: boolean;
+}
+
+export interface AddInstitutionSubjectPayload {
+  true_subject_id: number;
+  semester: number;
+  department_id: number;
+  teacher_id: number;
+}
+
+export interface ReassignInstitutionSubjectPayload {
+  subject_id: number;
+  teacher_id: number;
+}
+
+export interface RemoveInstitutionSubjectPayload {
+  subject_id: number;
+}
+
+export class InstitutionApiError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string
+  ) {
+    super(message);
+    this.name = 'InstitutionApiError';
+  }
 }

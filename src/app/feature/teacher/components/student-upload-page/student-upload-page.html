@@ -1,0 +1,211 @@
+<section class="upload-shell">
+  <header class="upload-header">
+    <div class="title-wrap">
+      <h1>OCR Evaluation</h1>
+      <p *ngIf="uploadType === 'general'">
+        {{ studentName || 'Student' }} <span *ngIf="studentEmail">({{ studentEmail }})</span>
+      </p>
+      <p *ngIf="uploadType === 'answerKey'">Upload answer key PDF for a subject.</p>
+    </div>
+    <button app-button variant="secondary" type="button" (click)="goBack()">Back to Students</button>
+  </header>
+
+  <section class="upload-card">
+    <div class="upload-controls">
+      <label for="subject-select">Subject</label>
+      <select id="subject-select" [value]="selectedSubjectId || ''" (change)="onSubjectChange($event)">
+        <option value="">Select subject</option>
+        <option *ngFor="let subject of teacherSubjects" [value]="subject.subject_id">
+          {{ subject.subject_name || 'Untitled' }} ({{ subject.subject_code || '-' }})
+        </option>
+      </select>
+    </div>
+
+    <div class="upload-grid" *ngIf="uploadType === 'general'">
+      <section class="upload-pane">
+        <h3>Student PDF Upload</h3>
+        <p class="hint">Required: subject + student + PDF</p>
+        <input
+          #studentPdfInput
+          type="file"
+          accept=".pdf"
+          (change)="onStudentPdfChange($event)"
+          [disabled]="loadingStudentUpload"
+        />
+        <p class="hint" *ngIf="selectedStudentPdf">Selected: {{ selectedStudentPdf.name }}</p>
+        <p class="hint success" *ngIf="studentPdfUploaded">Uploaded: {{ studentPdfName || 'Done' }}</p>
+        <a *ngIf="studentPdfUrl" [href]="studentPdfUrl" target="_blank" rel="noopener noreferrer">{{ studentPdfUrl }}</a>
+        <div class="actions">
+          <button
+            app-button
+            variant="primary"
+            type="button"
+            (click)="uploadStudentPdf()"
+            [disabled]="!selectedStudentPdf || loadingStudentUpload"
+          >
+            {{ loadingStudentUpload ? 'Uploading...' : 'Upload Student PDF' }}
+          </button>
+          <button
+            app-button
+            variant="secondary"
+            type="button"
+            (click)="retryStudentUpload()"
+            *ngIf="studentUploadFailed"
+            [disabled]="!selectedStudentPdf || loadingStudentUpload"
+          >
+            Retry Upload
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <section class="upload-pane" *ngIf="uploadType === 'answerKey'">
+      <h3>Teacher Answer Key Upload</h3>
+      <p class="hint">Upload subject answer schema PDF.</p>
+      <input #answerKeyInput type="file" accept=".pdf" (change)="onAnswerKeyPdfChange($event)" [disabled]="loadingAnswerKeyUpload" />
+      <p class="hint" *ngIf="selectedAnswerKeyPdf">Selected: {{ selectedAnswerKeyPdf.name }}</p>
+      <p class="hint success" *ngIf="answerKeyUploaded">Uploaded: {{ answerKeyName || 'Done' }}</p>
+      <a *ngIf="answerKeyUrl" [href]="answerKeyUrl" target="_blank" rel="noopener noreferrer">{{ answerKeyUrl }}</a>
+      <div class="actions">
+        <button app-button variant="primary" type="button" (click)="uploadAnswerKeyPdf()" [disabled]="!selectedAnswerKeyPdf || loadingAnswerKeyUpload">
+          {{ loadingAnswerKeyUpload ? 'Uploading...' : 'Upload Answer Key' }}
+        </button>
+        <button
+          app-button
+          variant="secondary"
+          type="button"
+          (click)="retryAnswerKeyUpload()"
+          *ngIf="answerKeyUploadFailed"
+          [disabled]="!selectedAnswerKeyPdf || loadingAnswerKeyUpload"
+        >
+          Retry Upload
+        </button>
+      </div>
+    </section>
+
+    <section class="status-card" *ngIf="uploadType === 'general'">
+      <h3>Answer Key Status</h3>
+      <p *ngIf="answerKeyUploaded" class="success">
+        Answer key available for this subject: {{ answerKeyName || 'Uploaded' }}
+      </p>
+      <p *ngIf="!answerKeyUploaded" class="error">
+        Answer key not found for this subject. Upload it first.
+      </p>
+      <a *ngIf="answerKeyUrl" [href]="answerKeyUrl" target="_blank" rel="noopener noreferrer">{{ answerKeyUrl }}</a>
+      <div class="actions">
+        <button app-button variant="secondary" type="button" (click)="goToAnswerKeyUpload()" [disabled]="!selectedSubjectId">
+          Upload / Update Answer Key
+        </button>
+      </div>
+    </section>
+
+    <section class="schema-card" *ngIf="uploadType === 'general'">
+      <h3>Answer Schema</h3>
+      <form [formGroup]="schemaForm" class="schema-form">
+        <label for="question-count">Number of Questions</label>
+        <input
+          id="question-count"
+          type="number"
+          min="1"
+          formControlName="number_of_questions"
+          (blur)="onSchemaQuestionCountBlur()"
+          placeholder="Enter total questions"
+        />
+
+        <div class="schema-errors" *ngIf="schemaForm.controls.number_of_questions.touched && schemaForm.controls.number_of_questions.invalid">
+          <span>Question count is required and must be greater than 0.</span>
+        </div>
+
+        <div class="schema-table" formArrayName="questions" *ngIf="questionsArray.length > 0">
+          <div class="schema-row schema-head">
+            <span>Question No</span>
+            <span>Max Mark</span>
+          </div>
+          <div class="schema-row" *ngFor="let question of questionsArray.controls; let idx = index" [formGroupName]="idx">
+            <span>{{ idx + 1 }}</span>
+            <input type="number" min="0.01" step="0.01" formControlName="max_mark" placeholder="Max mark" />
+          </div>
+        </div>
+      </form>
+
+      <div class="schema-summary">
+        <span><strong>Marks Array:</strong> {{ marks.join(', ') || '[]' }}</span>
+        <span><strong>Total Possible Marks:</strong> {{ totalPossibleMarks }}</span>
+      </div>
+      <p class="error" *ngIf="!isSchemaValid">Schema is invalid. Ensure row count matches question count and all marks are greater than 0.</p>
+    </section>
+
+    <section class="engine-card" *ngIf="uploadType === 'general'">
+      <h3>Engine Trigger</h3>
+      <div class="actions">
+        <button app-button variant="primary" type="button" (click)="triggerEvaluation()" [disabled]="!canTriggerEvaluation">
+          {{ loadingTrigger ? 'Triggering...' : 'Trigger OCR Evaluation' }}
+        </button>
+        <button app-button variant="secondary" type="button" (click)="retryTrigger()" *ngIf="triggerFailed" [disabled]="loadingTrigger">
+          Retry Trigger
+        </button>
+      </div>
+      <p class="hint">
+        Trigger enabled only when subject + student + uploaded student PDF + uploaded answer key + valid schema are all available.
+      </p>
+    </section>
+
+    <section class="status-card" *ngIf="uploadType === 'general' && taskStatus">
+      <h3>Task Status</h3>
+      <p class="hint">
+        <strong>Realtime Connection:</strong>
+        <span [class.success]="engineSocketState === 'open'" [class.error]="engineSocketState === 'error' || engineSocketState === 'closed'">
+          {{ engineSocketState }}
+        </span>
+      </p>
+      <p class="hint" *ngIf="latestEngineWsPath"><strong>WS Path:</strong> {{ latestEngineWsPath }}</p>
+      <app-upload-status-tracker
+        [steps]="engineStatusSteps"
+        [currentStep]="engineCurrentStep"
+        [isComplete]="engineComplete"
+        [hasError]="engineError"
+      ></app-upload-status-tracker>
+      <div class="status-grid">
+        <p><strong>Task ID:</strong> {{ taskStatus.task_id }}</p>
+        <p><strong>State:</strong> {{ taskStatus.state }}</p>
+        <p><strong>Stage:</strong> {{ taskStatus.stage || '-' }}</p>
+        <p><strong>Progress:</strong> {{ taskStatus.progress }}%</p>
+        <p><strong>Message:</strong> {{ taskStatus.message || '-' }}</p>
+      </div>
+      <button app-button variant="secondary" type="button" (click)="retryPolling()" *ngIf="pollingFailed && taskId">
+        Retry Polling
+      </button>
+    </section>
+
+    <section class="result-card" *ngIf="uploadType === 'general' && taskStatus?.result">
+      <h3>Evaluation Result</h3>
+      <div class="result-meta">
+        <p><strong>Total Acquired:</strong> {{ taskStatus?.result?.total_score }}</p>
+        <p><strong>Total Max:</strong> {{ totalPossibleMarks }}</p>
+        <p><strong>Student Answers Count:</strong> {{ taskStatus?.result?.student_answers_count }}</p>
+        <p><strong>Teacher Answers Count:</strong> {{ taskStatus?.result?.teacher_answers_count }}</p>
+        <p><strong>Student Mark ID:</strong> {{ taskStatus?.result?.student_mark_id }}</p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Score</th>
+            <th>Max Mark</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let score of taskStatus?.result?.scores; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ score }}</td>
+            <td>{{ marks[i] || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+  </section>
+</section>

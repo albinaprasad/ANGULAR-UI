@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { BaseResponse } from "../../types/base-http.types";
 import { PermissionGroup, Permissions } from "../../types/permission.types";
 import { BaseHttpService } from "./base.service";
@@ -13,10 +13,14 @@ export class PermissionService extends BaseHttpService {
         super();
     }
 
-    getGroupPermissions(groupId: number) : Observable<BaseResponse<Permissions[], string>> {
-        return this.httpClient.get<BaseResponse<Permissions[], string>>(
+    getGroupPermissions(groupId: number, params?: { page?: number; pageSize?: number }) : Observable<BaseResponse<unknown, string>> {
+        let httpParams = new HttpParams();
+        if (typeof params?.page === 'number') httpParams = httpParams.set('page', String(params.page));
+        if (typeof params?.pageSize === 'number') httpParams = httpParams.set('page_size', String(params.pageSize));
+
+        return this.httpClient.get<BaseResponse<unknown, string>>(
             `${this.API_URL}/api/groups/${groupId}/permissions`,
-            { headers: this.getAuthHeaders() }
+            { headers: this.getAuthHeaders(), params: httpParams }
         )
     }
 
@@ -35,10 +39,14 @@ export class PermissionService extends BaseHttpService {
         );
     }
 
-    getAllPermissions(): Observable<BaseResponse<Permissions[], string>> {
-        return this.httpClient.get<BaseResponse<Permissions[], string>>(
+    getAllPermissions(params?: { page?: number; pageSize?: number }): Observable<BaseResponse<unknown, string>> {
+        let httpParams = new HttpParams();
+        if (typeof params?.page === 'number') httpParams = httpParams.set('page', String(params.page));
+        if (typeof params?.pageSize === 'number') httpParams = httpParams.set('page_size', String(params.pageSize));
+
+        return this.httpClient.get<BaseResponse<unknown, string>>(
             `${this.API_URL}/api/permissions`,
-            { headers: this.getAuthHeaders() }
+            { headers: this.getAuthHeaders(), params: httpParams }
         );
     }
     

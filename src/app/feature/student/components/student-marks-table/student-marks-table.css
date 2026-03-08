@@ -1,12 +1,13 @@
 .card {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e1e9ff;
   border-radius: 12px;
   padding: 1rem;
 }
 
 h2 {
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.9rem;
+  color: #1f2a44;
 }
 
 .loading {
@@ -16,6 +17,9 @@ h2 {
 
 .results {
   overflow-x: auto;
+  border: 1px solid #e6ecff;
+  border-radius: 10px;
+  background: #ffffff;
 }
 
 table {
@@ -26,6 +30,22 @@ table {
 th,
 td {
   text-align: left;
-  padding: 0.7rem 0.45rem;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 0.72rem 0.55rem;
+  border-bottom: 1px solid #eef2ff;
+}
+
+th {
+  background: #f3f6ff;
+  color: #1f2a44;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafcff;
+}
+
+tbody tr:hover {
+  background: #edf3ff;
 }

@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { InstitutionService } from '../../../../services/http/institution.service';
+import { ModalCloseService } from '../../../../services/modal/modal-close.service';
 import { SnackbarService } from '../../../../services/modal/snackbar.service';
 import { Department } from '../../../../types/institution.types';
 
@@ -9,7 +11,7 @@ import { Department } from '../../../../types/institution.types';
   templateUrl: './create-student-modal.html',
   styleUrl: './create-student-modal.css'
 })
-export class CreateStudentModalComponent implements OnChanges {
+export class CreateStudentModalComponent implements OnChanges, OnInit, OnDestroy {
   @Input() isOpen = false;
   @Input() departments: Department[] = [];
   @Output() closed = new EventEmitter<void>();
@@ -23,16 +25,30 @@ export class CreateStudentModalComponent implements OnChanges {
   submitted = false;
   loading = false;
   departmentsLoading = false;
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private institutionService: InstitutionService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private modalCloseService: ModalCloseService
   ) {}
+
+  ngOnInit(): void {
+    this.modalCloseService.closeAll$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      if (!this.isOpen) return;
+      this.forceClose();
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen']?.currentValue === true) {
       this.loadDepartments();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   close(): void {
@@ -126,5 +142,11 @@ export class CreateStudentModalComponent implements OnChanges {
     this.password = '';
     this.departmentId = null;
     this.submitted = false;
+  }
+
+  private forceClose(): void {
+    this.loading = false;
+    this.resetForm();
+    this.closed.emit();
   }
 }

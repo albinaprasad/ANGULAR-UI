@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { BaseResponse } from '../../types/base-http.types';
 import {
+  AddInstitutionSubjectPayload,
   AddExistingStudentPayload,
   AddExistingTeacherPayload,
   CreateStudentPayload,
@@ -12,11 +13,22 @@ import {
   Department,
   DepartmentCreatePayload,
   DepartmentCreateResponse,
+  DepartmentRemovePayload,
+  DepartmentUpdatePayload,
+  GetInstitutionSubjectsParams,
+  InstitutionApiError,
   InstitutionSearchUser,
   InstitutionSubject,
+  InstitutionSubjectsListResponse,
+  ReassignInstitutionSubjectPayload,
+  RemoveInstitutionSubjectPayload,
+  RemoveStudentPayload,
+  RemoveTeacherPayload,
   SetInstitutionSubjectPayload,
   SetInstitutionSubjectResponse,
   TrueSubject,
+  UpdateStudentDepartmentPayload,
+  UpdateTeacherDepartmentPayload,
 } from '../../types/institution.types';
 import { BaseHttpService } from './base.service';
 
@@ -57,6 +69,32 @@ export class InstitutionService extends BaseHttpService {
       );
   }
 
+  updateDepartment(payload: DepartmentUpdatePayload): Observable<Record<string, unknown>> {
+    return this.http
+      .post<BaseResponse<Record<string, unknown>, string>>(
+        `${this.institutionBase}/departments/update`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((res) => res.message ?? {}),
+        catchError((error) => this.handleError(error))
+      );
+  }
+
+  removeDepartment(payload: DepartmentRemovePayload): Observable<Record<string, unknown>> {
+    return this.http
+      .post<BaseResponse<Record<string, unknown>, string>>(
+        `${this.institutionBase}/departments/remove`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((res) => res.message ?? {}),
+        catchError((error) => this.handleError(error))
+      );
+  }
+
   createTeacher(payload: CreateTeacherPayload): Observable<CreateTeacherResponse> {
     return this.http
       .post<BaseResponse<CreateTeacherResponse, string>>(
@@ -75,6 +113,32 @@ export class InstitutionService extends BaseHttpService {
       );
   }
 
+  updateTeacherDepartment(payload: UpdateTeacherDepartmentPayload): Observable<Record<string, unknown>> {
+    return this.http
+      .post<BaseResponse<Record<string, unknown>, string>>(
+        `${this.institutionBase}/teachers/update`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((res) => res.message ?? {}),
+        catchError((error) => this.handleError(error))
+      );
+  }
+
+  removeTeacher(payload: RemoveTeacherPayload): Observable<Record<string, unknown>> {
+    return this.http
+      .post<BaseResponse<Record<string, unknown>, string>>(
+        `${this.institutionBase}/teachers/remove`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((res) => res.message ?? {}),
+        catchError((error) => this.handleError(error))
+      );
+  }
+
   createStudent(payload: CreateStudentPayload): Observable<CreateStudentResponse> {
     return this.http
       .post<BaseResponse<CreateStudentResponse, string>>(
@@ -89,6 +153,32 @@ export class InstitutionService extends BaseHttpService {
           }
           return res.message;
         }),
+        catchError((error) => this.handleError(error))
+      );
+  }
+
+  updateStudentDepartment(payload: UpdateStudentDepartmentPayload): Observable<Record<string, unknown>> {
+    return this.http
+      .post<BaseResponse<Record<string, unknown>, string>>(
+        `${this.institutionBase}/students/update`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((res) => res.message ?? {}),
+        catchError((error) => this.handleError(error))
+      );
+  }
+
+  removeStudent(payload: RemoveStudentPayload): Observable<Record<string, unknown>> {
+    return this.http
+      .post<BaseResponse<Record<string, unknown>, string>>(
+        `${this.institutionBase}/students/remove`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((res) => res.message ?? {}),
         catchError((error) => this.handleError(error))
       );
   }
@@ -152,9 +242,13 @@ export class InstitutionService extends BaseHttpService {
   }
 
   setInstitutionSubject(payload: SetInstitutionSubjectPayload): Observable<SetInstitutionSubjectResponse> {
+    return this.addInstitutionSubject(payload);
+  }
+
+  addInstitutionSubject(payload: AddInstitutionSubjectPayload): Observable<SetInstitutionSubjectResponse> {
     return this.http
       .post<BaseResponse<SetInstitutionSubjectResponse, string>>(
-        `${this.institutionBase}/subjects/set`,
+        `${this.institutionBase}/subjects/add`,
         payload,
         { headers: this.getAuthHeaders() }
       )
@@ -169,10 +263,43 @@ export class InstitutionService extends BaseHttpService {
       );
   }
 
-  getInstitutionSubjects(): Observable<InstitutionSubject[]> {
+  reassignSubjectTeacher(payload: ReassignInstitutionSubjectPayload): Observable<Record<string, unknown>> {
+    return this.http
+      .post<BaseResponse<Record<string, unknown>, string>>(
+        `${this.institutionBase}/subjects/update-assignment`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((res) => res.message ?? {}),
+        catchError((error) => this.handleError(error))
+      );
+  }
+
+  removeInstitutionSubject(payload: RemoveInstitutionSubjectPayload): Observable<Record<string, unknown>> {
+    return this.http
+      .post<BaseResponse<Record<string, unknown>, string>>(
+        `${this.institutionBase}/subjects/remove`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((res) => res.message ?? {}),
+        catchError((error) => this.handleError(error))
+      );
+  }
+
+  getInstitutionSubjects(params?: GetInstitutionSubjectsParams): Observable<InstitutionSubjectsListResponse> {
+    let httpParams = new HttpParams();
+    const query = params?.q?.trim();
+    if (query) httpParams = httpParams.set('q', query);
+    if (typeof params?.page === 'number') httpParams = httpParams.set('page', String(params.page));
+    if (typeof params?.pageSize === 'number') httpParams = httpParams.set('page_size', String(params.pageSize));
+
     return this.http
       .get<BaseResponse<unknown, string>>(`${this.institutionBase}/subjects`, {
         headers: this.getAuthHeaders(),
+        params: httpParams,
       })
       .pipe(
         map((res) => this.normalizeInstitutionSubjects(res.message)),
@@ -180,7 +307,7 @@ export class InstitutionService extends BaseHttpService {
       );
   }
 
-  private normalizeInstitutionSubjects(message: unknown): InstitutionSubject[] {
+  private normalizeInstitutionSubjects(message: unknown): InstitutionSubjectsListResponse {
     const payload = message as Record<string, unknown> | null;
     const rawList = Array.isArray(message)
       ? message
@@ -188,7 +315,18 @@ export class InstitutionService extends BaseHttpService {
         ? payload['subjects'] as unknown[]
         : [];
 
-    return rawList.map((raw) => this.normalizeInstitutionSubject(raw));
+    const page = Number(payload?.['page'] ?? 1);
+    const pageSize = Number(payload?.['page_size'] ?? (rawList.length || 20));
+    const total = Number(payload?.['total'] ?? rawList.length);
+    const hasMore = Boolean(payload?.['has_more'] ?? (page * pageSize < total));
+
+    return {
+      subjects: rawList.map((raw) => this.normalizeInstitutionSubject(raw)),
+      page: Number.isFinite(page) && page > 0 ? page : 1,
+      pageSize: Number.isFinite(pageSize) && pageSize > 0 ? pageSize : 20,
+      total: Number.isFinite(total) && total >= 0 ? total : rawList.length,
+      hasMore,
+    };
   }
 
   private normalizeInstitutionSubject(raw: unknown): InstitutionSubject {
@@ -230,6 +368,6 @@ export class InstitutionService extends BaseHttpService {
         : '';
 
     const message = backendMessage || statusMessage[error.status] || 'Something went wrong. Please try again.';
-    return throwError(() => new Error(message));
+    return throwError(() => new InstitutionApiError(error.status, message));
   }
 }
