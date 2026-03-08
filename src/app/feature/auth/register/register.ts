@@ -3,8 +3,6 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/http/auth.service';
 import { SnackbarService } from '../../../services/modal/snackbar.service';
 
-type RegistrationRole = 'institution' | 'teacher' | 'student';
-
 @Component({
   selector: 'app-register',
   standalone: false,
@@ -16,12 +14,6 @@ export class RegisterComponent implements AfterViewInit, OnDestroy {
   email = '';
   password = '';
   confirmPassword = '';
-  role: RegistrationRole = 'institution';
-  readonly roleOptions: { value: RegistrationRole; label: string }[] = [
-    { value: 'institution', label: 'Institution' },
-    { value: 'teacher', label: 'Teacher' },
-    { value: 'student', label: 'Student' },
-  ];
   isLoading = false;
   errorMessage = '';
 
@@ -98,13 +90,6 @@ export class RegisterComponent implements AfterViewInit, OnDestroy {
     this.errorMessage = '';
   }
 
-  roleChanged(value: string): void {
-    if (value === 'institution' || value === 'teacher' || value === 'student') {
-      this.role = value;
-      this.errorMessage = '';
-    }
-  }
-
   async register(): Promise<void> {
     if (!this.fullName.trim() || !this.email.trim() || !this.password || !this.confirmPassword) {
       this.errorMessage = 'Please fill all fields.';
@@ -120,7 +105,7 @@ export class RegisterComponent implements AfterViewInit, OnDestroy {
     this.errorMessage = '';
 
     try {
-      await this.authService.register(this.email.trim(), this.password, this.fullName.trim(), this.role);
+      await this.authService.register(this.email.trim(), this.password, this.fullName.trim(), 'institution');
       this.snackbarService.success('Account created successfully');
       document.body.style.overflow = 'initial';
       this.router.navigate(['/auth/login']);
