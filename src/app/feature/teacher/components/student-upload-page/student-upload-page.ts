@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, Subscription, takeUntil, timer } from 'rxjs';
@@ -22,7 +22,12 @@ type UploadType = 'general' | 'answerKey';
   templateUrl: './student-upload-page.html',
   styleUrl: './student-upload-page.css',
 })
-export class StudentUploadPageComponent implements OnInit, OnDestroy {
+export class StudentUploadPageComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() embeddedMode = false;
+  @Input() initialUploadType: UploadType | null = null;
+  @Input() initialSubjectId: number | null = null;
+  @Input() hideHeader = false;
+
   @ViewChild('studentPdfInput') studentPdfInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('answerKeyInput') answerKeyInputRef?: ElementRef<HTMLInputElement>;
 
@@ -98,28 +103,32 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadTeacherSubjects();
 
-    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
-      const id = Number(params.get('studentId'));
-      this.studentCoreId = Number.isFinite(id) && id > 0 ? id : 0;
-      this.restoreSessionState();
-    });
+    if (this.embeddedMode) {
+      this.applyEmbeddedContext();
+    } else {
+      this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+        const id = Number(params.get('studentId'));
+        this.studentCoreId = Number.isFinite(id) && id > 0 ? id : 0;
+        this.restoreSessionState();
+      });
 
-    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
-      this.studentName = params.get('username') ?? '';
-      this.studentEmail = params.get('email') ?? '';
+      this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+        this.studentName = params.get('username') ?? '';
+        this.studentEmail = params.get('email') ?? '';
 
-      const uploadType = params.get('uploadType');
-      if (uploadType === 'answerKey' || uploadType === 'general') {
-        this.uploadType = uploadType;
-      }
+        const uploadType = params.get('uploadType');
+        if (uploadType === 'answerKey' || uploadType === 'general') {
+          this.uploadType = uploadType;
+        }
 
-      const subjectId = Number(params.get('subjectId'));
-      if (Number.isFinite(subjectId) && subjectId > 0) {
-        this.selectedSubjectId = subjectId;
-      }
-      this.syncAnswerKeyStateFromSubject();
-      this.restoreSessionState();
-    });
+        const subjectId = Number(params.get('subjectId'));
+        if (Number.isFinite(subjectId) && subjectId > 0) {
+          this.selectedSubjectId = subjectId;
+        }
+        this.syncAnswerKeyStateFromSubject();
+        this.restoreSessionState();
+      });
+    }
 
     this.schemaForm.controls.number_of_questions.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((count) => {
       this.syncQuestionRows(count ?? 0);
@@ -158,6 +167,14 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!this.embeddedMode) return;
+    if (changes['initialUploadType'] || changes['initialSubjectId'] || changes['embeddedMode']) {
+      this.applyEmbeddedContext();
+      this.requestViewUpdate();
+    }
+  }
+
   get questionsArray(): FormArray<FormGroup<{ max_mark: FormControl<number | null> }>> {
     return this.schemaForm.controls.questions;
   }
@@ -190,10 +207,12 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
+    if (this.embeddedMode) return;
     this.router.navigate(['/teacher/students']);
   }
 
   goToAnswerKeyUpload(): void {
+    if (this.embeddedMode) return;
     this.router.navigate(['/teacher/uploads'], {
       queryParams: {
         uploadType: 'answerKey',
@@ -617,6 +636,25 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
     }
     this.errorMessage = '';
     return file;
+  }
+
+  private applyEmbeddedContext(): void {
+    if (this.initialUploadType === 'answerKey' || this.initialUploadType === 'general') {
+      this.uploadType = this.initialUploadType;
+    }
+
+    this.studentCoreId = 0;
+    this.studentName = '';
+    this.studentEmail = '';
+
+    if (Number.isFinite(this.initialSubjectId) && Number(this.initialSubjectId) > 0) {
+      this.selectedSubjectId = Number(this.initialSubjectId);
+    } else {
+      this.selectedSubjectId = null;
+    }
+
+    this.syncAnswerKeyStateFromSubject();
+    this.restoreSessionState();
   }
 
   private loadTeacherSubjects(): void {

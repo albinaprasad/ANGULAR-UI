@@ -13,6 +13,7 @@ import { Action, ActionEmit, Column } from '../../../../types/table.types';
 })
 export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
   subjectGroups: TeacherSubjectGroup[] = [];
+  selectedSchemaSubjectId: number | null = null;
   loading = false;
   errorMessage = '';
   semesterFilter = 'all';
@@ -127,13 +128,17 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
 
   openSubjectAnswerUpload(group: TeacherSubjectGroup): void {
     if (!group.subject_id) return;
+    this.selectedSchemaSubjectId = this.selectedSchemaSubjectId === group.subject_id ? null : group.subject_id;
+    this.requestViewUpdate();
+  }
 
-    this.router.navigate(['/teacher/uploads'], {
-      queryParams: {
-        uploadType: 'answerKey',
-        subjectId: group.subject_id,
-      },
-    });
+  closeSubjectAnswerUpload(): void {
+    this.selectedSchemaSubjectId = null;
+    this.requestViewUpdate();
+  }
+
+  isSubjectSchemaPanelOpen(group: TeacherSubjectGroup): boolean {
+    return this.selectedSchemaSubjectId === group.subject_id;
   }
 
   toggleAllSubjectGroups(expand: boolean): void {

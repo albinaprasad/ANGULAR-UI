@@ -1,5 +1,5 @@
-<section class="upload-shell">
-  <header class="upload-header">
+<section class="upload-shell" [class.embedded]="embeddedMode">
+  <header class="upload-header" *ngIf="!hideHeader">
     <div class="title-wrap">
       <h1>OCR Evaluation</h1>
       <p *ngIf="uploadType === 'general'">
