@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { NotificationService } from '../../../services/http/notification.service';
 import { Notification } from '../../../types/notification.types';
 import { Subject, of } from 'rxjs';
@@ -20,7 +20,10 @@ export class NotificationComponent implements OnInit, OnDestroy {
   private pendingSeenIds = new Set<number>();
   private expandedSeenByIds = new Set<number>();
 
-  constructor(private notificationService: NotificationService) {}
+  constructor(
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.bindNotificationReload();
@@ -106,12 +109,15 @@ export class NotificationComponent implements OnInit, OnDestroy {
         tap(() => {
           this.errorMessage = null;
           this.isLoading = true;
+          console.log("Loading started...",this.isLoading)
         }),
         switchMap(() =>
           this.notificationService.fetchNotifications().pipe(
             tap((response) => {
+              console.log(response)
               this.notifications = this.sortNotifications(this.extractNotifications(response?.message));
               this.syncUnreadCount();
+              console.log("completed loading the message")
             }),
             catchError(() => {
               this.errorMessage = 'Unable to load notifications. Please try again.';
@@ -121,6 +127,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
             }),
             finalize(() => {
               this.isLoading = false;
+              this.cdr.markForCheck();
             })
           )
         ),
