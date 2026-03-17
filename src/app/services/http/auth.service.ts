@@ -13,6 +13,7 @@ import { BaseResponse } from '../../types/base-http.types';
 export class AuthService extends BaseHttpService {
 
   private readonly USER_ROLES_KEY = 'user_roles';
+  private readonly ADMIN_SELECTED_TABLE_KEY = 'admin-dashboard-selected-table';
   public user = new BehaviorSubject<User | null>(null)
   public tokenChanges: BehaviorSubject<string | null>;
   
@@ -103,6 +104,7 @@ export class AuthService extends BaseHttpService {
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
     localStorage.removeItem(environmentJson.IS_SUPER_ADMIN);
     localStorage.removeItem(this.USER_ROLES_KEY);
+    localStorage.removeItem(this.ADMIN_SELECTED_TABLE_KEY);
     this.tokenChanges.next(null);
     this.user.next(null);
   }

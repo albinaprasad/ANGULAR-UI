@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, Subscription, takeUntil, timer } from 'rxjs';
@@ -7,8 +7,10 @@ import { RoleDashboardService } from '../../../../services/http/role-dashboard.s
 import { SnackbarService } from '../../../../services/modal/snackbar.service';
 import { EngineTaskSocketService, EngineTaskSocketState } from '../../../../services/websocket/engine-task-socket.service';
 import {
+  AnswerKeyDetail,
   EngineSocketEvent,
   EngineStatusResponse,
+  EngineWorkflowStep,
   TeacherAnswerKeyUploadResponse,
   TeacherOwnedSubject,
   TeacherPdfUploadResponse,
@@ -22,7 +24,12 @@ type UploadType = 'general' | 'answerKey';
   templateUrl: './student-upload-page.html',
   styleUrl: './student-upload-page.css',
 })
-export class StudentUploadPageComponent implements OnInit, OnDestroy {
+export class StudentUploadPageComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() embeddedMode = false;
+  @Input() initialUploadType: UploadType | null = null;
+  @Input() initialSubjectId: number | null = null;
+  @Input() hideHeader = false;
+
   @ViewChild('studentPdfInput') studentPdfInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('answerKeyInput') answerKeyInputRef?: ElementRef<HTMLInputElement>;
 
@@ -46,6 +53,7 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
 
   loadingStudentUpload = false;
   loadingAnswerKeyUpload = false;
+  loadingAnswerKeyStatus = false;
   loadingTrigger = false;
   pollingActive = false;
   pollingFailed = false;
@@ -59,7 +67,15 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
   taskStatus: EngineStatusResponse | null = null;
   latestEngineWsPath = '';
   engineSocketState: EngineTaskSocketState = 'closed';
-  readonly engineStatusSteps = ['Queued', 'OCR Running', 'Scoring', 'Completed'];
+  readonly defaultEngineStatusSteps: EngineWorkflowStep[] = [
+    { key: 'connected', label: 'Connection Ready' },
+    { key: 'queued', label: 'Task Queued' },
+    { key: 'prepare', label: 'Preparing Input' },
+    { key: 'extract', label: 'Extracting Pages' },
+    { key: 'ocr', label: 'Reading Answers' },
+    { key: 'score', label: 'Scoring Answers' },
+    { key: 'complete', label: 'Publishing Result' },
+  ];
 
   uploadStatusSteps = ['Preparing PDF', 'Uploading', 'Processing metadata', 'Upload completed'];
   currentStatusStep = -1;
@@ -98,28 +114,33 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadTeacherSubjects();
 
-    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
-      const id = Number(params.get('studentId'));
-      this.studentCoreId = Number.isFinite(id) && id > 0 ? id : 0;
-      this.restoreSessionState();
-    });
+    if (this.embeddedMode) {
+      this.applyEmbeddedContext();
+    } else {
+      this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+        const id = Number(params.get('studentId'));
+        this.studentCoreId = Number.isFinite(id) && id > 0 ? id : 0;
+        this.restoreSessionState();
+      });
 
-    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
-      this.studentName = params.get('username') ?? '';
-      this.studentEmail = params.get('email') ?? '';
+      this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+        this.studentName = params.get('username') ?? '';
+        this.studentEmail = params.get('email') ?? '';
 
-      const uploadType = params.get('uploadType');
-      if (uploadType === 'answerKey' || uploadType === 'general') {
-        this.uploadType = uploadType;
-      }
+        const uploadType = params.get('uploadType');
+        if (uploadType === 'answerKey' || uploadType === 'general') {
+          this.uploadType = uploadType;
+        }
 
-      const subjectId = Number(params.get('subjectId'));
-      if (Number.isFinite(subjectId) && subjectId > 0) {
-        this.selectedSubjectId = subjectId;
-      }
-      this.syncAnswerKeyStateFromSubject();
-      this.restoreSessionState();
-    });
+        const subjectId = Number(params.get('subjectId'));
+        if (Number.isFinite(subjectId) && subjectId > 0) {
+          this.selectedSubjectId = subjectId;
+        }
+        this.syncAnswerKeyStateFromSubject();
+        this.restoreSessionState();
+        this.refreshAnswerKeyStatusForSubject();
+      });
+    }
 
     this.schemaForm.controls.number_of_questions.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((count) => {
       this.syncQuestionRows(count ?? 0);
@@ -158,6 +179,14 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!this.embeddedMode) return;
+    if (changes['initialUploadType'] || changes['initialSubjectId'] || changes['embeddedMode']) {
+      this.applyEmbeddedContext();
+      this.requestViewUpdate();
+    }
+  }
+
   get questionsArray(): FormArray<FormGroup<{ max_mark: FormControl<number | null> }>> {
     return this.schemaForm.controls.questions;
   }
@@ -189,11 +218,26 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
     );
   }
 
+  get engineStatusSteps(): string[] {
+    return this.getEngineWorkflowSteps().map((step) => step.label);
+  }
+
+  get selectedSubjectLabel(): string {
+    if (!this.selectedSubjectId) return 'Subject not available';
+
+    const subject = this.teacherSubjects.find((item) => item.subject_id === this.selectedSubjectId);
+    if (!subject) return `Subject #${this.selectedSubjectId}`;
+
+    return `${subject.subject_name || 'Untitled'} (${subject.subject_code || '-'})`;
+  }
+
   goBack(): void {
+    if (this.embeddedMode) return;
     this.router.navigate(['/teacher/students']);
   }
 
   goToAnswerKeyUpload(): void {
+    if (this.embeddedMode) return;
     this.router.navigate(['/teacher/uploads'], {
       queryParams: {
         uploadType: 'answerKey',
@@ -208,6 +252,7 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
     this.selectedSubjectId = Number.isFinite(value) && value > 0 ? value : null;
     if (previousSubjectId !== this.selectedSubjectId) {
       this.syncAnswerKeyStateFromSubject();
+      this.refreshAnswerKeyStatusForSubject();
     }
     this.errorMessage = '';
     this.persistSessionState();
@@ -373,6 +418,11 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
             stage: '',
             progress: 0,
             message: response.message || 'Engine task queued.',
+            step_key: 'queued',
+            step_label: 'Task Queued',
+            step_index: 1,
+            step_total: this.defaultEngineStatusSteps.length,
+            steps: this.defaultEngineStatusSteps,
             result: null,
             error: null,
           };
@@ -415,15 +465,23 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
 
   get engineCurrentStep(): number {
     if (!this.taskStatus) return -1;
+    const steps = this.getEngineWorkflowSteps();
+    if (!steps.length) return -1;
+
     const state = (this.taskStatus.state || '').toUpperCase();
-    if (state === 'SUCCESS') return this.engineStatusSteps.length - 1;
-    if (state === 'FAILED' || state === 'FAILURE' || state === 'ERROR') return Math.max(0, this.engineStatusSteps.length - 2);
+    if (state === 'SUCCESS') return steps.length - 1;
+
+    if (typeof this.taskStatus.step_index === 'number' && Number.isFinite(this.taskStatus.step_index)) {
+      return Math.max(0, Math.min(this.taskStatus.step_index, steps.length - 1));
+    }
+
+    if (state === 'FAILED' || state === 'FAILURE' || state === 'ERROR') {
+      return Math.max(0, steps.length - 2);
+    }
 
     const progress = Number(this.taskStatus.progress ?? 0);
     if (progress <= 0) return 0;
-    if (progress < 50) return 1;
-    if (progress < 100) return 2;
-    return this.engineStatusSteps.length - 1;
+    return Math.max(0, Math.min(Math.floor((progress / 100) * (steps.length - 1)), steps.length - 1));
   }
 
   get engineComplete(): boolean {
@@ -447,7 +505,20 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (status) => {
-          this.taskStatus = status;
+          this.taskStatus = {
+            task_id: status.task_id || taskId,
+            state: status.state,
+            stage: status.stage,
+            progress: status.progress,
+            message: status.message,
+            step_key: status.step_key ?? this.taskStatus?.step_key ?? null,
+            step_label: status.step_label ?? this.taskStatus?.step_label ?? null,
+            step_index: status.step_index ?? this.taskStatus?.step_index ?? null,
+            step_total: status.step_total ?? this.taskStatus?.step_total ?? this.getEngineWorkflowSteps(status.steps).length,
+            steps: this.getEngineWorkflowSteps(status.steps),
+            result: status.result,
+            error: status.error,
+          };
           this.taskId = status.task_id || taskId;
           this.persistSessionState();
 
@@ -503,9 +574,14 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
         this.taskStatus = {
           task_id: event.task_id,
           state: 'PENDING',
-          stage: 'connected',
-          progress: 0,
+          stage: event.stage || 'connected',
+          progress: Number(event.progress ?? 0),
           message: event.message || 'Realtime status connected.',
+          step_key: event.step_key || 'connected',
+          step_label: event.step_label || 'Connection Ready',
+          step_index: typeof event.step_index === 'number' ? event.step_index : 0,
+          step_total: typeof event.step_total === 'number' ? event.step_total : this.getEngineWorkflowSteps(event.steps).length,
+          steps: this.getEngineWorkflowSteps(event.steps),
           result: null,
           error: null,
         };
@@ -513,8 +589,14 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
         this.taskStatus = {
           ...this.taskStatus,
           state: this.taskStatus.state || 'PENDING',
-          stage: this.taskStatus.stage || 'connected',
+          stage: event.stage || this.taskStatus.stage || 'connected',
+          progress: Number(event.progress ?? this.taskStatus.progress ?? 0),
           message: event.message || this.taskStatus.message,
+          step_key: event.step_key || this.taskStatus.step_key || 'connected',
+          step_label: event.step_label || this.taskStatus.step_label || 'Connection Ready',
+          step_index: typeof event.step_index === 'number' ? event.step_index : (this.taskStatus.step_index ?? 0),
+          step_total: typeof event.step_total === 'number' ? event.step_total : (this.taskStatus.step_total ?? this.getEngineWorkflowSteps(event.steps).length),
+          steps: this.getEngineWorkflowSteps(event.steps),
         };
       }
       this.persistSessionState();
@@ -522,13 +604,18 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (event.event === 'progress') {
+    if (event.event === 'snapshot' || event.event === 'progress') {
       this.taskStatus = {
         task_id: event.task_id,
         state: 'RUNNING',
         stage: event.stage || 'running',
         progress: Number(event.progress ?? 0),
         message: event.message || 'Processing...',
+        step_key: event.step_key || this.taskStatus?.step_key || null,
+        step_label: event.step_label || this.taskStatus?.step_label || null,
+        step_index: typeof event.step_index === 'number' ? event.step_index : (this.taskStatus?.step_index ?? null),
+        step_total: typeof event.step_total === 'number' ? event.step_total : (this.taskStatus?.step_total ?? this.getEngineWorkflowSteps(event.steps).length),
+        steps: this.getEngineWorkflowSteps(event.steps),
         result: this.taskStatus?.result ?? null,
         error: null,
       };
@@ -541,12 +628,18 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
       this.shouldFallbackToPolling = false;
       this.engineTaskSocketService.disconnect();
       this.stopPolling();
+      const steps = this.getEngineWorkflowSteps(event.steps);
       this.taskStatus = {
         task_id: event.task_id,
         state: 'SUCCESS',
         stage: 'completed',
         progress: 100,
         message: 'Evaluation completed successfully.',
+        step_key: event.step_key || 'complete',
+        step_label: event.step_label || 'Publishing Result',
+        step_index: Math.max(0, steps.length - 1),
+        step_total: steps.length,
+        steps,
         result: {
           scores: event.scores ?? [],
           total_score: Number(event.total_score ?? 0),
@@ -572,6 +665,11 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
         stage: event.stage || 'failed',
         progress: Number(event.progress ?? 100),
         message: event.message || 'Evaluation failed.',
+        step_key: event.step_key || this.taskStatus?.step_key || null,
+        step_label: event.step_label || this.taskStatus?.step_label || 'Failed',
+        step_index: typeof event.step_index === 'number' ? event.step_index : this.engineCurrentStep,
+        step_total: typeof event.step_total === 'number' ? event.step_total : (this.taskStatus?.step_total ?? this.getEngineWorkflowSteps(event.steps).length),
+        steps: this.getEngineWorkflowSteps(event.steps),
         result: null,
         error: event.details || event.message || 'Evaluation failed.',
       };
@@ -590,6 +688,19 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
     this.startPolling(this.taskId);
     this.snackbarService.warning(message, 3000);
     this.requestViewUpdate();
+  }
+
+  private getEngineWorkflowSteps(steps?: EngineWorkflowStep[] | null): EngineWorkflowStep[] {
+    const source = Array.isArray(steps) && steps.length
+      ? steps
+      : (Array.isArray(this.taskStatus?.steps) && this.taskStatus?.steps.length
+        ? this.taskStatus.steps
+        : this.defaultEngineStatusSteps);
+
+    return source.map((step, index) => ({
+      key: String(step?.key || index),
+      label: String(step?.label || step?.key || `Step ${index + 1}`),
+    }));
   }
 
   private syncQuestionRows(countRaw: number): void {
@@ -617,6 +728,26 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
     }
     this.errorMessage = '';
     return file;
+  }
+
+  private applyEmbeddedContext(): void {
+    if (this.initialUploadType === 'answerKey' || this.initialUploadType === 'general') {
+      this.uploadType = this.initialUploadType;
+    }
+
+    this.studentCoreId = 0;
+    this.studentName = '';
+    this.studentEmail = '';
+
+    if (Number.isFinite(this.initialSubjectId) && Number(this.initialSubjectId) > 0) {
+      this.selectedSubjectId = Number(this.initialSubjectId);
+    } else {
+      this.selectedSubjectId = null;
+    }
+
+    this.syncAnswerKeyStateFromSubject();
+    this.restoreSessionState();
+    this.refreshAnswerKeyStatusForSubject();
   }
 
   private loadTeacherSubjects(): void {
@@ -807,6 +938,66 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
     this.answerKeyUrl = entry?.fileUrl || '';
   }
 
+  private refreshAnswerKeyStatusForSubject(): void {
+    const subjectId = this.selectedSubjectId;
+    if (!subjectId || subjectId <= 0) {
+      this.loadingAnswerKeyStatus = false;
+      return;
+    }
+
+    this.loadingAnswerKeyStatus = true;
+    this.roleDashboardService.searchAnswerKey(subjectId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (detail) => {
+        if (this.selectedSubjectId !== subjectId) return;
+        this.loadingAnswerKeyStatus = false;
+        this.applyAnswerKeyStatusForSubject(subjectId, detail);
+        this.persistSessionState();
+        this.requestViewUpdate();
+      },
+      error: (error: { status?: number }) => {
+        if (this.selectedSubjectId !== subjectId) return;
+        this.loadingAnswerKeyStatus = false;
+        if (error?.status === 404) {
+          this.clearAnswerKeyStateForSubject(subjectId);
+          this.persistSessionState();
+          this.requestViewUpdate();
+          return;
+        }
+        this.requestViewUpdate();
+      },
+    });
+  }
+
+  private applyAnswerKeyStatusForSubject(subjectId: number, detail: AnswerKeyDetail | null | undefined): void {
+    const found = detail?.status === 'Found';
+    if (!found) {
+      this.clearAnswerKeyStateForSubject(subjectId);
+      return;
+    }
+
+    const existingState = this.getAnswerKeyStateMap()[String(subjectId)];
+    const fileUrl = String(detail?.answer_link || existingState?.fileUrl || '').trim();
+    const fileName = String(
+      existingState?.fileName
+      || this.getFileNameFromPath(fileUrl)
+      || detail?.subject
+      || 'Uploaded'
+    ).trim();
+
+    this.answerKeyUploaded = true;
+    this.answerKeyName = fileName;
+    this.answerKeyUrl = fileUrl;
+
+    const map = this.getAnswerKeyStateMap();
+    map[String(subjectId)] = {
+      uploaded: true,
+      fileName,
+      fileUrl,
+    };
+    localStorage.setItem(this.answerKeyStateStorageKey, JSON.stringify(map));
+    sessionStorage.setItem(this.answerKeyStateStorageKey, JSON.stringify(map));
+  }
+
   private persistAnswerKeyStateForSubject(): void {
     if (!this.selectedSubjectId || this.selectedSubjectId <= 0) return;
     const map = this.getAnswerKeyStateMap();
@@ -828,6 +1019,27 @@ export class StudentUploadPageComponent implements OnInit, OnDestroy {
     } catch {
       return {};
     }
+  }
+
+  private clearAnswerKeyStateForSubject(subjectId: number): void {
+    if (this.selectedSubjectId === subjectId) {
+      this.answerKeyUploaded = false;
+      this.answerKeyName = '';
+      this.answerKeyUrl = '';
+    }
+
+    const map = this.getAnswerKeyStateMap();
+    delete map[String(subjectId)];
+    localStorage.setItem(this.answerKeyStateStorageKey, JSON.stringify(map));
+    sessionStorage.setItem(this.answerKeyStateStorageKey, JSON.stringify(map));
+  }
+
+  private getFileNameFromPath(path: string): string {
+    const normalized = String(path || '').trim();
+    if (!normalized) return '';
+
+    const parts = normalized.split('/').filter(Boolean);
+    return parts.length ? decodeURIComponent(parts[parts.length - 1]) : '';
   }
 
   private requestViewUpdate(): void {

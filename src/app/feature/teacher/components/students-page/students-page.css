@@ -226,6 +226,20 @@
   overflow: visible;
 }
 
+.inline-upload-panel {
+  border-top: 1px solid #e2e8ff;
+  padding-top: 0.9rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.inline-upload-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
 .section-header h2 {
   margin: 0 0 0.12rem;
   color: #1f2a44;
@@ -338,6 +352,11 @@
 
   .subject-meta {
     justify-content: flex-start;
+  }
+
+  .inline-upload-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .students-toolbar {

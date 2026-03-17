@@ -22,16 +22,39 @@
             <h3>{{ group.subject_name || 'Untitled Subject' }} <span>({{ group.subject_code || '-' }})</span></h3>
             <p>Semester {{ group.semester || '-' }} • {{ group.department_name || ('Department #' + group.department_id) }}</p>
           </div>
+          <div class="subject-details">
+            <span></span>
+
+          </div>
           <div class="subject-meta">
             <span class="subject-count">{{ group.student_count }} students</span>
             <button app-button variant="secondary" type="button" (click)="openSubjectAnswerUpload(group)">
-              Upload Answer Schema
+              {{ isSubjectSchemaPanelOpen(group) ? 'Close Answer Schema' : 'Upload Answer Schema' }}
             </button>
           </div>
         </div>
       </article>
       <p *ngIf="filteredSubjectGroups.length === 0" class="empty-row">No assigned subjects found for this filter.</p>
     </div>
+
+    <section class="inline-upload-panel" *ngIf="selectedSchemaSubjectId">
+      <header class="section-header inline-upload-header">
+        <div>
+          <h2>Answer Schema Upload</h2>
+          <p>Upload or replace the teacher answer schema without leaving this page.</p>
+        </div>
+        <button app-button variant="secondary" type="button" (click)="closeSubjectAnswerUpload()">
+          Close
+        </button>
+      </header>
+
+      <app-student-upload-page
+        [embeddedMode]="true"
+        [hideHeader]="true"
+        [initialUploadType]="'answerKey'"
+        [initialSubjectId]="selectedSchemaSubjectId"
+      ></app-student-upload-page>
+    </section>
   </section>
 
   <div class="students-toolbar">

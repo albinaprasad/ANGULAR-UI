@@ -1,5 +1,5 @@
-<section class="upload-shell">
-  <header class="upload-header">
+<section class="upload-shell" [class.embedded]="embeddedMode">
+  <header class="upload-header" *ngIf="!hideHeader">
     <div class="title-wrap">
       <h1>OCR Evaluation</h1>
       <p *ngIf="uploadType === 'general'">
@@ -11,7 +11,7 @@
   </header>
 
   <section class="upload-card">
-    <div class="upload-controls">
+    <div class="upload-controls" *ngIf="uploadType === 'answerKey'; else fixedSubjectDisplay">
       <label for="subject-select">Subject</label>
       <select id="subject-select" [value]="selectedSubjectId || ''" (change)="onSubjectChange($event)">
         <option value="">Select subject</option>
@@ -20,6 +20,13 @@
         </option>
       </select>
     </div>
+
+    <ng-template #fixedSubjectDisplay>
+      <div class="upload-controls">
+        <label>Subject</label>
+        <input type="text" [value]="selectedSubjectLabel" readonly />
+      </div>
+    </ng-template>
 
     <div class="upload-grid" *ngIf="uploadType === 'general'">
       <section class="upload-pane">
@@ -62,9 +69,10 @@
     <section class="upload-pane" *ngIf="uploadType === 'answerKey'">
       <h3>Teacher Answer Key Upload</h3>
       <p class="hint">Upload subject answer schema PDF.</p>
+      <p class="hint" *ngIf="loadingAnswerKeyStatus">Checking existing answer key...</p>
       <input #answerKeyInput type="file" accept=".pdf" (change)="onAnswerKeyPdfChange($event)" [disabled]="loadingAnswerKeyUpload" />
       <p class="hint" *ngIf="selectedAnswerKeyPdf">Selected: {{ selectedAnswerKeyPdf.name }}</p>
-      <p class="hint success" *ngIf="answerKeyUploaded">Uploaded: {{ answerKeyName || 'Done' }}</p>
+      <p class="hint success" *ngIf="answerKeyUploaded">Current answer key: {{ answerKeyName || 'Done' }}</p>
       <a *ngIf="answerKeyUrl" [href]="answerKeyUrl" target="_blank" rel="noopener noreferrer">{{ answerKeyUrl }}</a>
       <div class="actions">
         <button app-button variant="primary" type="button" (click)="uploadAnswerKeyPdf()" [disabled]="!selectedAnswerKeyPdf || loadingAnswerKeyUpload">
@@ -85,18 +93,16 @@
 
     <section class="status-card" *ngIf="uploadType === 'general'">
       <h3>Answer Key Status</h3>
+      <p *ngIf="loadingAnswerKeyStatus" class="hint">
+        Checking answer key status for this subject...
+      </p>
       <p *ngIf="answerKeyUploaded" class="success">
         Answer key available for this subject: {{ answerKeyName || 'Uploaded' }}
       </p>
-      <p *ngIf="!answerKeyUploaded" class="error">
+      <p *ngIf="!loadingAnswerKeyStatus && !answerKeyUploaded" class="error">
         Answer key not found for this subject. Upload it first.
       </p>
       <a *ngIf="answerKeyUrl" [href]="answerKeyUrl" target="_blank" rel="noopener noreferrer">{{ answerKeyUrl }}</a>
-      <div class="actions">
-        <button app-button variant="secondary" type="button" (click)="goToAnswerKeyUpload()" [disabled]="!selectedSubjectId">
-          Upload / Update Answer Key
-        </button>
-      </div>
     </section>
 
     <section class="schema-card" *ngIf="uploadType === 'general'">
