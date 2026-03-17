@@ -110,6 +110,16 @@ export interface TeacherPdfUploadResponse {
   file_url: string;
 }
 
+export interface AnswerKeyDetail {
+  status: "Found" | "Not Found",
+  id : number,
+  subject: string,
+  created_at: Date,
+  answer_link: string,
+  extracted_text: string,
+  teacher: string
+}
+
 export interface TeacherAnswerKeyUploadResponse extends TeacherPdfUploadResponse {
   subject_id: number;
 }
@@ -143,12 +153,22 @@ export interface EngineResultPayload {
   student_mark_id: number;
 }
 
+export interface EngineWorkflowStep {
+  key: string;
+  label: string;
+}
+
 export interface EngineStatusResponse {
   task_id: string;
   state: string;
   stage: string;
   progress: number;
   message: string;
+  step_key?: string | null;
+  step_label?: string | null;
+  step_index?: number | null;
+  step_total?: number | null;
+  steps?: EngineWorkflowStep[];
   result?: EngineResultPayload | null;
   error?: string | null;
 }
@@ -156,7 +176,27 @@ export interface EngineStatusResponse {
 export interface EngineSocketConnectedEvent {
   event: 'connected';
   task_id: string;
+  stage?: string;
+  progress?: number;
   message?: string;
+  step_key?: string;
+  step_label?: string;
+  step_index?: number;
+  step_total?: number;
+  steps?: EngineWorkflowStep[];
+}
+
+export interface EngineSocketSnapshotEvent {
+  event: 'snapshot';
+  task_id: string;
+  stage?: string;
+  progress?: number;
+  message?: string;
+  step_key?: string;
+  step_label?: string;
+  step_index?: number;
+  step_total?: number;
+  steps?: EngineWorkflowStep[];
 }
 
 export interface EngineSocketProgressEvent {
@@ -165,11 +205,24 @@ export interface EngineSocketProgressEvent {
   stage?: string;
   progress?: number;
   message?: string;
+  step_key?: string;
+  step_label?: string;
+  step_index?: number;
+  step_total?: number;
+  steps?: EngineWorkflowStep[];
 }
 
 export interface EngineSocketSuccessEvent {
   event: 'success';
   task_id: string;
+  stage?: string;
+  progress?: number;
+  message?: string;
+  step_key?: string;
+  step_label?: string;
+  step_index?: number;
+  step_total?: number;
+  steps?: EngineWorkflowStep[];
   subject_id?: number;
   student_id?: number;
   scores: number[];
@@ -183,12 +236,18 @@ export interface EngineSocketFailureEvent {
   stage?: string;
   progress?: number;
   message?: string;
+  step_key?: string;
+  step_label?: string;
+  step_index?: number;
+  step_total?: number;
+  steps?: EngineWorkflowStep[];
   status?: number;
   details?: string;
 }
 
 export type EngineSocketEvent =
   | EngineSocketConnectedEvent
+  | EngineSocketSnapshotEvent
   | EngineSocketProgressEvent
   | EngineSocketSuccessEvent
   | EngineSocketFailureEvent;

@@ -22,6 +22,10 @@
             <h3>{{ group.subject_name || 'Untitled Subject' }} <span>({{ group.subject_code || '-' }})</span></h3>
             <p>Semester {{ group.semester || '-' }} • {{ group.department_name || ('Department #' + group.department_id) }}</p>
           </div>
+          <div class="subject-details">
+            <span></span>
+
+          </div>
           <div class="subject-meta">
             <span class="subject-count">{{ group.student_count }} students</span>
             <button app-button variant="secondary" type="button" (click)="openSubjectAnswerUpload(group)">

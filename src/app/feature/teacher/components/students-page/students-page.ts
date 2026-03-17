@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { RoleDashboardService } from '../../../../services/http/role-dashboard.service';
@@ -52,9 +52,12 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
+
+
 
   ngOnInit(): void {
+    console.log("Testing...")
     this.search$
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((query) => {
@@ -197,6 +200,10 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
         this.ensureExpandedState();
         this.loading = false;
         this.requestViewUpdate();
+        console.log(this.filteredSubjectGroups)
+        this.filteredSubjectGroups.map((group) => {
+          this.fetchAnswerSheetForSubject(group.subject_id)
+        })
       },
       error: (error: { status?: number; friendlyMessage?: string }) => {
         this.loading = false;
@@ -220,6 +227,16 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  private fetchAnswerSheetForSubject(params: number): void {
+    console.log("Called for fetching answers...")
+    this.roleDashboardService.searchAnswerKey(params)
+      .subscribe({
+        next: (reponse) => {
+          console.log(reponse)
+        }
+      })
+  }
+
   private updateSearchQueryParam(query: string | null): void {
     this.router.navigate([], {
       relativeTo: this.route,
@@ -236,6 +253,8 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     this.fetchStudents({
       q: q || undefined,
     });
+
+
   }
 
   private ensureExpandedState(): void {

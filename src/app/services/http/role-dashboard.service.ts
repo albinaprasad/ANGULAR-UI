@@ -21,6 +21,7 @@ import {
   EngineStatusResponse,
   EngineResultPayload,
   UserRole,
+  AnswerKeyDetail,
 } from '../../types/role-dashboard.types';
 import { BaseHttpService } from './base.service';
 
@@ -158,6 +159,34 @@ export class RoleDashboardService extends BaseHttpService {
             file_path: String(payload.file_path ?? ''),
             file_url: String(payload.file_url ?? ''),
           };
+        }),
+        catchError((err) => this.handleError(err))
+      );
+  }
+
+  searchAnswerKey(subjectId: number): Observable<AnswerKeyDetail> {
+    const formData = new FormData();
+    formData.append("subject_id", String(subjectId));
+
+    return this.http
+      .post<BaseResponse<AnswerKeyDetail, string>>(
+        `${this.API_URL}/core/teacher/answer-key/status`,
+        formData,
+        { headers: this.getAuthHeadersForFormData() }
+      )
+      .pipe(
+        map((response) => {
+          const payload = (response.message ?? {}) as Partial<AnswerKeyDetail>;
+
+          return {
+            status: payload.status ?? "Not Found",
+            id: payload.id ?? 0,
+            subject: payload.subject ?? "",
+            created_at: payload.created_at ? new Date(payload.created_at) : new Date(),
+            answer_link: payload.answer_link ?? "",
+            extracted_text: payload.extracted_text ?? "",
+            teacher: payload.teacher ?? ""
+          } as AnswerKeyDetail;
         }),
         catchError((err) => this.handleError(err))
       );
