@@ -53,6 +53,28 @@
   overflow-x: hidden;
   max-width: calc(100vw - 100px);
   min-height: 0;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(44, 62, 80, 0.45) rgba(195, 207, 226, 0.35);
+}
+
+.content-area::-webkit-scrollbar {
+  width: 10px;
+}
+
+.content-area::-webkit-scrollbar-track {
+  background: rgba(195, 207, 226, 0.35);
+  border-radius: 999px;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+  background: rgba(44, 62, 80, 0.45);
+  border-radius: 999px;
+  border: 2px solid rgba(195, 207, 226, 0.35);
+}
+
+.content-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(44, 62, 80, 0.6);
 }
 
 .state-card {
