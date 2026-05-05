@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { InstitutionService } from '../../../../services/http/institution.service';
 import { InstitutionMembersService } from '../../../../services/http/institution-members.service';
 import { ModalCloseService } from '../../../../services/modal/modal-close.service';
@@ -35,11 +35,8 @@ export class CreateSubjectMappingModalComponent implements OnChanges, OnDestroy 
 
   teachers: InstitutionMember[] = [];
   trueSubjectOptions: TrueSubject[] = [];
-  trueSubjectSearch = '';
 
-  private readonly trueSubjectSearch$ = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
-  private readonly trueSubjectCache = new Map<number, TrueSubject>();
 
   constructor(
     private institutionService: InstitutionService,
@@ -47,12 +44,6 @@ export class CreateSubjectMappingModalComponent implements OnChanges, OnDestroy 
     private snackbarService: SnackbarService,
     private modalCloseService: ModalCloseService
   ) {
-    this.trueSubjectSearch$
-      .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((query) => {
-        this.fetchTrueSubjects(query);
-      });
-
     this.modalCloseService.closeAll$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (!this.isOpen) return;
       this.forceClose();
@@ -100,11 +91,6 @@ export class CreateSubjectMappingModalComponent implements OnChanges, OnDestroy 
         this.snackbarService.error(error.message, 4500);
       },
     });
-  }
-
-  onTrueSubjectSearchChange(value: string): void {
-    this.trueSubjectSearch = value;
-    this.trueSubjectSearch$.next(value.trim());
   }
 
   onTrueSubjectChange(value: unknown): void {
@@ -169,7 +155,7 @@ export class CreateSubjectMappingModalComponent implements OnChanges, OnDestroy 
 
   private initializeModalData(): void {
     this.fetchTeachers();
-    this.fetchTrueSubjects('');
+    this.fetchTrueSubjects();
   }
 
   private fetchTeachers(): void {
@@ -186,18 +172,11 @@ export class CreateSubjectMappingModalComponent implements OnChanges, OnDestroy 
     });
   }
 
-  private fetchTrueSubjects(query: string): void {
+  private fetchTrueSubjects(): void {
     this.trueSubjectLoading = true;
-    this.institutionService.getTrueSubjects({ q: query || undefined }).subscribe({
+    this.institutionService.getTrueSubjects().subscribe({
       next: (subjects) => {
-        subjects.forEach((subject) => {
-          this.trueSubjectCache.set(subject.id, subject);
-        });
-
-        this.trueSubjectOptions = query
-          ? subjects
-          : Array.from(this.trueSubjectCache.values());
-
+        this.trueSubjectOptions = subjects;
         this.trueSubjectLoading = false;
       },
       error: (error: Error) => {
@@ -212,7 +191,6 @@ export class CreateSubjectMappingModalComponent implements OnChanges, OnDestroy 
     this.semester = null;
     this.departmentId = null;
     this.teacherId = null;
-    this.trueSubjectSearch = '';
     this.submitted = false;
     this.loading = false;
   }

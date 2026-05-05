@@ -1,7 +1,7 @@
 <section class="members-shell">
   <header class="members-header">
     <h1>Institution Members</h1>
-    <p>Manage teachers and students with search, create, update and remove actions.</p>
+    <p>Manage teachers and students with create, update and remove actions.</p>
   </header>
 
   <section class="toolbar-card">
@@ -20,78 +20,6 @@
       >
         Students ({{ studentState.total || studentState.items.length }})
       </button>
-    </div>
-
-    <label class="search-field">
-      <span>List Search</span>
-      <input
-        type="text"
-        [ngModel]="searchText"
-        (ngModelChange)="onSearchChange($event)"
-        placeholder="Search by name, email or username"
-      />
-    </label>
-  </section>
-
-  <section class="toolbar-card">
-    <h2>Add Existing {{ activeTab === 'teacher' ? 'Teacher' : 'Student' }}</h2>
-    <div class="search-controls">
-      <label>
-        Search user
-        <input
-          type="text"
-          [ngModel]="existingQuery"
-          (ngModelChange)="existingQuery = $event"
-          (keyup.enter)="searchExistingUsers()"
-          placeholder="Search by username or email"
-        />
-      </label>
-      <label>
-        Department
-        <select [ngModel]="selectedExistingDepartmentId" (ngModelChange)="onExistingDepartmentChange($event)">
-          <option [ngValue]="null">Select department</option>
-          <option *ngFor="let department of departments" [ngValue]="department.id">{{ department.name }}</option>
-        </select>
-      </label>
-      <button app-button variant="secondary" type="button" (click)="searchExistingUsers()" [disabled]="existingUsersLoading || !existingQuery.trim()">
-        {{ existingUsersLoading ? 'Searching...' : 'Search' }}
-      </button>
-      <button app-button variant="primary" type="button" (click)="addExistingMember()" [disabled]="addingExisting || !selectedExistingUserId || !selectedExistingDepartmentId">
-        {{ addingExisting ? 'Adding...' : 'Add Existing' }}
-      </button>
-    </div>
-
-    <app-empty-state
-      *ngIf="existingUsersError"
-      variant="error"
-      title="Search failed"
-      [message]="existingUsersError"
-      [compact]="true"
-    ></app-empty-state>
-
-    <div class="results" *ngIf="!existingUsersError && existingUsers.length">
-      <table>
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Name</th>
-            <th>Role</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let user of existingUsers" [class.active]="selectedExistingUserId === user.id">
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.name || '-' }}</td>
-            <td>{{ user.role }}</td>
-            <td>
-              <button app-button variant="secondary" type="button" (click)="selectExistingUser(user.id)">Select</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   </section>
 
@@ -171,7 +99,7 @@
       <app-empty-state
         *ngIf="teacherState.loadedOnce && !teacherState.loading && !teacherState.error && teacherState.items.length === 0"
         title="No teachers found"
-        message="Try adjusting search text."
+        message="No teachers are available right now."
       ></app-empty-state>
 
       <app-empty-state
@@ -255,7 +183,7 @@
       <app-empty-state
         *ngIf="studentState.loadedOnce && !studentState.loading && !studentState.error && studentState.items.length === 0"
         title="No students found"
-        message="Try adjusting search text."
+        message="No students are available right now."
       ></app-empty-state>
 
       <app-empty-state
