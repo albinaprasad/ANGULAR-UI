@@ -113,6 +113,10 @@
         <button app-button variant="secondary" type="button" (click)="retryActiveTab()">Retry</button>
       </div>
 
+      <div class="retry-row" *ngIf="!teacherState.error && teacherState.hasMore && !teacherState.loading">
+        <button app-button variant="secondary" type="button" (click)="onReachedBottom('teacher')">Load More</button>
+      </div>
+
       <p class="loading-more" *ngIf="teacherState.loading && teacherState.items.length > 0">Loading more...</p>
     </div>
   </section>
@@ -195,6 +199,10 @@
 
       <div class="retry-row" *ngIf="studentState.error">
         <button app-button variant="secondary" type="button" (click)="retryActiveTab()">Retry</button>
+      </div>
+
+      <div class="retry-row" *ngIf="!studentState.error && studentState.hasMore && !studentState.loading">
+        <button app-button variant="secondary" type="button" (click)="onReachedBottom('student')">Load More</button>
       </div>
 
       <p class="loading-more" *ngIf="studentState.loading && studentState.items.length > 0">Loading more...</p>

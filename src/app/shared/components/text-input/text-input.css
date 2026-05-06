@@ -18,12 +18,24 @@
   transition: 0.3s;
 }
 
+.input-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .input-block input {
+  width: 100%;
   outline: 0;
   border: 0;
   padding: 4px 0 0;
   font-size: 14px;
   font-family: 'Roboto', sans-serif;
+  min-width: 0;
+}
+
+.input-control.has-password-toggle .modal-input {
+  padding-right: 2rem;
 }
 
 .input-block input.invalid {
@@ -40,6 +52,36 @@
 
 .input-block:focus-within .input-label {
   color: rgba(140, 117, 105, 0.8);
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #8c7569;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  flex-shrink: 0;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.password-toggle:hover {
+  color: rgba(140, 117, 105, 0.8);
+}
+
+.password-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
 }
 
 .input-error {

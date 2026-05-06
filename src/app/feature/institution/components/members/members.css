@@ -4,10 +4,7 @@
   padding: 2rem;
   display: grid;
   gap: 1rem;
-  height: calc(100vh - 140px);
-  min-height: 460px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  min-height: 100%;
   background:
     radial-gradient(circle at 5% 0%, rgba(59, 130, 246, 0.1), transparent 35%),
     radial-gradient(circle at 100% 10%, rgba(14, 165, 233, 0.1), transparent 30%),
@@ -133,9 +130,8 @@
 }
 
 .table-scroll {
-  height: 62vh;
-  min-height: 360px;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
   border: 1px solid #d8e2ff;
   border-radius: 12px;
 }
@@ -241,8 +237,6 @@ tbody tr:hover {
     width: 100%;
     margin: 0;
     padding: 1.25rem;
-    height: calc(100vh - 120px);
-    min-height: 420px;
   }
 }
 
@@ -252,8 +246,4 @@ tbody tr:hover {
     align-items: stretch;
   }
 
-  .table-scroll {
-    height: 56vh;
-    min-height: 300px;
-  }
 }

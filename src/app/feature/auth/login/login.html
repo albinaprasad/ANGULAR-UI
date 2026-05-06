@@ -21,6 +21,7 @@
             label="Username" 
             type="text" 
             placeholder="Username" 
+            autocomplete="username"
             (valueChange)="emailChanged($event)">
           </app-text-input>
           
@@ -28,6 +29,7 @@
             label="Password" 
             type="password" 
             placeholder="Password"
+            autocomplete="off"
             (valueChange)="passwordChanged($event)">
           </app-text-input>
 

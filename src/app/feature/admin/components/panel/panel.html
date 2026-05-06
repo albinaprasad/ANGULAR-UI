@@ -1,10 +1,15 @@
-<app-navbar
-    *ngIf="showPanel"
-    [title]="panelTitle"
-    [subtitle]="panelSubtitle"
-    [logoUrl]="'/assets/admin-logo.png'"
-    [roleType]="roleType"
-    [navItems]="navItems">
-</app-navbar>
+<div class="panel-layout">
+  <div class="panel-fixed" *ngIf="showPanel">
+    <app-navbar
+        [title]="panelTitle"
+        [subtitle]="panelSubtitle"
+        [logoUrl]="'/assets/admin-logo.png'"
+        [roleType]="roleType"
+        [navItems]="navItems">
+    </app-navbar>
+  </div>
 
-<router-outlet></router-outlet>
+  <main class="panel-content" [class.with-panel]="showPanel">
+    <router-outlet></router-outlet>
+  </main>
+</div>

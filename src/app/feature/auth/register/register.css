@@ -110,7 +110,7 @@ body {
 }
 
 .modal.is-open .modal-button {
-  opacity: 0;
+  display: none;
 }
 
 .modal.is-open .modal-container {
