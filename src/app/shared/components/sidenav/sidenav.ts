@@ -17,6 +17,7 @@ export class SidenavComponent {
   @Input() navItems: NavItem[] = [];
   @Input() isOpen: boolean = false;
   @Input() title: string = 'Navigation';
+  @Input() heightCss: string | null = null;
 
   @Output() itemSelected = new EventEmitter<string>();
   @Output() toggleSidenav = new EventEmitter<void>();

@@ -27,6 +27,21 @@ export class AuthService extends BaseHttpService {
     return this.user.value
   }
 
+  getCurrentUserId(): number | null {
+    const currentUser = this.user.value as (User & { id?: unknown; user_id?: unknown }) | null;
+    const directId = Number(currentUser?.id ?? currentUser?.user_id ?? 0);
+    if (Number.isFinite(directId) && directId > 0) {
+      return directId;
+    }
+
+    const token = this.getAuthToken();
+    if (!token) return null;
+
+    const payload = this.decodeJwtPayload(token);
+    const tokenId = Number(payload?.['user_id'] ?? payload?.['id'] ?? payload?.['sub'] ?? 0);
+    return Number.isFinite(tokenId) && tokenId > 0 ? tokenId : null;
+  }
+
   isSuperAdmin(): boolean {
     const currentUser = this.user.value;
     if (currentUser) {

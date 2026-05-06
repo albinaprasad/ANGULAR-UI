@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, catchError, map, throwError } from 'rxjs';
+import { Observable, catchError, map, throwError, timeout } from 'rxjs';
 import { BaseResponse } from '../../types/base-http.types';
 import {
   GetTeacherStudentsParams,
@@ -22,6 +22,9 @@ import {
   EngineResultPayload,
   UserRole,
   AnswerKeyDetail,
+  TeacherStudentAnswerSheetRequest,
+  TeacherStudentAnswerSheetResponse,
+  TeacherStudentMarkUpdateRequest,
 } from '../../types/role-dashboard.types';
 import { BaseHttpService } from './base.service';
 
@@ -127,13 +130,63 @@ export class RoleDashboardService extends BaseHttpService {
 
   getTeacherStudentMarks(studentUserId: number): Observable<StudentMark[]> {
     return this.http
-      .get<BaseResponse<StudentMark[], string>>(`${this.API_URL}/core/teacher/students/${studentUserId}/marks`, {
+      .get<BaseResponse<unknown, string> | Record<string, unknown>>(`${this.API_URL}/core/teacher/students/${studentUserId}/marks`, {
         headers: this.getAuthHeaders(),
       })
       .pipe(
-        map((response) => response.message ?? []),
+        timeout(15000),
+        map((response) => {
+          const record = response as Record<string, unknown>;
+          const payload = record['message'] ?? record['data'] ?? response;
+          return this.normalizeTeacherStudentMarks(payload);
+        }),
         catchError((err) => this.handleError(err))
       );
+  }
+
+  fetchTeacherStudentAnswerSheet(payload: TeacherStudentAnswerSheetRequest): Observable<TeacherStudentAnswerSheetResponse> {
+    return this.http
+      .post<BaseResponse<unknown, string> | Record<string, unknown>>(
+        `${this.API_URL}/core/teacher/students/answer-sheet`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        timeout(15000),
+        map((response) => {
+          const record = response as Record<string, unknown>;
+          const rawMessage = record['message'] ?? record['data'] ?? response;
+          const normalizedSource = (rawMessage ?? {}) as Record<string, unknown>;
+          const nestedPayload = normalizedSource['answer_sheet'];
+          const payload = (
+            nestedPayload && typeof nestedPayload === 'object'
+              ? nestedPayload
+              : normalizedSource
+          ) as Partial<TeacherStudentAnswerSheetResponse>;
+          return {
+            id: Number(payload.id ?? 0),
+            teacher_user_id: Number(payload.teacher_user_id ?? 0),
+            student_id: Number(payload.student_id ?? 0),
+            subject_id: Number(payload.subject_id ?? 0),
+            department_id: Number(payload.department_id ?? 0) || undefined,
+            original_filename: String(payload.original_filename ?? ''),
+            stored_filename: String(payload.stored_filename ?? ''),
+            file_path: String(payload.file_path ?? ''),
+            file_url: String(payload.file_url ?? ''),
+          };
+        }),
+        catchError((err) => this.handleError(err))
+      );
+  }
+
+  updateTeacherStudentMark(payload: TeacherStudentMarkUpdateRequest): Observable<BaseResponse<unknown, string>> {
+    return this.http
+      .post<BaseResponse<unknown, string>>(
+        `${this.API_URL}/core/teacher/students/marks/update`,
+        payload,
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(catchError((err) => this.handleError(err)));
   }
 
   uploadTeacherPdf(subjectId: number, studentId: number, file: File): Observable<TeacherPdfUploadResponse> {
@@ -387,6 +440,38 @@ export class RoleDashboardService extends BaseHttpService {
       subject_count: Number.isFinite(subjectCount) ? subjectCount : subjects.length,
       student_count: Number.isFinite(studentCount) ? studentCount : 0,
     };
+  }
+
+  private normalizeTeacherStudentMarks(message: unknown): StudentMark[] {
+    const payload = (message ?? {}) as Record<string, unknown>;
+    const rawMarks = Array.isArray(message)
+      ? message
+      : Array.isArray(payload['marks'])
+        ? payload['marks']
+        : Array.isArray(payload['data'])
+          ? payload['data']
+          : [];
+
+    return rawMarks.map((rawMark) => {
+      const row = (rawMark ?? {}) as Record<string, unknown>;
+      return {
+        subject_id: Number(row['subject_id'] ?? row['subjectId'] ?? 0) || undefined,
+        subject_name: String(
+          row['subject_name']
+          ?? row['subject__true_subject__name']
+          ?? row['subject']
+          ?? ''
+        ),
+        subject_code: String(
+          row['subject_code']
+          ?? row['subject__true_subject__code']
+          ?? row['code']
+          ?? ''
+        ),
+        total_mark: Number(row['total_mark'] ?? row['total'] ?? 0),
+        acquired_mark: Number(row['acquired_mark'] ?? row['score'] ?? row['mark'] ?? 0),
+      };
+    });
   }
 
   private normalizeEngineStatus(taskId: string, message: unknown): EngineStatusResponse {

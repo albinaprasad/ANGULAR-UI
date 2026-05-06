@@ -29,6 +29,7 @@ export interface SubjectPayload {
 }
 
 export interface StudentMark {
+  subject_id?: number;
   subject_name: string;
   subject_code: string;
   total_mark: number;
@@ -76,6 +77,33 @@ export interface TeacherStudent {
   department_name: string;
   role: string;
   mark_completed: boolean;
+}
+
+export interface TeacherStudentAnswerSheetRequest {
+  teacher_id: number;
+  student_id: number;
+  department_id: number;
+  subject_id?: number;
+}
+
+export interface TeacherStudentAnswerSheetResponse {
+  id: number;
+  teacher_user_id: number;
+  student_id: number;
+  subject_id: number;
+  department_id?: number;
+  original_filename: string;
+  stored_filename: string;
+  file_path: string;
+  file_url: string;
+}
+
+export interface TeacherStudentMarkUpdateRequest {
+  teacher_id: number;
+  student_id: number;
+  subject_id: number;
+  department_id?: number;
+  acquired_mark: number;
 }
 
 export interface GetTeacherStudentsParams {

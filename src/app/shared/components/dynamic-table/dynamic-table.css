@@ -32,7 +32,9 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: 100%;
+  min-height: 0;
   width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   /* overflow: hidden; removed to allow scrollbars */
@@ -60,12 +62,11 @@
 
 .table-wrapper {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: auto;
   border-radius: 4px;
   border: 1px solid #ddd;
-  min-height: 300px;
-  max-height: 60vh;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
