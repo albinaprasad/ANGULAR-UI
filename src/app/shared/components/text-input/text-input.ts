@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-text-input',
@@ -13,7 +13,8 @@ export class TextInput implements OnChanges {
   @Input() label!: string;
   @Input() type: string = 'text';
   @Input() placeholder!: string;
-  @Input() required: boolean = false;
+  @Input() autocomplete = '';
+  @Input() required: boolean = false; 
   @Input() validationType: 'none' | 'email' | 'phone' | 'custom' = 'none';
   @Input() validationPattern = '';
   @Input() customErrorMessage = '';
@@ -27,12 +28,17 @@ export class TextInput implements OnChanges {
   }
   @Output() valueChange = new EventEmitter<string>();
   @Output() validityChange = new EventEmitter<boolean>();
+  @ViewChild('inputElement') inputElement?: ElementRef<HTMLInputElement>;
 
   inputValue: string = '';
   isValid = true;
   validationMessage = '';
+  showPassword = false;
+  currentInputType = 'text';
+  private lastPointerToggleAt = 0;
 
   ngOnChanges(_changes: SimpleChanges): void {
+    this.currentInputType = this.type;
     this.validate();
   }
 
@@ -41,6 +47,71 @@ export class TextInput implements OnChanges {
     this.validate();
     this.valueChange.emit(value);
     this.validityChange.emit(this.isValid);
+  }
+
+  onPasswordTogglePointerDown(event: MouseEvent | PointerEvent | TouchEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.lastPointerToggleAt = Date.now();
+    console.log('[TextInput] pointerdown on password toggle', {
+      label: this.label,
+      type: this.type,
+      currentInputType: this.currentInputType,
+      showPassword: this.showPassword,
+    });
+    this.togglePasswordVisibility();
+  }
+
+  onPasswordToggleClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log('[TextInput] click on password toggle', {
+      label: this.label,
+      type: this.type,
+      currentInputType: this.currentInputType,
+      showPassword: this.showPassword,
+      deltaMs: Date.now() - this.lastPointerToggleAt,
+    });
+
+    if (Date.now() - this.lastPointerToggleAt < 250) {
+      return;
+    }
+
+    this.togglePasswordVisibility();
+  }
+
+  private togglePasswordVisibility(): void {
+    if (this.type !== 'password') {
+      console.log('[TextInput] toggle ignored because input type is not password', {
+        label: this.label,
+        type: this.type,
+      });
+      return;
+    }
+
+    this.showPassword = !this.showPassword;
+    this.currentInputType = this.showPassword ? 'text' : 'password';
+
+    const nativeInput = this.inputElement?.nativeElement;
+    if (nativeInput) {
+      nativeInput.type = this.currentInputType;
+      nativeInput.focus();
+      const length = nativeInput.value.length;
+      nativeInput.setSelectionRange(length, length);
+      console.log('[TextInput] password visibility toggled', {
+        label: this.label,
+        showPassword: this.showPassword,
+        currentInputType: this.currentInputType,
+        domInputType: nativeInput.type,
+      });
+      return;
+    }
+
+    console.log('[TextInput] password visibility toggled but no native input was found', {
+      label: this.label,
+      showPassword: this.showPassword,
+      currentInputType: this.currentInputType,
+    });
   }
 
   private validate(): void {

@@ -7,16 +7,6 @@
 
     <div class="modal-body">
       <label>
-        Search true subject
-        <input
-          type="text"
-          [ngModel]="trueSubjectSearch"
-          (ngModelChange)="onTrueSubjectSearchChange($event)"
-          placeholder="Search by name or code"
-        />
-      </label>
-
-      <label>
         True subject
         <select
           [ngModel]="trueSubjectId === null ? '' : trueSubjectId"

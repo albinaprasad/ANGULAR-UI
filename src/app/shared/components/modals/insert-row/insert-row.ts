@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { finalize, take } from 'rxjs/operators';
 import { DataService } from '../../../../services/http/data.service';
 import { SnackbarService } from '../../../../services/modal/snackbar.service';
@@ -46,7 +46,8 @@ export class InsertRow implements OnInit{
   constructor(
     private dataService: DataService,
     private snackbarService: SnackbarService,
-    private insertRowService: InsertRowService
+    private insertRowService: InsertRowService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -89,12 +90,14 @@ export class InsertRow implements OnInit{
 
     const payload = this.buildPayload();
     this.isSubmitting = true;
+    this.cdr.detectChanges();
     this.dataService
       .insertTableRow(this.tableDes.table, payload)
       .pipe(
         take(1),
         finalize(() => {
           this.isSubmitting = false;
+          this.cdr.detectChanges();
         })
       )
       .subscribe({
@@ -103,15 +106,18 @@ export class InsertRow implements OnInit{
         if (res?.error) {
           this.submitError = typeof res.error === 'string' ? res.error : 'Failed to insert row';
           this.snackbarService.error(this.submitError);
+          this.cdr.detectChanges();
           return;
         }
 
         this.snackbarService.success('Row inserted successfully');
+        this.cdr.detectChanges();
         this.insertRowService.close();
       },
       error: (err) => {
         this.submitError = err?.error?.error || err?.error?.message || 'Failed to insert row';
         this.snackbarService.error(this.submitError);
+        this.cdr.detectChanges();
       }
     });
   }

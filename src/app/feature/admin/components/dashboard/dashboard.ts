@@ -15,6 +15,7 @@ import { InsertRowService } from '../../../../services/modal/insert-row.service'
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
+  private readonly lastSelectedTableStorageKey = 'admin-dashboard-selected-table';
 
   constructor(
     private dataService: DataService,
@@ -45,6 +46,7 @@ export class Dashboard implements OnInit {
 
   selectTable(tableName: string): void {
     this.selectedTable = tableName;
+    localStorage.setItem(this.lastSelectedTableStorageKey, tableName);
 
     this.navItems = this.navItems.map(item => ({
       ...item,
@@ -84,13 +86,18 @@ export class Dashboard implements OnInit {
         id: table,
         label: table.replace(/_/g, ' ').toUpperCase(),
         icon: '📄',
-        active: index === 0
+        active: false
       }))
 
       console.log('Nav items:', this.navItems);
 
-      if (this.tables.tables.length > 0) {
-        this.selectedTable = this.tables.tables[0];
+      const storedTable = localStorage.getItem(this.lastSelectedTableStorageKey) ?? '';
+      const initialTable = this.tables.tables.includes(storedTable)
+        ? storedTable
+        : (this.tables.tables[0] ?? '');
+
+      if (initialTable) {
+        this.selectTable(initialTable);
       }
       this.snackbarService.show(`Loaded ${this.tables.tables.length} tables`, SnackbarType.SUCCESS, 3000);
       this.initializeTables();

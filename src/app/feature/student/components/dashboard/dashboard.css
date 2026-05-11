@@ -92,6 +92,11 @@ app-student-marks-table {
   gap: 0.35rem;
 }
 
+.filters-action {
+  display: flex;
+  align-items: flex-end;
+}
+
 .filters-grid label span {
   color: #334155;
   font-size: 0.86rem;
@@ -108,7 +113,11 @@ app-student-marks-table {
 }
 
 .clear-filters-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: fit-content;
+  min-height: 40px;
   min-width: 128px;
   justify-self: start;
 }
@@ -126,6 +135,10 @@ app-student-marks-table {
 
   .filters-grid {
     grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .filters-action {
     align-items: stretch;
   }
 

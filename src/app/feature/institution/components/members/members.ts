@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { InstitutionMembersService } from '../../../../services/http/institution-members.service';
 import { InstitutionService } from '../../../../services/http/institution.service';
 import { SnackbarService } from '../../../../services/modal/snackbar.service';
@@ -8,7 +8,7 @@ import {
   InstitutionMembersApiError,
   MemberRole,
 } from '../../../../types/institution-members.types';
-import { Department, InstitutionSearchUser } from '../../../../types/institution.types';
+import { Department } from '../../../../types/institution.types';
 
 type MembersTabState = {
   items: InstitutionMember[];
@@ -33,7 +33,6 @@ export class InstitutionMembersComponent implements OnInit, OnDestroy {
   @ViewChild('studentScroll') studentScroll?: ElementRef<HTMLElement>;
 
   activeTab: MemberRole = 'teacher';
-  searchText = '';
 
   teacherState: MembersTabState = this.createDefaultState();
   studentState: MembersTabState = this.createDefaultState();
@@ -41,21 +40,12 @@ export class InstitutionMembersComponent implements OnInit, OnDestroy {
   departments: Department[] = [];
   loadingDepartments = false;
 
-  existingQuery = '';
-  existingUsers: InstitutionSearchUser[] = [];
-  existingUsersLoading = false;
-  existingUsersError = '';
-  selectedExistingUserId: number | null = null;
-  selectedExistingDepartmentId: number | null = null;
-  addingExisting = false;
-
   showCreateTeacherModal = false;
   showCreateStudentModal = false;
 
   rowActionLoadingKey = '';
   memberDepartmentDraft: Record<string, number> = {};
 
-  private readonly searchSubject = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
   private readonly scrollPositions: Record<MemberRole, number> = { teacher: 0, student: 0 };
   private destroyed = false;
@@ -68,15 +58,6 @@ export class InstitutionMembersComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.searchSubject
-      .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.resetTabState('teacher');
-        this.resetTabState('student');
-        this.loadFirstPage('teacher');
-        this.loadFirstPage('student');
-      });
-
     this.loadDepartments();
     this.loadFirstPage('teacher');
     this.loadFirstPage('student');
@@ -95,17 +76,11 @@ export class InstitutionMembersComponent implements OnInit, OnDestroy {
 
     this.captureCurrentScroll();
     this.activeTab = tab;
-    this.resetMutationForms();
 
     setTimeout(() => {
       this.restoreScroll(tab);
       this.requestViewUpdate();
     }, 0);
-  }
-
-  onSearchChange(value: string): void {
-    this.searchText = value;
-    this.searchSubject.next(value.trim());
   }
 
   retryActiveTab(): void {
@@ -129,74 +104,6 @@ export class InstitutionMembersComponent implements OnInit, OnDestroy {
 
   getState(role: MemberRole): MembersTabState {
     return role === 'teacher' ? this.teacherState : this.studentState;
-  }
-
-  get selectedExistingUser(): InstitutionSearchUser | null {
-    return this.existingUsers.find((user) => user.id === this.selectedExistingUserId) ?? null;
-  }
-
-  searchExistingUsers(): void {
-    const query = this.existingQuery.trim();
-    if (!query || this.existingUsersLoading) {
-      return;
-    }
-
-    this.existingUsersLoading = true;
-    this.existingUsersError = '';
-    this.existingUsers = [];
-    this.selectedExistingUserId = null;
-
-    this.institutionService.searchUsers(this.activeTab, query).subscribe({
-      next: (users) => {
-        this.existingUsersLoading = false;
-        this.existingUsers = users;
-      },
-      error: (error: Error) => {
-        this.existingUsersLoading = false;
-        this.existingUsersError = error.message || 'Failed to search users.';
-      },
-    });
-  }
-
-  selectExistingUser(userId: number): void {
-    this.selectedExistingUserId = userId;
-  }
-
-  onExistingDepartmentChange(value: unknown): void {
-    const parsed = Number(value);
-    this.selectedExistingDepartmentId = Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-  }
-
-  addExistingMember(): void {
-    if (this.addingExisting) return;
-    if (!this.selectedExistingUserId || !this.selectedExistingDepartmentId) {
-      this.snackbarService.error('Select user and department before adding.', 3500);
-      return;
-    }
-
-    this.addingExisting = true;
-    const request$ = this.activeTab === 'teacher'
-      ? this.institutionService.addExistingTeacher({
-        teacher_user_id: this.selectedExistingUserId,
-        department_id: this.selectedExistingDepartmentId,
-      })
-      : this.institutionService.addExistingStudent({
-        student_user_id: this.selectedExistingUserId,
-        department_id: this.selectedExistingDepartmentId,
-      });
-
-    request$.subscribe({
-      next: () => {
-        this.addingExisting = false;
-        this.snackbarService.success(`${this.capitalizeRole(this.activeTab)} added successfully.`, 3000);
-        this.resetMutationForms();
-        this.reloadRole(this.activeTab);
-      },
-      error: (error: Error) => {
-        this.addingExisting = false;
-        this.snackbarService.error(error.message, 4500);
-      },
-    });
   }
 
   openCreateModal(): void {
@@ -323,7 +230,6 @@ export class InstitutionMembersComponent implements OnInit, OnDestroy {
     this.institutionMembersService
       .getMembers({
         role,
-        q: this.searchText.trim() || undefined,
         pageSize: state.pageSize,
         page: state.page,
         offset: state.offset,
@@ -411,15 +317,6 @@ export class InstitutionMembersComponent implements OnInit, OnDestroy {
   private reloadRole(role: MemberRole): void {
     this.resetTabState(role);
     this.loadFirstPage(role);
-  }
-
-  private resetMutationForms(): void {
-    this.existingQuery = '';
-    this.existingUsers = [];
-    this.existingUsersError = '';
-    this.existingUsersLoading = false;
-    this.selectedExistingUserId = null;
-    this.selectedExistingDepartmentId = null;
   }
 
   private dedupeMembers(items: InstitutionMember[]): InstitutionMember[] {

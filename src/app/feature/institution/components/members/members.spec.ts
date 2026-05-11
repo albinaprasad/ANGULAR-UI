@@ -28,9 +28,6 @@ describe('InstitutionMembersComponent flows', () => {
 
   const institutionService = {
     getDepartments: vi.fn(() => of([{ id: 1, name: 'CSE' }, { id: 2, name: 'ECE' }])),
-    searchUsers: vi.fn(() => of([{ id: 12, username: 't2', email: 't2@x.com', role: 'teacher' }])),
-    addExistingTeacher: vi.fn(() => of({})),
-    addExistingStudent: vi.fn(() => of({})),
     createTeacher: vi.fn(() => of({})),
     createStudent: vi.fn(() => of({})),
     updateTeacherDepartment: vi.fn(() => of({})),
@@ -63,16 +60,10 @@ describe('InstitutionMembersComponent flows', () => {
     fixture.detectChanges();
   });
 
-  it('teachers flow: add existing and open create modal', () => {
-    component.existingQuery = 't2';
-    component.searchExistingUsers();
-    component.selectExistingUser(12);
-    component.onExistingDepartmentChange(1);
-    component.addExistingMember();
+  it('teachers flow: open create modal and refresh list', () => {
     component.openCreateModal();
     component.onTeacherCreated();
 
-    expect(institutionService.addExistingTeacher).toHaveBeenCalledWith({ teacher_user_id: 12, department_id: 1 });
     expect(component.showCreateTeacherModal).toBe(false);
   });
 

@@ -13,6 +13,7 @@ import { BaseResponse } from '../../types/base-http.types';
 export class AuthService extends BaseHttpService {
 
   private readonly USER_ROLES_KEY = 'user_roles';
+  private readonly ADMIN_SELECTED_TABLE_KEY = 'admin-dashboard-selected-table';
   public user = new BehaviorSubject<User | null>(null)
   public tokenChanges: BehaviorSubject<string | null>;
   
@@ -24,6 +25,21 @@ export class AuthService extends BaseHttpService {
 
   getUser(): User | null {
     return this.user.value
+  }
+
+  getCurrentUserId(): number | null {
+    const currentUser = this.user.value as (User & { id?: unknown; user_id?: unknown }) | null;
+    const directId = Number(currentUser?.id ?? currentUser?.user_id ?? 0);
+    if (Number.isFinite(directId) && directId > 0) {
+      return directId;
+    }
+
+    const token = this.getAuthToken();
+    if (!token) return null;
+
+    const payload = this.decodeJwtPayload(token);
+    const tokenId = Number(payload?.['user_id'] ?? payload?.['id'] ?? payload?.['sub'] ?? 0);
+    return Number.isFinite(tokenId) && tokenId > 0 ? tokenId : null;
   }
 
   isSuperAdmin(): boolean {
@@ -103,6 +119,7 @@ export class AuthService extends BaseHttpService {
     localStorage.removeItem(this.AUTH_TOKEN_KEY);
     localStorage.removeItem(environmentJson.IS_SUPER_ADMIN);
     localStorage.removeItem(this.USER_ROLES_KEY);
+    localStorage.removeItem(this.ADMIN_SELECTED_TABLE_KEY);
     this.tokenChanges.next(null);
     this.user.next(null);
   }

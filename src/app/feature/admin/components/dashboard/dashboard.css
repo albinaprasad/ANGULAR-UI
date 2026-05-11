@@ -1,7 +1,21 @@
+:host {
+  display: block;
+  height: calc(100dvh - 166px);
+  overflow: hidden;
+}
+
 .dashboard-layout {
   display: flex;
-  min-height: 100vh;
+  height: calc(100dvh - 166px);
+  min-height: calc(100dvh - 166px);
+  align-items: stretch;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  overflow: hidden;
+}
+
+.dashboard-layout app-sidenav {
+  align-self: flex-start;
+  flex-shrink: 0;
 }
 
 .main-content {
@@ -9,7 +23,10 @@
   transition: margin-left 0.3s ease;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .main-content:not(.sidenav-open) {
@@ -45,9 +62,20 @@
 
 .content-area {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: calc(100dvh - 166px);
   padding: 2rem;
+  box-sizing: border-box;
   overflow: hidden;
   max-width: calc(100vw - 400px);
+}
+
+.content-area app-dynamic-table {
+  display: block;
+  flex: 1;
+  min-height: 0;
 }
 
 .table-toolbar {

@@ -12,6 +12,16 @@
   background: linear-gradient(135deg, #eef2ff 0%, #ede9fe 100%);
 }
 
+.upload-shell.embedded {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: auto;
+  max-height: none;
+  overflow: visible;
+  background: transparent;
+}
+
 .upload-header {
   background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
   border: 1px solid #d9e4ff;

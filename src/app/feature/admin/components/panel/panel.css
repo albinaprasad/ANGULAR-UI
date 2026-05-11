@@ -1,0 +1,43 @@
+:host {
+  --panel-side-padding: 1.25rem;
+  --panel-top-padding: 1rem;
+  --panel-offset: 150px;
+  display: block;
+  min-height: 100vh;
+  background: #f8fbff;
+}
+
+.panel-layout {
+  min-height: 100vh;
+  padding: var(--panel-top-padding) var(--panel-side-padding) 1.5rem;
+  box-sizing: border-box;
+}
+
+.panel-fixed {
+  position: fixed;
+  top: var(--panel-top-padding);
+  left: var(--panel-side-padding);
+  right: var(--panel-side-padding);
+  z-index: 1000;
+}
+
+.panel-content {
+  display: block;
+  min-height: 0;
+}
+
+.panel-content.with-panel {
+  padding-top: var(--panel-offset);
+}
+
+@media (max-width: 960px) {
+  :host {
+    --panel-side-padding: 0.85rem;
+    --panel-top-padding: 0.85rem;
+    --panel-offset: 210px;
+  }
+
+  .panel-layout {
+    padding: var(--panel-top-padding) var(--panel-side-padding) 1rem;
+  }
+}

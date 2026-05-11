@@ -1,9 +1,10 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { RoleDashboardService } from '../../../../services/http/role-dashboard.service';
 import { GetTeacherStudentsParams, TeacherStudent, TeacherSubjectGroup } from '../../../../types/role-dashboard.types';
 import { Action, ActionEmit, Column } from '../../../../types/table.types';
+import { AuthService } from '../../../../services/http/auth.service';
 
 @Component({
   selector: 'app-teacher-students-page',
@@ -13,6 +14,7 @@ import { Action, ActionEmit, Column } from '../../../../types/table.types';
 })
 export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
   subjectGroups: TeacherSubjectGroup[] = [];
+  selectedSchemaSubjectId: number | null = null;
   loading = false;
   errorMessage = '';
   semesterFilter = 'all';
@@ -50,10 +52,14 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     private roleDashboardService: RoleDashboardService,
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
+  ) { }
+
+
 
   ngOnInit(): void {
+    console.log("Testing...")
     this.search$
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((query) => {
@@ -91,12 +97,41 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     this.updateSearchQueryParam(null);
   }
 
-  openMarksPage(student: TeacherStudent): void {
+  openMarksPage(student: TeacherStudent, group?: TeacherSubjectGroup): void {
     const studentId = student.user_id || student.id;
     this.router.navigate(['/teacher/students', studentId, 'marks'], {
       queryParams: {
         username: student.username || '',
         email: student.email || '',
+        subjectId: group?.subject_id || null,
+        departmentId: group?.department_id || student.department_id || null,
+        subjectName: group?.subject_name || '',
+        subjectCode: group?.subject_code || '',
+      },
+    });
+  }
+
+  private fetchStudentAnswerSheet(student: TeacherStudent, group?: TeacherSubjectGroup): void {
+    const teacherId = this.authService.getCurrentUserId();
+    const studentId = student.user_id || student.id;
+    const departmentId = group?.department_id || student.department_id;
+    const subjectId = group?.subject_id;
+
+    if (!teacherId || !studentId || !departmentId) {
+      return;
+    }
+
+    this.roleDashboardService.fetchTeacherStudentAnswerSheet({
+      teacher_id: teacherId,
+      student_id: studentId,
+      department_id: departmentId,
+      subject_id: subjectId,
+    }).subscribe({
+      next: (response) => {
+        console.log('Fetched student answer sheet metadata.', response);
+      },
+      error: (error) => {
+        console.warn('Failed to fetch teacher student answer sheet.', error);
       },
     });
   }
@@ -118,7 +153,8 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     const actionType = event.action.callback(student);
 
     if (actionType === 'view') {
-      this.openMarksPage(student);
+      this.fetchStudentAnswerSheet(student, group);
+      this.openMarksPage(student, group);
       return;
     }
 
@@ -127,13 +163,17 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
 
   openSubjectAnswerUpload(group: TeacherSubjectGroup): void {
     if (!group.subject_id) return;
+    this.selectedSchemaSubjectId = this.selectedSchemaSubjectId === group.subject_id ? null : group.subject_id;
+    this.requestViewUpdate();
+  }
 
-    this.router.navigate(['/teacher/uploads'], {
-      queryParams: {
-        uploadType: 'answerKey',
-        subjectId: group.subject_id,
-      },
-    });
+  closeSubjectAnswerUpload(): void {
+    this.selectedSchemaSubjectId = null;
+    this.requestViewUpdate();
+  }
+
+  isSubjectSchemaPanelOpen(group: TeacherSubjectGroup): boolean {
+    return this.selectedSchemaSubjectId === group.subject_id;
   }
 
   toggleAllSubjectGroups(expand: boolean): void {
@@ -192,6 +232,10 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
         this.ensureExpandedState();
         this.loading = false;
         this.requestViewUpdate();
+        console.log(this.filteredSubjectGroups)
+        this.filteredSubjectGroups.map((group) => {
+          this.fetchAnswerSheetForSubject(group.subject_id)
+        })
       },
       error: (error: { status?: number; friendlyMessage?: string }) => {
         this.loading = false;
@@ -215,6 +259,16 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  private fetchAnswerSheetForSubject(params: number): void {
+    console.log("Called for fetching answers...")
+    this.roleDashboardService.searchAnswerKey(params)
+      .subscribe({
+        next: (reponse) => {
+          console.log(reponse)
+        }
+      })
+  }
+
   private updateSearchQueryParam(query: string | null): void {
     this.router.navigate([], {
       relativeTo: this.route,
@@ -231,6 +285,8 @@ export class TeacherStudentsPageComponent implements OnInit, OnDestroy {
     this.fetchStudents({
       q: q || undefined,
     });
+
+
   }
 
   private ensureExpandedState(): void {

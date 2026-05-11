@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { InsertRowService } from '../../../../../services/modal/insert-row.service';
 import { TableDescription } from '../../../../../types/admin.types';
@@ -16,9 +16,10 @@ export class InsertRowContainer implements OnDestroy{
     columns: []
   }
 
-  constructor(private insertRowService: InsertRowService) {
+  constructor(private insertRowService: InsertRowService, private cdr: ChangeDetectorRef) {
     this.sub = this.insertRowService.insertRow$.subscribe(i => {
       this.insertRow = i
+      this.cdr.detectChanges();
     })
   }
 

@@ -8,7 +8,34 @@
   </header>
 
   <section class="marks-card">
+    <section class="answer-sheet-card">
+      <div class="answer-sheet-copy">
+        <h2>Answer Sheet</h2>
+        <p>
+          {{ subjectName || 'Selected subject' }}
+          <span *ngIf="subjectCode">({{ subjectCode }})</span>
+        </p>
+      </div>
+
+      <p class="hint" *ngIf="answerSheetLoading">Loading answer sheet...</p>
+      <p class="error-text" *ngIf="!answerSheetLoading && answerSheetError">{{ answerSheetError }}</p>
+
+      <div class="answer-sheet-actions" *ngIf="!answerSheetLoading && answerSheet?.file_url">
+        <a [href]="answerSheet?.file_url" target="_blank" rel="noopener noreferrer" class="answer-sheet-link">
+          Open Answer Sheet
+        </a>
+      </div>
+
+      <iframe
+        *ngIf="!answerSheetLoading && answerSheetViewerUrl"
+        class="answer-sheet-frame"
+        [src]="answerSheetViewerUrl"
+        title="Student answer sheet"
+      ></iframe>
+    </section>
+
     <p class="hint" *ngIf="loading">Loading marks...</p>
+    <p class="hint success-text" *ngIf="!loading && saveMessage">{{ saveMessage }}</p>
 
     <app-empty-state
       *ngIf="!loading && !!errorMessage"
@@ -34,15 +61,45 @@
             <th>Acquired</th>
             <th>Total</th>
             <th>Percentage</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let mark of marks">
             <td>{{ mark.subject_name || '-' }}</td>
             <td>{{ mark.subject_code || '-' }}</td>
-            <td>{{ mark.acquired_mark }}</td>
+            <td>
+              <ng-container *ngIf="editingSubjectId === mark.subject_id; else acquiredDisplay">
+                <input
+                  class="mark-input"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  [max]="mark.total_mark"
+                  [(ngModel)]="draftMarkValue"
+                />
+              </ng-container>
+              <ng-template #acquiredDisplay>{{ mark.acquired_mark }}</ng-template>
+            </td>
             <td>{{ mark.total_mark }}</td>
             <td>{{ getPercentage(mark) | number:'1.0-2' }}%</td>
+            <td class="actions-cell">
+              <ng-container *ngIf="editingSubjectId === mark.subject_id; else editButton">
+                <button
+                  app-button
+                  variant="primary"
+                  type="button"
+                  (click)="saveManualMark(mark)"
+                  [disabled]="savingSubjectId === mark.subject_id"
+                >
+                  {{ savingSubjectId === mark.subject_id ? 'Saving...' : 'Save' }}
+                </button>
+                <button app-button variant="secondary" type="button" (click)="cancelEdit()">Cancel</button>
+              </ng-container>
+              <ng-template #editButton>
+                <button app-button variant="secondary" type="button" (click)="startEdit(mark)">Update Mark</button>
+              </ng-template>
+            </td>
           </tr>
         </tbody>
       </table>

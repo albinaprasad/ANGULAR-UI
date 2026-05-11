@@ -1,7 +1,6 @@
 .profile-layout {
   display: flex;
   min-height: 100vh;
-  overflow: hidden;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
@@ -10,8 +9,8 @@
   transition: margin-left 0.3s ease;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   min-width: 0;
+  min-height: 0;
 }
 
 .main-content:not(.sidenav-open) {
@@ -95,11 +94,9 @@
 .content-area {
   flex: 1;
   padding: 2rem;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-height: 0;
+  overflow: visible;
+  min-height: auto;
   max-width: calc(100vw - 320px);
-  scroll-behavior: smooth;
 }
 
 .profile-grid {

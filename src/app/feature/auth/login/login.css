@@ -105,7 +105,7 @@ body {
 }
 
 .modal.is-open .modal-button {
-  opacity: 0;
+  display: none;
 }
 
 .modal.is-open .modal-container {
@@ -129,6 +129,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
 .modal-buttons a {
@@ -258,5 +261,14 @@ body {
   }
   .modal-right {
     display: none;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .input-button {
+    width: 100%;
   }
 }

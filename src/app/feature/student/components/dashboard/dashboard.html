@@ -40,16 +40,18 @@
         </select>
       </label>
 
-      <button
-        app-button
-        class="clear-filters-btn"
-        variant="secondary"
-        type="button"
-        (click)="clearFilters()"
-        [disabled]="loading"
-      >
-        Clear Filters
-      </button>
+      <div class="filters-action">
+        <button
+          app-button
+          class="clear-filters-btn"
+          variant="secondary"
+          type="button"
+          (click)="clearFilters()"
+          [disabled]="loading"
+        >
+          Clear Filters
+        </button>
+      </div>
     </div>
   </section>
 
